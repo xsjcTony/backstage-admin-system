@@ -1,0 +1,15 @@
+Backend/logs/
+Backend/npm-debug.log
+Backend/node_modules/
+Backend/coverage/
+Backend/.idea/
+Backend/run/
+Backend/.DS_Store
+Backend/.vscode
+Backend/*.swp
+Backend/*.lock
+
+Backend/app/**/*.map
+Backend/test/**/*.map
+Backend/config/**/*.map
+
