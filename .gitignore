@@ -15,3 +15,6 @@ Backend/config/**/*.map
 
 KOA2-TS/node_modules/
 KOA2-TS/.idea/
+
+Frontend/.idea/
+Frontend/node_modules/
