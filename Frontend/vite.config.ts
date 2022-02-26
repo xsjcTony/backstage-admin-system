@@ -18,7 +18,14 @@ export default defineConfig({
     }),
     AutoImport({ resolvers: [ElementPlusResolver()] }),
     Components({ resolvers: [ElementPlusResolver()] })
-  ]
+  ],
+  css: {
+    postcss: {
+      plugins: [
+        require('autoprefixer')
+      ]
+    }
+  }
   /*
   resolve: {
     alias: {

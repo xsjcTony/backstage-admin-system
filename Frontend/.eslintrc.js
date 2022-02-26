@@ -120,7 +120,6 @@ module.exports = {
         disallowVue3BuiltInComponents: true
       }
     ],
-    'vue/no-static-inline-styles': ['error', { allowBinding: true }],
     'vue/no-template-target-blank': [
       'error',
       {
@@ -128,7 +127,15 @@ module.exports = {
         enforceDynamicLinks: 'always'
       }
     ],
-    'vue/no-undef-components': ['error', { ignorePatterns: [] }],
+    'vue/no-undef-components': [
+      'error',
+      {
+        ignorePatterns: [
+          /^router-view$/,
+          /^el/
+        ]
+      }
+    ],
     'vue/no-undef-properties': ['error', { ignores: ['/^\\$/'] }],
     'vue/no-unused-properties': ['error', {
       groups: ['props'],
@@ -173,6 +180,14 @@ module.exports = {
     'vue/v-on-function-call': ['error', 'never', { ignoreIncludesComment: false }],
 
     // vue default rules overwrite
+    'vue/multi-word-component-names': [
+      'error',
+      {
+        ignores: [
+          'Register'
+        ]
+      }
+    ],
     'vue/first-attribute-linebreak': [
       'error',
       {
