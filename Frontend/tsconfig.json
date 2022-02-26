@@ -18,5 +18,8 @@
     "src/**/*.tsx",
     "src/**/*.vue"
   ],
-  "references": [{ "path": "./tsconfig.node.json"}]
+  "references": [
+    { "path": "./tsconfig.node.json" },
+    { "path":  "./tsconfig.eslint.json" }
+  ]
 }
