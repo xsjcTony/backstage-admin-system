@@ -88,7 +88,6 @@ module.exports = {
     'no-useless-escape': 'error',
     'no-new-func': 'error',
     'wrap-iife': ['error', 'outside'],
-    'no-loop-func': 'error',
     'prefer-spread': 'error',
     'prefer-arrow-callback': [
       'error',
@@ -235,7 +234,6 @@ module.exports = {
     ],
     '@typescript-eslint/no-extra-non-null-assertion': 'error',
     '@typescript-eslint/no-extra-parens': 'error',
-    // '@typescript-eslint/no-extra-semi': 'error'
     '@typescript-eslint/no-extraneous-class': 'error',
     '@typescript-eslint/no-floating-promises': [
       'error',
@@ -261,6 +259,7 @@ module.exports = {
         allowAsThisParameter: false
       }
     ],
+    '@typescript-eslint/no-loop-func': 'error',
     '@typescript-eslint/no-loss-of-precision': 'error',
     '@typescript-eslint/no-meaningless-void-operator': ['error', { checkNever: false }],
     '@typescript-eslint/no-misused-new': 'error',
@@ -337,7 +336,10 @@ module.exports = {
       {
         functions: true,
         classes: true,
-        variables: true
+        variables: true,
+        enums: true,
+        typedefs: true,
+        ignoreTypeReferences: true
       }
     ],
     '@typescript-eslint/no-useless-constructor': 'error',
