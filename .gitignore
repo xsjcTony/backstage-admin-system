@@ -29,6 +29,7 @@ Frontend/node_modules
 Frontend/dist
 Frontend/dist-ssr
 Frontend/*.local
+Frontend/.eslintcache
 
 # Editor directories and files
 Frontend/.vscode
