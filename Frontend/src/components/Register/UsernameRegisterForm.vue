@@ -3,6 +3,8 @@ import { ref, reactive } from 'vue'
 import { $ref } from 'vue/macros'
 import type { ElForm } from 'element-plus'
 import { User, Lock, Check } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import 'element-plus/es/components/message/style/css'
 
 
 /**
@@ -33,7 +35,7 @@ const validateUsername = (rule: any, value: string, callback: any): void => {
 const validatePassword = (rule: any, value: string, callback: any): void => {
   if (value === '') {
     callback(new Error('Please input the password'))
-  } else if (!(/^(?:(?=.*[0-9].*)(?=.*[A-Za-z].*)(?=.*[,.#%'+*\-:;^_`].*))[,.#%'+*\-:;^_`0-9A-Za-z]{8,20}$/).test(value)) {
+  } else if (!(/^((?=.*[0-9].*)(?=.*[A-Za-z].*)(?=.*[,.#%'+*\-:;^_`].*))[,.#%'+*\-:;^_`0-9A-Za-z]{8,20}$/).test(value)) {
     callback(new Error('Password must include characters, numbers, symbols, and between 8 and 20 (both inclusive) characters long.'))
   } else {
     if (usernameRegisterData.confirmPassword !== '') {
@@ -79,11 +81,17 @@ const usernameRegisterRules = reactive({
 
 const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
   if (!formEl) return
-  await formEl.validate((valid, errors) => {
+  await formEl.validate((valid) => {
     if (valid) {
       console.log('submit!')
     } else {
-      return false
+      ElMessage({
+        message: 'Invalid registration data',
+        type: 'error',
+        center: true,
+        showClose: true,
+        duration: 3000
+      })
     }
   })
 }
@@ -91,6 +99,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
 const resetForm = (formEl: FormInstance | undefined): void => {
   if (!formEl) return
   formEl.resetFields()
+  ElMessage.closeAll()
 }
 
 
