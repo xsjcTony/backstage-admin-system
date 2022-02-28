@@ -8,6 +8,7 @@ Backend/.DS_Store
 Backend/.vscode
 Backend/*.swp
 Backend/*.lock
+Backend/.eslintcache
 
 Backend/app/**/*.map
 Backend/test/**/*.map

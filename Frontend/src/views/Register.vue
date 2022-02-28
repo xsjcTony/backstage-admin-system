@@ -1,13 +1,15 @@
 <script setup lang="ts">
-
+import UsernameRegister from '/src/components/Register/UsernameRegister.vue'
 </script>
 
 <template>
     <div class="register-container">
         <div class="register-wrapper">
-            <h1>欢迎注册</h1>
-            <el-tabs tab-position="left" style="height: 200px" class="demo-tabs">
-                <el-tab-pane label="Username">User</el-tab-pane>
+            <h1>Register</h1>
+            <el-tabs tab-position="left" class="register-tab">
+                <el-tab-pane label="Username">
+                    <UsernameRegister/>
+                </el-tab-pane>
                 <el-tab-pane label="E-mail">Config</el-tab-pane>
             </el-tabs>
         </div>
@@ -18,11 +20,11 @@
 .register-container {
     width: 100%;
     height: 100%;
-    background: url('/src/assets/bg.jpg') center center / cover no-repeat;
+    background: url('/src/assets/images/bg.jpg') center center / cover no-repeat;
 
     .register-wrapper {
-        width: 500px;
-        height: 300px;
+        width: 600px;
+        height: fit-content;
         background: #fff;
         border-radius: 10px;
         position: absolute;
@@ -32,7 +34,16 @@
 
         h1 {
             text-align: center;
+            font-size: 30px;
         }
+    }
+}
+
+.el-tabs {
+    height: fit-content;
+
+    .el-tab-pane {
+        padding: 0 20px 0 10px;
     }
 }
 </style>

@@ -199,7 +199,7 @@ module.exports = {
       'error',
       {
         singleline: 'never',
-        multiline: 'never'
+        multiline: 'always'
       }
     ],
     'vue/html-closing-bracket-spacing': [
@@ -503,20 +503,13 @@ module.exports = {
       'error',
       {
         ignoreArrowShorthand: false,
-        ignoreVoidOperator: false
+        ignoreVoidOperator: true
       }
     ],
     '@typescript-eslint/no-dupe-class-members': 'error',
     '@typescript-eslint/no-duplicate-imports': ['error', { includeExports: true }],
     '@typescript-eslint/no-empty-function': ['error', { allow: ['decoratedFunctions'] }],
     '@typescript-eslint/no-empty-interface': ['error', { allowSingleExtends: true }],
-    '@typescript-eslint/no-explicit-any': [
-      'error',
-      {
-        fixToUnknown: false,
-        ignoreRestArgs: true
-      }
-    ],
     '@typescript-eslint/no-extra-non-null-assertion': 'error',
     '@typescript-eslint/no-extra-parens': 'error',
     '@typescript-eslint/no-extraneous-class': 'error',
@@ -546,7 +539,6 @@ module.exports = {
     ],
     '@typescript-eslint/no-loop-func': 'error',
     '@typescript-eslint/no-loss-of-precision': 'error',
-    '@typescript-eslint/no-meaningless-void-operator': ['error', { checkNever: false }],
     '@typescript-eslint/no-misused-new': 'error',
     '@typescript-eslint/no-misused-promises': [
       'error',
@@ -603,11 +595,6 @@ module.exports = {
     '@typescript-eslint/no-unnecessary-qualifier': 'error',
     '@typescript-eslint/no-unnecessary-type-assertion': 'error',
     '@typescript-eslint/no-unnecessary-type-constraint': 'error',
-    '@typescript-eslint/no-unsafe-argument': 'error',
-    '@typescript-eslint/no-unsafe-assignment': 'error',
-    '@typescript-eslint/no-unsafe-call': 'error',
-    '@typescript-eslint/no-unsafe-member-access': 'error',
-    '@typescript-eslint/no-unsafe-return': 'error',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
