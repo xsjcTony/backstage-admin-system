@@ -4,17 +4,7 @@
 import { Context } from 'egg'
 import nodemailer, { Transporter } from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
-
-
-/**
- * enums & interfaces
- */
-interface EmailInfo {
-  from: string
-  to: string
-  subject: string
-  text: string
-}
+import type { EmailInfo } from './types'
 
 
 /**

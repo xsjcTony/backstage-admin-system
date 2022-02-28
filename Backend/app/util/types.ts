@@ -20,3 +20,12 @@ interface EmailRegisterData extends BaseRegisterData {
 }
 
 export type RegisterData = EmailRegisterData | NormalRegisterData
+
+
+// Email Verification
+export interface EmailInfo {
+  from: string
+  to: string
+  subject: string
+  text: string
+}

@@ -7,8 +7,7 @@ module.exports = {
     'vue/setup-compiler-macros': true
   },
   'extends': [
-    'plugin:vue/vue3-recommended',
-    'prettier'
+    'plugin:vue/vue3-recommended'
   ],
   parser: 'vue-eslint-parser',
   parserOptions: {
@@ -254,6 +253,7 @@ module.exports = {
     'vue/no-multi-spaces': ['error', { ignoreProperties: false }],
     'vue/no-spaces-around-equal-signs-in-attribute': 'error',
     'vue/no-template-shadow': 'error',
+    'vue/singleline-html-element-content-newline': 'off',
 
     // vue extension rules (for expression in <template>)
     'vue/arrow-spacing': [

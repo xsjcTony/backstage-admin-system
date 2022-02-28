@@ -21,7 +21,9 @@ declare module 'vue' {
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTimePicker: typeof import('element-plus/es')['ElTimePicker']
-    UsernameRegister: typeof import('./src/components/Register/UsernameRegister.vue')['default']
+    Test: typeof import('./src/components/Test.vue')['default']
+    UsernameRegister: typeof import('./src/components/Register/UsernameRegisterForm.vue')['default']
+    UsernameRegisterForm: typeof import('./src/components/Register/UsernameRegisterForm.vue')['default']
   }
 }
 

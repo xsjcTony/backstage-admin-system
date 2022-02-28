@@ -20,7 +20,6 @@ export const generateCaptcha = (ctx: Context): string => {
   // save captcha
   ctx.session.captcha = captcha.text
   ctx.session.maxAge = 60 * 1000 // 1 min
-  console.log(captcha.text)
 
   // send captcha to the client
   return captcha.data

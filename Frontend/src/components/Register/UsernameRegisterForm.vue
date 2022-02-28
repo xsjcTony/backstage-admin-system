@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
+import { $ref } from 'vue/macros'
 import type { ElForm } from 'element-plus'
 import { User, Lock, Check } from '@element-plus/icons-vue'
 
 
+/**
+ * Register Form
+ */
 type FormInstance = InstanceType<typeof ElForm>
 
-const usernameRegisterRef = ref<FormInstance>()
+const usernameRegisterRef = ref<FormInstance | null>(null)
 
 const usernameRegisterData = reactive({
   username: '',
@@ -74,25 +78,30 @@ const usernameRegisterRules = reactive({
 })
 
 const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
-  if (!formEl) {
-    return
-  }
+  if (!formEl) return
   await formEl.validate((valid, errors) => {
     if (valid) {
       console.log('submit!')
     } else {
-      console.log('error submit!')
-      console.error(errors)
       return false
     }
   })
 }
 
 const resetForm = (formEl: FormInstance | undefined): void => {
-  if (!formEl) {
-    return
-  }
+  if (!formEl) return
   formEl.resetFields()
+}
+
+
+/**
+ * Captcha
+ */
+const captcha = $ref<HTMLImageElement | null>(null)
+
+const refreshCaptcha = (): void => {
+  if (!captcha) return
+  captcha.src = `http://127.0.0.1:7001/captcha?t=${ new Date().getTime() }`
 }
 </script>
 
@@ -138,7 +147,7 @@ const resetForm = (formEl: FormInstance | undefined): void => {
 
         <el-row :gutter="20" align="middle" class="captcha-container">
             <el-col :span="15">
-                <el-form-item prop="captcha" required class="captcha">
+                <el-form-item prop="captcha" required class="captcha-input">
                     <el-input v-model="usernameRegisterData.captcha"
                               type="text"
                               autocomplete="off"
@@ -151,7 +160,12 @@ const resetForm = (formEl: FormInstance | undefined): void => {
                 </el-form-item>
             </el-col>
             <el-col :span="9">
-                <img src="/src/assets/images/code.png" alt>
+                <img ref="captcha"
+                     src="http://127.0.0.1:7001/captcha"
+                     alt
+                     class="captcha-image"
+                     @click="refreshCaptcha"
+                >
             </el-col>
         </el-row>
 
@@ -161,7 +175,7 @@ const resetForm = (formEl: FormInstance | undefined): void => {
             </el-checkbox>
         </el-form-item>
 
-        <el-form-item>
+        <el-form-item class="register-buttons">
             <el-button type="primary" @click="submitForm(usernameRegisterRef)">Submit</el-button>
             <el-button @click="resetForm(usernameRegisterRef)">Reset</el-button>
         </el-form-item>
@@ -178,8 +192,12 @@ const resetForm = (formEl: FormInstance | undefined): void => {
 .captcha-container {
     margin-bottom: 18px;
 
-    .captcha {
+    .captcha-input {
         margin-bottom: 0;
+    }
+
+    .captcha-image {
+        cursor: pointer;
     }
 }
 
@@ -187,6 +205,12 @@ const resetForm = (formEl: FormInstance | undefined): void => {
     a {
         text-decoration: underline;
         color: inherit;
+    }
+}
+
+.register-buttons {
+    :deep(.el-form-item__content) {
+        justify-content: center;
     }
 }
 </style>
