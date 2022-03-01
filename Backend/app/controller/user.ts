@@ -1,4 +1,5 @@
 /* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
 
 /**
  * imports

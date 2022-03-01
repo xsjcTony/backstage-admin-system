@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import UsernameRegisterForm from '../components/Register/UsernameRegisterForm.vue'
 </script>
 
@@ -6,7 +6,7 @@ import UsernameRegisterForm from '../components/Register/UsernameRegisterForm.vu
     <div class="register-container">
         <div class="register-wrapper">
             <h1>Register</h1>
-            <el-tabs tab-position="left" class="register-tab">
+            <el-tabs class="register-tab" tab-position="left">
                 <el-tab-pane label="Username">
                     <UsernameRegisterForm/>
                 </el-tab-pane>
@@ -16,25 +16,25 @@ import UsernameRegisterForm from '../components/Register/UsernameRegisterForm.vu
     </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .register-container {
     width: 100%;
     height: 100%;
     background: url('/src/assets/images/bg.jpg') center center / cover no-repeat;
 
     .register-wrapper {
-        width: 600px;
-        height: fit-content;
-        background: #fff;
-        border-radius: 10px;
         position: absolute;
-        left: 50%;
         top: 50%;
+        left: 50%;
+        width: 500px;
+        height: fit-content;
+        border-radius: 10px;
+        background: #fff;
         transform: translate(-50%, -50%);
 
         h1 {
-            text-align: center;
             font-size: 30px;
+            text-align: center;
         }
     }
 }
