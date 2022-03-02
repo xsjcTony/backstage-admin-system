@@ -5,7 +5,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
  * Global configs
  */
 axios.defaults.baseURL = 'http://127.0.0.1:7001'
-axios.defaults.timeout = 5000
+axios.defaults.timeout = 10000
 axios.defaults.withCredentials = true // cookie
 
 

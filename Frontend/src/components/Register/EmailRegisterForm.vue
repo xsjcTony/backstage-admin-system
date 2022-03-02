@@ -136,8 +136,12 @@ const resetForm = (formEl: FormInstance | undefined): void => {
  */
 let disableSendButton = $ref(false)
 let sendButtonText = $ref('Send Verification Code')
+let loading = $ref(false)
 
 const sendVerificationCode = async (): Promise<void> => {
+  loading = true
+  sendButtonText = 'Sending'
+
   const email = emailRegisterData.email
 
   // validate email
@@ -163,6 +167,7 @@ const sendVerificationCode = async (): Promise<void> => {
       })
 
       // disable send button for 60 seconds
+      loading = false
       disableSendButton = true
       let count = 60
       sendButtonText = `Resend in ${ count }s`
@@ -186,6 +191,9 @@ const sendVerificationCode = async (): Promise<void> => {
         showClose: true,
         duration: 3000
       })
+
+      disableSendButton = false
+      sendButtonText = 'Resend Verification Code'
     }
   } catch (err) {
     ElMessage.error({
@@ -194,6 +202,9 @@ const sendVerificationCode = async (): Promise<void> => {
       showClose: true,
       duration: 3000
     })
+
+    disableSendButton = false
+    sendButtonText = 'Resend Verification Code'
   }
 }
 </script>
@@ -247,7 +258,7 @@ const sendVerificationCode = async (): Promise<void> => {
                           type="text"
                 />
             </el-form-item>
-            <el-button :disabled="disableSendButton" @click="sendVerificationCode">{{ sendButtonText }}</el-button>
+            <el-button :disabled="disableSendButton" :loading="loading" @click="sendVerificationCode">{{ sendButtonText }}</el-button>
         </div>
 
         <el-form-item class="agreement" prop="agreement" required>
