@@ -1,17 +1,20 @@
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { reactive } from 'vue'
 import { $ref } from 'vue/macros'
 import { User, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
 import { registerUser } from '../../api'
 import { RegisterType, FormInstance, ResponseData } from '../../types'
+import { useRouter } from 'vue-router'
 
+
+const router = useRouter()
 
 /**
  * Register Form
  */
-const usernameRegisterRef = ref<FormInstance | null>(null)
+const usernameRegisterRef = $ref<FormInstance | null>(null)
 
 const usernameRegisterData = reactive({
   username: '',
@@ -40,8 +43,8 @@ const validatePassword = (rule: any, value: string, callback: any): void => {
     callback(new Error('Password must include characters, numbers, symbols, and between 8 and 20 (both inclusive) characters long.'))
   } else {
     if (usernameRegisterData.confirmPassword !== '') {
-      if (!usernameRegisterRef.value) return
-      usernameRegisterRef.value.validateField('confirmPassword', () => null)
+      if (!usernameRegisterRef) return
+      usernameRegisterRef.validateField('confirmPassword', () => null)
     }
     callback()
   }
@@ -91,12 +94,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
 
         if (data.code === 200) {
           // Succeed
-          ElMessage.success({
-            message: 'Register succeed',
-            center: true,
-            showClose: true,
-            duration: 3000
-          })
+          await router.push('/login')
         } else {
           // Fail
           ElMessage.error({
@@ -105,6 +103,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
             showClose: true,
             duration: 3000
           })
+          refreshCaptcha()
         }
       } catch (err) {
         ElMessage.error({
@@ -113,6 +112,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
           showClose: true,
           duration: 3000
         })
+        refreshCaptcha()
       }
     } else {
       ElMessage.error({
@@ -130,6 +130,7 @@ const resetForm = (formEl: FormInstance | undefined): void => {
   if (!formEl) return
   formEl.resetFields()
   ElMessage.closeAll()
+  refreshCaptcha()
 }
 
 

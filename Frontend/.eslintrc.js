@@ -183,7 +183,8 @@ module.exports = {
       'error',
       {
         ignores: [
-          'Register'
+          'Register',
+          'Login'
         ]
       }
     ],
@@ -601,17 +602,6 @@ module.exports = {
         vars: 'all',
         args: 'none',
         ignoreRestSiblings: true
-      }
-    ],
-    '@typescript-eslint/no-use-before-define': [
-      'error',
-      {
-        functions: true,
-        classes: true,
-        variables: true,
-        enums: true,
-        typedefs: true,
-        ignoreTypeReferences: true
       }
     ],
     '@typescript-eslint/no-useless-constructor': 'error',
