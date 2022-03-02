@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import UsernameRegisterForm from '../components/Register/UsernameRegisterForm.vue'
+import EmailRegisterForm from '../components/Register/EmailRegisterForm.vue'
 </script>
 
 <template>
@@ -10,7 +11,9 @@ import UsernameRegisterForm from '../components/Register/UsernameRegisterForm.vu
                 <el-tab-pane label="Username">
                     <UsernameRegisterForm/>
                 </el-tab-pane>
-                <el-tab-pane label="E-mail">Config</el-tab-pane>
+                <el-tab-pane label="E-mail">
+                    <EmailRegisterForm/>
+                </el-tab-pane>
             </el-tabs>
         </div>
     </div>

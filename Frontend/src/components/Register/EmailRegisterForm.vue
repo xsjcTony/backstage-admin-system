@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { reactive } from 'vue'
 import { $ref } from 'vue/macros'
-import { User, Lock, Check } from '@element-plus/icons-vue'
+import { Message, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
-import { registerUser } from '../../api'
+import { registerUser, sendVerificationEmail } from '../../api'
 import { RegisterType, FormInstance, ResponseData } from '../../types'
 import { useRouter } from 'vue-router'
 
@@ -14,23 +14,23 @@ const router = useRouter()
 /**
  * Register Form
  */
-const usernameRegisterRef = $ref<FormInstance | null>(null)
+const emailRegisterRef = $ref<FormInstance | null>(null)
 
-const usernameRegisterData = reactive({
-  username: '',
+const emailRegisterData = reactive({
+  email: '',
   password: '',
   confirmPassword: '',
   captcha: '',
-  registerType: RegisterType.Normal,
+  registerType: RegisterType.Email,
   agreement: false
 })
 
-const validateUsername = (rule: any, value: string, callback: any): void => {
-  const regex = /^[A-Za-z0-9]{6,20}$/
+const validateEmail = (rule: any, value: string, callback: any): void => {
+  const regex = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
   if (value === '') {
-    callback(new Error('Please input the username'))
+    callback(new Error('Please input the email'))
   } else if (!regex.test(value)) {
-    callback(new Error('Username must be any of a-z, A-Z or 0-9, and between 6 and 20 (both inclusive) characters long'))
+    callback(new Error('Invalid email address'))
   } else {
     callback()
   }
@@ -42,9 +42,9 @@ const validatePassword = (rule: any, value: string, callback: any): void => {
   } else if (!regex.test(value)) {
     callback(new Error('Password must include characters, numbers, symbols, and between 8 and 20 (both inclusive) characters long.'))
   } else {
-    if (usernameRegisterData.confirmPassword !== '') {
-      if (!usernameRegisterRef) return
-      usernameRegisterRef.validateField('confirmPassword', () => null)
+    if (emailRegisterData.confirmPassword !== '') {
+      if (!emailRegisterRef) return
+      emailRegisterRef.validateField('confirmPassword', () => null)
     }
     callback()
   }
@@ -52,7 +52,7 @@ const validatePassword = (rule: any, value: string, callback: any): void => {
 const validateConfirmPassword = (rule: any, value: string, callback: any): void => {
   if (value === '') {
     callback(new Error('Please input the password again'))
-  } else if (value !== usernameRegisterData.password) {
+  } else if (value !== emailRegisterData.password) {
     callback(new Error('Password doesn\'t match'))
   } else {
     callback()
@@ -76,8 +76,8 @@ const validateAgreement = (rule: any, value: boolean, callback: any): void => {
   }
 }
 
-const usernameRegisterRules = reactive({
-  username: { validator: validateUsername },
+const emailRegisterRules = reactive({
+  email: { validator: validateEmail },
   password: { validator: validatePassword },
   confirmPassword: { validator: validateConfirmPassword },
   captcha: { validator: validateCaptcha },
@@ -90,7 +90,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const data: ResponseData = await registerUser(usernameRegisterData) as ResponseData
+        const data: ResponseData = await registerUser(emailRegisterData) as ResponseData
 
         if (data.code === 200) {
           // Succeed
@@ -103,7 +103,6 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
             showClose: true,
             duration: 3000
           })
-          refreshCaptcha()
         }
       } catch (err) {
         ElMessage.error({
@@ -112,7 +111,6 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
           showClose: true,
           duration: 3000
         })
-        refreshCaptcha()
       }
     } else {
       ElMessage.error({
@@ -130,40 +128,92 @@ const resetForm = (formEl: FormInstance | undefined): void => {
   if (!formEl) return
   formEl.resetFields()
   ElMessage.closeAll()
-  refreshCaptcha()
 }
 
 
 /**
- * Captcha
+ * Verification Code
  */
-const captcha = $ref<HTMLImageElement | null>(null)
+let disableSendButton = $ref(false)
+let sendButtonText = $ref('Send Verification Code')
 
-const refreshCaptcha = (): void => {
-  if (!captcha) return
-  captcha.src = `http://127.0.0.1:7001/captcha?t=${ new Date().getTime() }`
+const sendVerificationCode = async (): Promise<void> => {
+  const email = emailRegisterData.email
+
+  // validate email
+  if (!(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/).test(email)) {
+    ElMessage.error({
+      message: 'Invalid email address',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+    return
+  }
+
+  try {
+    const data: ResponseData = await sendVerificationEmail({ email }) as ResponseData
+
+    if (data.code === 200) {
+      ElMessage.success({
+        message: 'Verification email has been sent',
+        center: true,
+        showClose: true,
+        duration: 3000
+      })
+
+      // disable send button for 60 seconds
+      disableSendButton = true
+      let count = 60
+      sendButtonText = `Resend in ${ count }s`
+      const disableTimer = setInterval(() => {
+        count--
+
+        if (count === 0) {
+          disableSendButton = false
+          sendButtonText = 'Resend Verification Code'
+          clearInterval(disableTimer)
+          return
+        }
+
+        sendButtonText = `Resend in ${ count }s`
+      }, 1000)
+
+    } else {
+      ElMessage.error({
+        message: 'Failed to sent verification email',
+        center: true,
+        showClose: true,
+        duration: 3000
+      })
+    }
+  } catch (err) {
+    ElMessage.error({
+      message: err instanceof Error ? err.message : 'Error',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+  }
 }
 </script>
 
 <template>
-    <el-form ref="usernameRegisterRef"
-             :model="usernameRegisterData"
-             :rules="usernameRegisterRules"
-             class="username-register-form"
+    <el-form ref="emailRegisterRef"
+             :model="emailRegisterData"
+             :rules="emailRegisterRules"
+             class="email-register-form"
     >
-        <el-form-item class="username" prop="username" required>
-            <el-input v-model.number="usernameRegisterData.username"
-                      :prefix-icon="User"
-                      autofocus
+        <el-form-item class="email" prop="email" required>
+            <el-input v-model.number="emailRegisterData.email"
+                      :prefix-icon="Message"
                       clearable
-                      maxlength="20"
-                      placeholder="Username"
-                      show-word-limit
+                      placeholder="E-mail"
                       type="text"
             />
         </el-form-item>
         <el-form-item class="password" prop="password" required>
-            <el-input v-model="usernameRegisterData.password"
+            <el-input v-model="emailRegisterData.password"
                       :prefix-icon="Lock"
                       autocomplete="off"
                       clearable
@@ -174,7 +224,7 @@ const refreshCaptcha = (): void => {
             />
         </el-form-item>
         <el-form-item prop="confirmPassword" required>
-            <el-input v-model="usernameRegisterData.confirmPassword"
+            <el-input v-model="emailRegisterData.confirmPassword"
                       :prefix-icon="Lock"
                       autocomplete="off"
                       clearable
@@ -185,9 +235,9 @@ const refreshCaptcha = (): void => {
             />
         </el-form-item>
 
-        <div class="captcha-container">
-            <el-form-item class="captcha-input" prop="captcha" required>
-                <el-input v-model="usernameRegisterData.captcha"
+        <div class="code-container">
+            <el-form-item class="code-input" prop="captcha" required>
+                <el-input v-model="emailRegisterData.captcha"
                           :prefix-icon="Check"
                           autocomplete="off"
                           clearable
@@ -197,47 +247,35 @@ const refreshCaptcha = (): void => {
                           type="text"
                 />
             </el-form-item>
-            <img ref="captcha"
-                 alt
-                 class="captcha-image"
-                 src="http://127.0.0.1:7001/captcha"
-                 @click="refreshCaptcha"
-            >
+            <el-button :disabled="disableSendButton" @click="sendVerificationCode">{{ sendButtonText }}</el-button>
         </div>
 
         <el-form-item class="agreement" prop="agreement" required>
-            <el-checkbox v-model="usernameRegisterData.agreement">
+            <el-checkbox v-model="emailRegisterData.agreement">
                 <p>I agree to the <a href="javascript:">Terms and Conditions</a></p>
             </el-checkbox>
         </el-form-item>
 
         <el-form-item class="register-buttons">
-            <el-button type="primary" @click="submitForm(usernameRegisterRef)">Submit</el-button>
-            <el-button @click="resetForm(usernameRegisterRef)">Reset</el-button>
+            <el-button type="primary" @click="submitForm(emailRegisterRef)">Submit</el-button>
+            <el-button @click="resetForm(emailRegisterRef)">Reset</el-button>
         </el-form-item>
     </el-form>
 </template>
 
 <style lang="scss" scoped>
-.username,
-.password,
-.agreement {
+.el-form-item {
     margin-bottom: 30px;
 }
 
-.captcha-container {
+.code-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 
-    .captcha-input {
+    .code-input {
         margin-bottom: 0;
         margin-right: 20px;
-    }
-
-    .captcha-image {
-        cursor: pointer;
     }
 }
 
@@ -249,6 +287,8 @@ const refreshCaptcha = (): void => {
 }
 
 .register-buttons {
+    margin-bottom: 18px;
+
     :deep(.el-form-item__content) {
         justify-content: center;
     }

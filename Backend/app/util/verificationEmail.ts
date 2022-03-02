@@ -41,7 +41,7 @@ function _createEmailInfoAndCode(ctx: Context, to: string): EmailInfo {
   const verificationCode = Math.random().toString(16).slice(2, 6).toLowerCase()
 
   ctx.session.email = verificationCode
-  ctx.session.maxAge = 60 * 1000 // 1 min
+  ctx.session.maxAge = 120 * 1000 // 2 min
 
   return {
     from: 'Aelita <xsjcTony@126.com>', // sender address
@@ -80,7 +80,6 @@ export const verifyEmail = (ctx: Context, clientCode: string): void => {
     throw new Error('Code has expired. Click to send another verification email.')
   } else if (emailCode.toLowerCase() !== clientCode.toLowerCase()) {
     // invalid
-    ctx.session.email = null
     throw new Error('Incorrect verification code.')
   }
 
