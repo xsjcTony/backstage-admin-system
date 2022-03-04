@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { Message, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import 'element-plus/es/components/message/style/css'
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
-import 'element-plus/es/components/message/style/css'
 import { registerUser, sendVerificationEmail } from '../../api'
 import { RegisterType, FormInstance, ResponseData } from '../../types'
 

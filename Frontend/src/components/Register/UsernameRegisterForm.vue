@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { User, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import 'element-plus/es/components/message/style/css'
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
-import 'element-plus/es/components/message/style/css'
 import { registerUser } from '../../api'
 import { RegisterType, FormInstance, ResponseData } from '../../types'
 
@@ -117,7 +117,6 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
     } else {
       ElMessage.error({
         message: 'Invalid registration data',
-        type: 'success',
         center: true,
         showClose: true,
         duration: 3000
