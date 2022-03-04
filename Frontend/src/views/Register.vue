@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import UsernameRegisterForm from '../components/Register/UsernameRegisterForm.vue'
 import EmailRegisterForm from '../components/Register/EmailRegisterForm.vue'
+import UsernameRegisterForm from '../components/Register/UsernameRegisterForm.vue'
 </script>
 
 <template>

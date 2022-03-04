@@ -408,6 +408,18 @@ module.exports = {
     'import/no-webpack-loader-syntax': 'error',
     'import/newline-after-import': ['error', { count: 2 }],
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
+    'import/order': [
+      'error',
+      {
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+        'newlines-between': 'ignore',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true
+        },
+        warnOnUnassignedImports: false
+      }
+    ],
 
 
     // TypeScript

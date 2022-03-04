@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { reactive } from 'vue'
-import { $ref } from 'vue/macros'
 import { User, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { $ref } from 'vue/macros'
 import 'element-plus/es/components/message/style/css'
 import { registerUser } from '../../api'
 import { RegisterType, FormInstance, ResponseData } from '../../types'
-import { useRouter } from 'vue-router'
 
 
 const router = useRouter()
