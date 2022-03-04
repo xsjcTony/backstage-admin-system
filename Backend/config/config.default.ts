@@ -10,6 +10,13 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
   // add your egg config in here
   config.middleware = []
 
+  // CORS
+  config.cors = {
+    origin: 'http://127.0.0.1:3000',
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+    credentials: true
+  }
+
   // add your special config in here
   const bizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${ appInfo.name }`

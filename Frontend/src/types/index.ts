@@ -1,3 +1,6 @@
+import type { ElForm } from 'element-plus'
+
+
 // RegisterData
 export const enum RegisterType {
   Normal = 'normal',
@@ -21,10 +24,13 @@ interface EmailRegisterData extends BaseRegisterData {
 export type RegisterData = EmailRegisterData | NormalRegisterData
 
 
-// Email Verification
-export interface EmailInfo {
-  from: string
-  to: string
-  subject: string
-  text: string
+// ElForm
+export type FormInstance = InstanceType<typeof ElForm>
+
+
+// ResponseData
+export interface ResponseData {
+  code: number
+  msg: unknown
+  data: unknown
 }

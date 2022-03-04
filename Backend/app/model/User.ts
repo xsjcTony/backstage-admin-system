@@ -41,7 +41,7 @@ export class User extends Model<User> {
   @AllowNull(false)
   @Unique(false)
   @Column(STRING)
-  public password!: string
+  public password?: string
 
   @CreatedAt
   public createdAt!: Date

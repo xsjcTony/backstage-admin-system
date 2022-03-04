@@ -8,6 +8,7 @@ Backend/.DS_Store
 Backend/.vscode
 Backend/*.swp
 Backend/*.lock
+Backend/.eslintcache
 
 Backend/app/**/*.map
 Backend/test/**/*.map
@@ -29,6 +30,7 @@ Frontend/node_modules
 Frontend/dist
 Frontend/dist-ssr
 Frontend/*.local
+Frontend/.eslintcache
 
 # Editor directories and files
 Frontend/.vscode

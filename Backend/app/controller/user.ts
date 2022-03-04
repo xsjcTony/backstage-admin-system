@@ -1,4 +1,5 @@
 /* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
 
 /**
  * imports
@@ -26,9 +27,9 @@ export default class UserController extends Controller {
       this._validateUserInfo()
 
       // save into database
-      await ctx.service.user.createUser(ctx.request.body)
+      const data = await ctx.service.user.createUser(ctx.request.body)
 
-      ctx.success(200, '注册成功')
+      ctx.success(200, '注册成功', data)
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
@@ -40,7 +41,6 @@ export default class UserController extends Controller {
 
   /**
    * Validate helper.
-   * @return {ValidateError[] | undefined} - Validate result.
    * @private
    */
   private _validateUserInfo(): void {

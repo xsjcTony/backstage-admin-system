@@ -11,15 +11,15 @@ export default class UserService extends Service {
    * @param {RegisterData} data
    * @return {Promise<void>}
    */
-  public async createUser(data: RegisterData): Promise<void> {
+  public async createUser(data: RegisterData): Promise<object> {
     const encryptedPassword = this.ctx.helper.encryptByMd5(data.password)
 
     if ('username' in data) {
       // Normal Register
-      await this._createUserByUsername(data.username, encryptedPassword)
+      return this._createUserByUsername(data.username, encryptedPassword)
     } else {
       // Email Register
-      await this._createUserByEmail(data.email, encryptedPassword)
+      return this._createUserByEmail(data.email, encryptedPassword)
     }
   }
 
@@ -51,6 +51,8 @@ export default class UserService extends Service {
       password
     })
 
+    delete data.password
+
     return data.toJSON()
   }
 
@@ -71,6 +73,8 @@ export default class UserService extends Service {
       email,
       password
     })
+
+    delete data.password
 
     return data.toJSON()
   }

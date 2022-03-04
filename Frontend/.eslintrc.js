@@ -7,8 +7,7 @@ module.exports = {
     'vue/setup-compiler-macros': true
   },
   'extends': [
-    'plugin:vue/vue3-recommended',
-    'prettier'
+    'plugin:vue/vue3-recommended'
   ],
   parser: 'vue-eslint-parser',
   parserOptions: {
@@ -120,7 +119,6 @@ module.exports = {
         disallowVue3BuiltInComponents: true
       }
     ],
-    'vue/no-static-inline-styles': ['error', { allowBinding: true }],
     'vue/no-template-target-blank': [
       'error',
       {
@@ -128,7 +126,15 @@ module.exports = {
         enforceDynamicLinks: 'always'
       }
     ],
-    'vue/no-undef-components': ['error', { ignorePatterns: [] }],
+    'vue/no-undef-components': [
+      'error',
+      {
+        ignorePatterns: [
+          /^router-view$/,
+          /^el/
+        ]
+      }
+    ],
     'vue/no-undef-properties': ['error', { ignores: ['/^\\$/'] }],
     'vue/no-unused-properties': ['error', {
       groups: ['props'],
@@ -173,6 +179,15 @@ module.exports = {
     'vue/v-on-function-call': ['error', 'never', { ignoreIncludesComment: false }],
 
     // vue default rules overwrite
+    'vue/multi-word-component-names': [
+      'error',
+      {
+        ignores: [
+          'Register',
+          'Login'
+        ]
+      }
+    ],
     'vue/first-attribute-linebreak': [
       'error',
       {
@@ -184,7 +199,7 @@ module.exports = {
       'error',
       {
         singleline: 'never',
-        multiline: 'never'
+        multiline: 'always'
       }
     ],
     'vue/html-closing-bracket-spacing': [
@@ -239,6 +254,7 @@ module.exports = {
     'vue/no-multi-spaces': ['error', { ignoreProperties: false }],
     'vue/no-spaces-around-equal-signs-in-attribute': 'error',
     'vue/no-template-shadow': 'error',
+    'vue/singleline-html-element-content-newline': 'off',
 
     // vue extension rules (for expression in <template>)
     'vue/arrow-spacing': [
@@ -392,6 +408,18 @@ module.exports = {
     'import/no-webpack-loader-syntax': 'error',
     'import/newline-after-import': ['error', { count: 2 }],
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
+    'import/order': [
+      'error',
+      {
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+        'newlines-between': 'ignore',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true
+        },
+        warnOnUnassignedImports: false
+      }
+    ],
 
 
     // TypeScript
@@ -488,20 +516,13 @@ module.exports = {
       'error',
       {
         ignoreArrowShorthand: false,
-        ignoreVoidOperator: false
+        ignoreVoidOperator: true
       }
     ],
     '@typescript-eslint/no-dupe-class-members': 'error',
     '@typescript-eslint/no-duplicate-imports': ['error', { includeExports: true }],
     '@typescript-eslint/no-empty-function': ['error', { allow: ['decoratedFunctions'] }],
     '@typescript-eslint/no-empty-interface': ['error', { allowSingleExtends: true }],
-    '@typescript-eslint/no-explicit-any': [
-      'error',
-      {
-        fixToUnknown: false,
-        ignoreRestArgs: true
-      }
-    ],
     '@typescript-eslint/no-extra-non-null-assertion': 'error',
     '@typescript-eslint/no-extra-parens': 'error',
     '@typescript-eslint/no-extraneous-class': 'error',
@@ -531,7 +552,6 @@ module.exports = {
     ],
     '@typescript-eslint/no-loop-func': 'error',
     '@typescript-eslint/no-loss-of-precision': 'error',
-    '@typescript-eslint/no-meaningless-void-operator': ['error', { checkNever: false }],
     '@typescript-eslint/no-misused-new': 'error',
     '@typescript-eslint/no-misused-promises': [
       'error',
@@ -588,28 +608,12 @@ module.exports = {
     '@typescript-eslint/no-unnecessary-qualifier': 'error',
     '@typescript-eslint/no-unnecessary-type-assertion': 'error',
     '@typescript-eslint/no-unnecessary-type-constraint': 'error',
-    '@typescript-eslint/no-unsafe-argument': 'error',
-    '@typescript-eslint/no-unsafe-assignment': 'error',
-    '@typescript-eslint/no-unsafe-call': 'error',
-    '@typescript-eslint/no-unsafe-member-access': 'error',
-    '@typescript-eslint/no-unsafe-return': 'error',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
         vars: 'all',
         args: 'none',
         ignoreRestSiblings: true
-      }
-    ],
-    '@typescript-eslint/no-use-before-define': [
-      'error',
-      {
-        functions: true,
-        classes: true,
-        variables: true,
-        enums: true,
-        typedefs: true,
-        ignoreTypeReferences: true
       }
     ],
     '@typescript-eslint/no-useless-constructor': 'error',

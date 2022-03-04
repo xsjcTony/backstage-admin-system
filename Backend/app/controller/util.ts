@@ -15,6 +15,7 @@ export default class UtilController extends Controller {
 
   public async generateCaptcha(): Promise<void> {
     const { ctx } = this
+    ctx.type = 'image/svg+xml'
     ctx.body = ctx.helper.generateCaptcha()
   }
 
