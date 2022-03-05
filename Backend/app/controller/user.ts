@@ -1,5 +1,6 @@
 /* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
 /* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
 
 /**
  * imports
@@ -40,6 +41,10 @@ export default class UserController extends Controller {
   }
 
 
+  /**
+   * Login user and save login status
+   * @return {Promise<void>}
+   */
   public async login(): Promise<void> {
     const { ctx } = this
     const data: LoginData = ctx.request.body
@@ -47,6 +52,7 @@ export default class UserController extends Controller {
     try {
       ctx.helper.verifyCaptcha(data.captcha)
       const res = await ctx.service.user.loginUser(data)
+      ctx.session.user = res
 
       ctx.success(200, 'Logged in', res)
     } catch (err) {
@@ -55,6 +61,18 @@ export default class UserController extends Controller {
       } else {
         ctx.error(400, 'error', err)
       }
+    }
+  }
+
+
+  public async isLoggedIn(): Promise<void> {
+    const { ctx } = this
+    const user = ctx.session.user
+
+    if (user) {
+      ctx.success(200, 'Logged in', user)
+    } else {
+      ctx.error(400, 'not Logged in')
     }
   }
 

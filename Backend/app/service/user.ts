@@ -11,7 +11,7 @@ export default class UserService extends Service {
    * @param {RegisterData} data
    * @return {Promise<object>}
    */
-  public async createUser(data: RegisterData): Promise<object> {
+  public async createUser(data: RegisterData): Promise<User> {
     const encryptedPassword = this.ctx.helper.encryptByMd5(data.password)
 
     if ('username' in data) {
@@ -29,7 +29,7 @@ export default class UserService extends Service {
    * @param {LoginData} data
    * @return {Promise<object>}
    */
-  public async loginUser(data: LoginData): Promise<object> {
+  public async loginUser(data: LoginData): Promise<User> {
     const usernameRegex = /^[A-Za-z0-9]{6,20}$/
     const emailRegex = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
     const { username, password } = data
@@ -54,7 +54,7 @@ export default class UserService extends Service {
 
 
   /**
-   * Look for ONE user from database based on given where options.
+   * Look for **ONE** user from database based on given where options.
    * @param {WhereOptions} options
    * @return {Promise<User | null>}
    * @private
@@ -71,7 +71,7 @@ export default class UserService extends Service {
    * @return {Promise<object>}
    * @private
    */
-  private async _createUserByUsername(username: string, password: string): Promise<object> {
+  private async _createUserByUsername(username: string, password: string): Promise<User> {
     const user = await this._findUser({ username })
     if (user) {
       throw new Error('Username already exists.')
@@ -82,9 +82,11 @@ export default class UserService extends Service {
       password
     })
 
-    delete data.password
+    const res = data.toJSON() as User
+    delete res.password
+    delete res.email
 
-    return data.toJSON()
+    return res
   }
 
 
@@ -95,7 +97,7 @@ export default class UserService extends Service {
    * @return {Promise<object>}
    * @private
    */
-  private async _createUserByEmail(email: string, password: string): Promise<object> {
+  private async _createUserByEmail(email: string, password: string): Promise<User> {
     const user = await this._findUser({ email })
     if (user) {
       throw new Error('Username already exists.')
@@ -106,9 +108,11 @@ export default class UserService extends Service {
       password
     })
 
-    delete data.password
+    const res = data.toJSON() as User
+    delete res.password
+    delete res.username
 
-    return data.toJSON()
+    return res
   }
 
 
@@ -119,16 +123,18 @@ export default class UserService extends Service {
    * @return {Promise<object>}
    * @private
    */
-  private async _loginUserByUsername(username: string, password: string): Promise<object> {
+  private async _loginUserByUsername(username: string, password: string): Promise<User> {
     const user = await this._findUser({ username, password })
 
     if (!user) {
       throw new Error('Incorrect login credential')
     }
 
-    delete user.password
+    const res = user.toJSON() as User
+    delete res.password
+    delete res.email
 
-    return user.toJSON()
+    return res
   }
 
 
@@ -139,15 +145,17 @@ export default class UserService extends Service {
    * @return {Promise<object>}
    * @private
    */
-  private async _loginUserByEmail(email: string, password: string): Promise<object> {
+  private async _loginUserByEmail(email: string, password: string): Promise<User> {
     const user = await this._findUser({ email, password })
 
     if (!user) {
       throw new Error('Incorrect login credential')
     }
 
-    delete user.password
+    const res = user.toJSON() as User
+    delete res.password
+    delete res.username
 
-    return user.toJSON()
+    return res
   }
 }
