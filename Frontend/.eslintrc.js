@@ -179,15 +179,7 @@ module.exports = {
     'vue/v-on-function-call': ['error', 'never', { ignoreIncludesComment: false }],
 
     // vue default rules overwrite
-    'vue/multi-word-component-names': [
-      'error',
-      {
-        ignores: [
-          'Register',
-          'Login'
-        ]
-      }
-    ],
+    'vue/multi-word-component-names': 'off',
     'vue/first-attribute-linebreak': [
       'error',
       {
