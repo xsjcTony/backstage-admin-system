@@ -16,7 +16,7 @@ const router = useRouter()
  */
 const loginRef = $ref<FormInstance | null>(null)
 
-const loginData = reactive<LoginData>({
+const loginData: LoginData = reactive({
   username: '',
   password: '',
   captcha: ''
@@ -201,6 +201,8 @@ const refreshCaptcha = (): void => {
 
             .captcha-image {
                 cursor: pointer;
+                width: 160px;
+                height: 60px;
             }
         }
 

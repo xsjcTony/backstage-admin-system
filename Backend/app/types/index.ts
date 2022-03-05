@@ -28,3 +28,11 @@ export interface EmailInfo {
   subject: string
   text: string
 }
+
+
+// loginData
+export interface LoginData {
+  username: string
+  password: string
+  captcha: string
+}

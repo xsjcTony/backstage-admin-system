@@ -5,9 +5,9 @@
  * imports
  */
 import { Controller } from 'egg'
-import NormalUserRule from '../validator/normalUserRule'
+import { RegisterType, RegisterData, LoginData } from '../types'
 import EmailUserRule from '../validator/emailUserRule'
-import { RegisterType, RegisterData } from '../util/types'
+import NormalUserRule from '../validator/normalUserRule'
 
 
 /**
@@ -29,7 +29,7 @@ export default class UserController extends Controller {
       // save into database
       const data = await ctx.service.user.createUser(ctx.request.body)
 
-      ctx.success(200, '注册成功', data)
+      ctx.success(200, 'Registered', data)
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
@@ -38,6 +38,31 @@ export default class UserController extends Controller {
       }
     }
   }
+
+
+  public async login(): Promise<void> {
+    const { ctx } = this
+    const data: LoginData = ctx.request.body
+
+    try {
+      ctx.helper.verifyCaptcha(data.captcha)
+      const res = await ctx.service.user.loginUser(data)
+
+      ctx.success(200, 'Logged in', res)
+    } catch (err) {
+      if (err instanceof Error) {
+        ctx.error(400, err.message, err)
+      } else {
+        ctx.error(400, 'error', err)
+      }
+    }
+  }
+
+
+  /**
+   * Helper functions
+   */
+
 
   /**
    * Validate helper.

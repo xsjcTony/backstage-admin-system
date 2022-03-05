@@ -10,4 +10,5 @@ export default (app: Application): void => {
   router.get('/verify_email', controller.util.sendVerificationEmail)
 
   router.post('/register', controller.user.create)
+  router.post('/login', controller.user.login)
 }

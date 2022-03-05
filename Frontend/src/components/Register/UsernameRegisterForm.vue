@@ -237,6 +237,8 @@ const refreshCaptcha = (): void => {
 
     .captcha-image {
         cursor: pointer;
+        width: 160px;
+        height: 60px;
     }
 }
 
