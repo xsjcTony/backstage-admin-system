@@ -12,7 +12,12 @@ axios.defaults.withCredentials = true // cookie
 /**
  * Interceptor
  */
-axios.interceptors.request.use((config: AxiosRequestConfig) => config, async err => Promise.reject(err))
+axios.interceptors.request.use((config: AxiosRequestConfig) => {
+  if (config.headers) {
+    config.headers.Authorization = sessionStorage.getItem('token') ?? '' // JWT Token
+  }
+  return config
+}, async err => Promise.reject(err))
 
 axios.interceptors.response.use((config: AxiosResponse) => config, async err => Promise.reject(err))
 

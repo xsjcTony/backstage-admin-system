@@ -34,3 +34,19 @@ export interface ResponseData {
   msg: unknown
   data: unknown
 }
+
+// JWTResponseData
+export interface JWTResponseData {
+  code: number
+  msg: unknown
+  data: {
+    token: string
+  }
+}
+
+// loginData
+export interface LoginData {
+  username: string
+  password: string
+  captcha: string
+}

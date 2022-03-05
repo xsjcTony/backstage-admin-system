@@ -30,6 +30,7 @@
     "egg-sequelize-ts": "^0.2.3-0",
     "egg-session-redis": "^2.1.0",
     "egg-validate": "^2.0.2",
+    "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.7.2",
     "sequelize": "^5.22.5",
@@ -37,6 +38,7 @@
     "svg-captcha": "^1.4.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/mocha": "^9.1.0",
     "@types/node": "^17.0.19",
     "@types/nodemailer": "^6.4.4",
