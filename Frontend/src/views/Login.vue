@@ -6,10 +6,14 @@ import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { loginUser } from '../api'
-import { FormInstance, LoginData, ResponseData } from '../types'
+import { FormInstance, LoginData, JWTResponseData } from '../types'
 
 
+/**
+ * Global Constants
+ */
 const router = useRouter()
+
 
 /**
  * Register Form
@@ -60,10 +64,11 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
     if (valid) {
       try {
         // login
-        const data: ResponseData = await loginUser(loginData) as ResponseData
+        const data: JWTResponseData = await loginUser(loginData) as JWTResponseData
 
         if (data.code === 200) {
           // Succeed
+          sessionStorage.setItem('token', data.data.token) // JWT Token
           await router.push('/admin')
         } else {
           // Fail

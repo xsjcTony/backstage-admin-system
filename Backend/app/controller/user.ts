@@ -6,6 +6,7 @@
  * imports
  */
 import { Controller } from 'egg'
+import * as jwt from 'jsonwebtoken'
 import { RegisterType, RegisterData, LoginData } from '../types'
 import EmailUserRule from '../validator/emailUserRule'
 import NormalUserRule from '../validator/normalUserRule'
@@ -28,9 +29,9 @@ export default class UserController extends Controller {
       this._validateUserInfo()
 
       // save into database
-      const data = await ctx.service.user.createUser(ctx.request.body)
+      const user = await ctx.service.user.createUser(ctx.request.body)
 
-      ctx.success(200, 'Registered', data)
+      ctx.success(200, 'Registered', user)
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
@@ -51,10 +52,12 @@ export default class UserController extends Controller {
 
     try {
       ctx.helper.verifyCaptcha(data.captcha)
-      const res = await ctx.service.user.loginUser(data)
-      ctx.session.user = res
+      const user = await ctx.service.user.loginUser(data)
 
-      ctx.success(200, 'Logged in', res)
+      // JWT
+      const token = jwt.sign(user, this.config.keys, { expiresIn: '7d' })
+
+      ctx.success(200, 'Logged in', { ...user, token })
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
@@ -67,12 +70,14 @@ export default class UserController extends Controller {
 
   public async isLoggedIn(): Promise<void> {
     const { ctx } = this
-    const user = ctx.session.user
 
-    if (user) {
-      ctx.success(200, 'Logged in', user)
-    } else {
-      ctx.error(400, 'not Logged in')
+    const token = ctx.get('Authorization')
+
+    try {
+      const data = jwt.verify(token, this.config.keys)
+      ctx.success(200, 'Logged in', data)
+    } catch (err) {
+      ctx.error(400, 'not logged in', err)
     }
   }
 
