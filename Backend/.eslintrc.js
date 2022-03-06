@@ -230,7 +230,7 @@ module.exports = {
       'error',
       {
         ignoreArrowShorthand: false,
-        ignoreVoidOperator: false
+        ignoreVoidOperator: true
       }
     ],
     '@typescript-eslint/no-dupe-class-members': 'error',
@@ -273,7 +273,6 @@ module.exports = {
     ],
     '@typescript-eslint/no-loop-func': 'error',
     '@typescript-eslint/no-loss-of-precision': 'error',
-    '@typescript-eslint/no-meaningless-void-operator': ['error', { checkNever: false }],
     '@typescript-eslint/no-misused-new': 'error',
     '@typescript-eslint/no-misused-promises': [
       'error',

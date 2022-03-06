@@ -1,9 +1,11 @@
 /* eslint '@typescript-eslint/unbound-method': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
 
 import { Application } from 'egg'
 
 export default (app: Application): void => {
   const { controller, router } = app
+  const authenticator = app.middleware.authenticator(null, app)
 
   /**
    * Utils
