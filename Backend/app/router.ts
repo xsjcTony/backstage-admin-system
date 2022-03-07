@@ -3,6 +3,7 @@
 
 import { Application } from 'egg'
 
+
 export default (app: Application): void => {
   const { controller, router } = app
   const authenticator = app.middleware.authenticator(null, app)
@@ -21,4 +22,10 @@ export default (app: Application): void => {
   router.post('/register', controller.user.create)
   router.post('/login', controller.user.login)
   router.get('/is_logged_in', controller.user.isLoggedIn)
+
+
+  /**
+   * OAuth - Github
+   */
+  router.get('/github', controller.github.loginView)
 }
