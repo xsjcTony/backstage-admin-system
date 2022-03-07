@@ -3,6 +3,7 @@ import Register from '/src/views/Register.vue'
 import Login from '/src/views/Login.vue'
 import Admin from '/src/views/Admin.vue'
 import { isLoggedIn } from '../api'
+import { useStore } from '../stores'
 import { ResponseData } from '../types'
 import { getAllRoutePaths } from '../utils'
 import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
@@ -32,22 +33,25 @@ const router = createRouter({
 })
 
 // access control
+let authenticated = false
 router.beforeEach(async (to: RouteLocationNormalized) => {
-  // check login status
-  let loggedIn = false
+  const store = useStore()
 
-  try {
-    const data = await isLoggedIn() as ResponseData
-    if (data.code === 200) {
-      loggedIn = true
+  if (!authenticated) {
+    try {
+      const data = await isLoggedIn() as ResponseData
+      if (data.code === 200) {
+        store.loggedIn = true
+      }
+    } catch (err) {
+      store.loggedIn = false
     }
-  } catch (err) {
-    console.error(err)
+
+    authenticated = true
   }
 
-
   if (to.path === '/login' || to.path === '/register') {
-    if (loggedIn) {
+    if (store.loggedIn) {
       // redirect to '/admin' if logged in
       return '/admin'
     } else {
@@ -56,7 +60,7 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
   }
 
   // redirect to '/login' if not logged in
-  if (!loggedIn) {
+  if (!store.loggedIn) {
     return '/login'
   }
 

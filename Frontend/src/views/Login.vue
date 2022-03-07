@@ -6,6 +6,7 @@ import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { loginUser } from '../api'
+import { useStore } from '../stores'
 import { FormInstance, LoginData, JWTResponseData } from '../types'
 
 
@@ -69,6 +70,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
         if (data.code === 200) {
           // Succeed
           sessionStorage.setItem('token', data.data.token) // JWT Token
+          useStore().loggedIn = true // Pinia
           await router.push('/admin')
         } else {
           // Fail
@@ -123,7 +125,11 @@ const refreshCaptcha = (): void => {
     <div class="login-container">
         <div class="login-wrapper">
             <h1>Login</h1>
-            <el-form ref="loginRef" :model="loginData" :rules="usernameRegisterRules">
+            <el-form ref="loginRef"
+                     :model="loginData"
+                     :rules="usernameRegisterRules"
+                     @submit.prevent
+            >
                 <el-form-item class="username" prop="username" required>
                     <el-input v-model.number="loginData.username"
                               :prefix-icon="User"
@@ -163,10 +169,22 @@ const refreshCaptcha = (): void => {
                     >
                 </div>
                 <el-form-item class="register-buttons">
-                    <el-button type="primary" @click="submitForm(loginRef)">Login</el-button>
+                    <el-button type="primary" native-type="submit" @click="submitForm(loginRef)">Login</el-button>
                     <el-button @click="resetForm(loginRef)">Reset</el-button>
                 </el-form-item>
             </el-form>
+            <ul class="third-party-login">
+                <li>
+                    <svg class="icon">
+                        <use xlink:href="#icon-weixin" role="button"/>
+                    </svg>
+                </li>
+                <li>
+                    <svg class="icon">
+                        <use xlink:href="#icon-github" role="button"/>
+                    </svg>
+                </li>
+            </ul>
         </div>
     </div>
 </template>
