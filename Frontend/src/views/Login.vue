@@ -169,20 +169,18 @@ const refreshCaptcha = (): void => {
                     >
                 </div>
                 <el-form-item class="register-buttons">
-                    <el-button type="primary" native-type="submit" @click="submitForm(loginRef)">Login</el-button>
+                    <el-button native-type="submit" type="primary" @click="submitForm(loginRef)">Login</el-button>
                     <el-button @click="resetForm(loginRef)">Reset</el-button>
                 </el-form-item>
             </el-form>
+            <p class="separate-line-with-text">Third Party Login</p>
             <ul class="third-party-login">
                 <li>
-                    <svg class="icon">
-                        <use xlink:href="#icon-weixin" role="button"/>
-                    </svg>
-                </li>
-                <li>
-                    <svg class="icon">
-                        <use xlink:href="#icon-github" role="button"/>
-                    </svg>
+                    <a href="http://127.0.0.1:7001/github">
+                        <svg class="icon">
+                            <use role="button" xlink:href="#icon-github"/>
+                        </svg>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -200,13 +198,12 @@ const refreshCaptcha = (): void => {
         top: 50%;
         left: 50%;
         width: 350px;
-        height: fit-content;
         padding: 0 20px;
         border-radius: 10px;
         background: #fff;
         transform: translate(-50%, -50%);
 
-        h1 {
+        & > h1 {
             font-size: 30px;
             text-align: center;
         }
@@ -218,20 +215,57 @@ const refreshCaptcha = (): void => {
             margin-bottom: 18px;
 
             .captcha-input {
-                margin-bottom: 0;
                 margin-right: 20px;
+                margin-bottom: 0;
             }
 
             .captcha-image {
-                cursor: pointer;
                 width: 160px;
                 height: 60px;
+                cursor: pointer;
             }
         }
 
         .register-buttons {
+            margin-bottom: 25px;
+
             :deep(.el-form-item__content) {
                 justify-content: center;
+            }
+        }
+
+        .separate-line-with-text {
+            display: flex;
+            color: #ccc;
+            font-size: 15px;
+
+            &::before,
+            &::after {
+                flex: 1;
+                margin: auto 0;
+                border-bottom: 1px solid #ccc;
+                content: '';
+            }
+
+            &::before {
+                margin-right: 10px;
+            }
+
+            &::after {
+                margin-left: 10px;
+            }
+        }
+
+        .third-party-login {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            padding: 20px 0;
+            list-style: none;
+
+            & > li {
+                padding: 0 30px;
+                font-size: 35px;
             }
         }
     }
