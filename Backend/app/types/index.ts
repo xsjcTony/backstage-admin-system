@@ -1,3 +1,5 @@
+/* eslint '@typescript-eslint/no-explicit-any': 'off' */
+
 // RegisterData
 export const enum RegisterType {
   Normal = 'normal',
@@ -35,4 +37,12 @@ export interface LoginData {
   username: string
   password: string
   captcha: string
+}
+
+
+// OAuthUserData
+export interface OAuthUserData {
+  [key: string]: any
+  id: number
+  provider: string
 }

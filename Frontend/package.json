@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.26.0",
     "element-plus": "^2.0.3",
+    "js-cookie": "^3.0.1",
     "normalize.css": "^8.0.1",
     "pinia": "^2.0.11",
     "vue": "^3.2.31",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "@nabla/vite-plugin-eslint": "^1.4.0",
+    "@types/js-cookie": "^3.0.1",
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
     "@typescript-eslint/parser": "^5.12.1",

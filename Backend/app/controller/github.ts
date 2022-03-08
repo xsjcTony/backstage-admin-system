@@ -1,8 +1,12 @@
 /* eslint 'camelcase': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
 /* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
 
 import { URLSearchParams } from 'node:url'
 import { Controller } from 'egg'
+import * as jwt from 'jsonwebtoken'
+import type { OAuthUserData } from '../types'
 
 
 export default class GithubController extends Controller {
@@ -45,8 +49,6 @@ export default class GithubController extends Controller {
     })
 
     await this._getGithubUserInfo(res.data['access_token'] as string)
-
-    ctx.success()
   }
 
 
@@ -61,6 +63,27 @@ export default class GithubController extends Controller {
       }
     })
 
-    console.log(res.data)
+    await this._goToAdmin({ ...res.data, provider: 'github' })
+  }
+
+
+  private async _goToAdmin(data: OAuthUserData): Promise<void> {
+    const { ctx } = this
+
+    try {
+      const user = await ctx.service.oauth.getUser(data)
+      const token = jwt.sign(user, this.config.keys, { expiresIn: '7d' })
+
+      ctx.cookies.set('token', token, {
+        path: '/',
+        maxAge: 24 * 60 * 60 * 1000, // 1 day,
+        httpOnly: false,
+        signed: false
+      })
+
+      ctx.redirect('http://127.0.0.1:3000/admin')
+    } catch (err) {
+      console.error(err)
+    }
   }
 }

@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie'
 import { createWebHistory, createRouter } from 'vue-router'
 import Register from '/src/views/Register.vue'
 import Login from '/src/views/Login.vue'
@@ -36,6 +37,14 @@ const router = createRouter({
 let authenticated = false
 router.beforeEach(async (to: RouteLocationNormalized) => {
   const store = useStore()
+
+  // OAuth cookie
+  const t = Cookies.get('token')
+  if (t) {
+    authenticated = false
+    sessionStorage.setItem('token', t)
+    Cookies.remove('token')
+  }
 
   if (!authenticated) {
     try {
