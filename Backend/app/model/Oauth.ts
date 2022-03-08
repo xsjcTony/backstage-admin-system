@@ -11,49 +11,47 @@ import {
   Unique,
   CreatedAt,
   UpdatedAt,
-  Is,
-  IsEmail,
-  HasMany
+  ForeignKey,
+  BelongsTo
 } from 'sequelize-typescript'
-import { Oauth } from './Oauth'
+import { User } from './User'
 
 
-const { INTEGER, STRING, TINYINT } = DataType
+const { INTEGER, STRING, BIGINT } = DataType
 
 @Table({
-  modelName: 'User'
+  modelName: 'Oauth'
 })
-export class User extends Model<User> {
+export class Oauth extends Model<Oauth> {
 
   @PrimaryKey
   @AutoIncrement
   @Column(INTEGER.UNSIGNED)
   public id!: number
 
-  @AllowNull(true)
-  @Unique(true)
-  @Is(/^[A-Za-z0-9]{6,20}$/)
+  @AllowNull(false)
+  @Unique(false)
   @Column(STRING)
-  public username?: string
-
-  @AllowNull(true)
-  @Unique(true)
-  @IsEmail
-  @Column(STRING)
-  public email?: string
+  public accessToken!: string
 
   @AllowNull(false)
   @Unique(false)
   @Column(STRING)
-  public password?: string
+  public provider!: string
 
   @AllowNull(false)
   @Unique(false)
-  @Column(TINYINT.UNSIGNED)
-  public github!: number
+  @Column(BIGINT.UNSIGNED)
+  public uid!: string
 
-  @HasMany(() => Oauth)
-  public oauths!: Oauth[]
+  @AllowNull(false)
+  @Unique(false)
+  @Column(INTEGER.UNSIGNED)
+  @ForeignKey(() => User)
+  public userId!: number
+
+  @BelongsTo(() => User)
+  public user!: User
 
   @CreatedAt
   public createdAt!: Date
@@ -62,4 +60,4 @@ export class User extends Model<User> {
   public updatedAt!: Date
 }
 
-export default () => User
+export default () => Oauth
