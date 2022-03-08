@@ -1,11 +1,12 @@
 import { Service } from 'egg'
 import { User } from '../model/User'
-import { OAuthUserData } from '../types'
+import type { Oauth } from '../model/Oauth'
+import type { OAuthUserData } from '../types'
 
 
 export default class OauthService extends Service {
 
-  public async getUser(data: OAuthUserData): Promise<object> {
+  public async getOAuth(data: OAuthUserData): Promise<Oauth> {
     const res = await this.ctx.model.Oauth.findOne({
       where: {
         uid: data.id,
@@ -22,4 +23,16 @@ export default class OauthService extends Service {
     }
   }
 
+
+  public async createOAuth(accessToken: string, provider: string, uid: number, userId: number): Promise<Oauth> {
+    const res = await this.ctx.model.Oauth.create({
+      accessToken,
+      provider,
+      uid,
+      userId
+    })
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return res.toJSON()
+  }
 }

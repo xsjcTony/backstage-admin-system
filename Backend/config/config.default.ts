@@ -1,11 +1,14 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg'
 
+
 export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
   const config: PowerPartial<EggAppConfig> = {}
 
   // override config from framework / plugin
   // use for cookie sign key, should change to your own and keep security
   config.keys = `${ appInfo.name }_Aelita`
+
+  config.serverTimeout = 10000
 
   // add your egg config in here
   config.middleware = []

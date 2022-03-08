@@ -13,7 +13,8 @@ import {
   UpdatedAt,
   Is,
   IsEmail,
-  HasMany
+  HasMany,
+  Default
 } from 'sequelize-typescript'
 import { Oauth } from './Oauth'
 
@@ -49,6 +50,7 @@ export class User extends Model<User> {
 
   @AllowNull(false)
   @Unique(false)
+  @Default(0)
   @Column(TINYINT.UNSIGNED)
   public github!: number
 

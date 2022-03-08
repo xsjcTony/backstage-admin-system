@@ -6,6 +6,8 @@
 import { URLSearchParams } from 'node:url'
 import { Controller } from 'egg'
 import * as jwt from 'jsonwebtoken'
+import { v4 as uuidV4 } from 'uuid'
+import { RegisterType } from '../types'
 import type { OAuthUserData } from '../types'
 
 
@@ -63,16 +65,20 @@ export default class GithubController extends Controller {
       }
     })
 
-    await this._goToAdmin({ ...res.data, provider: 'github' })
+    await this._goToAdmin({ ...res.data, provider: 'github' }, accessToken)
   }
 
 
-  private async _goToAdmin(data: OAuthUserData): Promise<void> {
+  private async _goToAdmin(data: OAuthUserData, accessToken: string): Promise<void> {
     const { ctx } = this
 
     try {
-      const user = await ctx.service.oauth.getUser(data)
-      const token = jwt.sign(user, this.config.keys, { expiresIn: '7d' })
+      const user = await ctx.service.oauth.getOAuth(data)
+
+      /**
+       * User already exists -> login straight away
+       */
+      const token = jwt.sign(user.user, this.config.keys, { expiresIn: '7d' })
 
       ctx.cookies.set('token', token, {
         path: '/',
@@ -83,7 +89,39 @@ export default class GithubController extends Controller {
 
       ctx.redirect('http://127.0.0.1:3000/admin')
     } catch (err) {
-      console.error(err)
+      /**
+       * User doesn't exist
+       * 1. Create a user
+       */
+      const userInfo = {
+        username: uuidV4().replace(/-/g, '').substring(0, 20),
+        password: 'com.123456',
+        captcha: '',
+        registerType: RegisterType.Normal,
+        github: 1
+      }
+
+      const user = await ctx.service.user.createUser(userInfo)
+
+      /**
+       * 2. Save user's OAuth info
+       */
+      await ctx.service.oauth.createOAuth(accessToken, data.provider, data.id, user.id)
+
+
+      /**
+       * 3. Login (redirect to '/admin')
+       */
+      const token = jwt.sign(user, this.config.keys, { expiresIn: '7d' })
+
+      ctx.cookies.set('token', token, {
+        path: '/',
+        maxAge: 24 * 60 * 60 * 1000, // 1 day,
+        httpOnly: false,
+        signed: false
+      })
+
+      ctx.redirect('http://127.0.0.1:3000/admin')
     }
   }
 }
