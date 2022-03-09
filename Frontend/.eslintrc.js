@@ -404,6 +404,12 @@ module.exports = {
       'error',
       {
         groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+        pathGroups: [
+          {
+            pattern: '/src/**',
+            group: 'internal'
+          }
+        ],
         'newlines-between': 'ignore',
         alphabetize: {
           order: 'asc',

@@ -1,12 +1,16 @@
 import Cookies from 'js-cookie'
 import { createWebHistory, createRouter } from 'vue-router'
-import Register from '/src/views/Register.vue'
-import Login from '/src/views/Login.vue'
+import Permissions from '/src/components/Admin/Permissions.vue'
+import Roles from '/src/components/Admin/Roles.vue'
+import Users from '/src/components/Admin/Users.vue'
+import Welcome from '/src/components/Admin/Welcome.vue'
 import Admin from '/src/views/Admin.vue'
+import Login from '/src/views/Login.vue'
+import Register from '/src/views/Register.vue'
 import { isLoggedIn } from '../api'
 import { useStore } from '../stores'
-import { ResponseData } from '../types'
 import { getAllRoutePaths } from '../utils'
+import type { ResponseData } from '../types'
 import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
 
 
@@ -23,17 +27,44 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/admin',
-    name: 'admin',
-    component: Admin
+    name: 'Admin',
+    component: Admin,
+    redirect: '/admin/welcome',
+    children: [
+      {
+        path: 'welcome',
+        name: 'Admin -> Welcome',
+        component: Welcome
+      },
+      {
+        path: 'users',
+        name: 'Admin -> Users',
+        component: Users
+      },
+      {
+        path: 'roles',
+        name: 'Admin -> Roles',
+        component: Roles
+      },
+      {
+        path: 'permissions',
+        name: 'Admin -> Permissions',
+        component: Permissions
+      }
+    ]
   }
 ]
+
 
 const router = createRouter({
   history: createWebHistory(),
   routes
 })
 
-// access control
+
+/**
+ * Access Control - Navigation Guard
+ */
 let authenticated = false
 router.beforeEach(async (to: RouteLocationNormalized) => {
   const store = useStore()
@@ -42,7 +73,7 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
   const t = Cookies.get('token')
   if (t) {
     authenticated = false
-    sessionStorage.setItem('token', t)
+    localStorage.setItem('token', t)
     Cookies.remove('token')
   }
 
@@ -74,11 +105,12 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
   }
 
   // logged in
-  if (getAllRoutePaths(routes).includes(to.path)) {
+  if (getAllRoutePaths(routes, '').includes(to.path)) {
     return true
   }
 
   return '/admin'
 })
+
 
 export default router

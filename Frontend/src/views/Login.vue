@@ -69,7 +69,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
 
         if (data.code === 200) {
           // Succeed
-          sessionStorage.setItem('token', data.data.token) // JWT Token
+          localStorage.setItem('token', data.data.token) // JWT Token
           useStore().loggedIn = true // Pinia
           await router.push('/admin')
         } else {
