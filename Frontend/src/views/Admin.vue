@@ -1,17 +1,16 @@
 <script lang="ts" setup>
 import { Collection, Setting, Unlock, User, View } from '@element-plus/icons-vue'
-import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { $ref } from 'vue/macros'
 import { useStore } from '../stores'
-import { useAdminStore } from '../stores/admin'
 
 
 /**
  * Global Constants
  */
 const mainStore = useStore()
-const adminStore = useAdminStore()
 const router = useRouter()
+const route = useRoute()
 
 
 /**
@@ -24,14 +23,26 @@ const logout = async (): Promise<void> => {
 }
 
 const toggleMenuCollapse = (): void => {
-  menuCollapsed.value = !menuCollapsed.value
+  menuCollapsed = !menuCollapsed
+  sessionStorage.setItem('menuCollapsed', menuCollapsed.toString())
 }
 
 
 /**
  * Aside
  */
-const { menuCollapsed } = storeToRefs(adminStore)
+const changeDefaultActiveMenuItem = (index: string): void => {
+  defaultActiveMenuItem = index
+}
+
+let menuCollapsed = $ref<boolean>(sessionStorage.getItem('menuCollapsed') === 'true')
+let defaultActiveMenuItem = $ref(sessionStorage.getItem('defaultActiveMenuItem') ?? 'users')
+
+const currentPath = route.name as string
+if (['users', 'roles', 'permissions'].includes(currentPath)) {
+  changeDefaultActiveMenuItem(currentPath)
+  sessionStorage.setItem('defaultActiveMenuItem', defaultActiveMenuItem)
+}
 
 
 /**
@@ -54,7 +65,7 @@ const { menuCollapsed } = storeToRefs(adminStore)
                 <el-menu :collapse="menuCollapsed"
                          :collapse-transition="false"
                          class="el-menu-vertical-demo"
-                         default-active="users"
+                         :default-active="defaultActiveMenuItem"
                          router
                 >
                     <el-sub-menu index="user-management">
@@ -64,7 +75,7 @@ const { menuCollapsed } = storeToRefs(adminStore)
                             </el-icon>
                             <span>User Management</span>
                         </template>
-                        <el-menu-item index="users">
+                        <el-menu-item index="users" @click="changeDefaultActiveMenuItem('users')">
                             <template #title>
                                 <el-icon>
                                     <User/>
@@ -80,7 +91,7 @@ const { menuCollapsed } = storeToRefs(adminStore)
                             </el-icon>
                             <span>Permission Management</span>
                         </template>
-                        <el-menu-item index="roles">
+                        <el-menu-item index="roles" @click="changeDefaultActiveMenuItem('roles')">
                             <template #title>
                                 <el-icon>
                                     <View/>
@@ -88,7 +99,7 @@ const { menuCollapsed } = storeToRefs(adminStore)
                                 <span>Role List</span>
                             </template>
                         </el-menu-item>
-                        <el-menu-item index="permissions">
+                        <el-menu-item index="permissions" @click="changeDefaultActiveMenuItem('permissions')">
                             <template #title>
                                 <el-icon>
                                     <Unlock/>
@@ -123,6 +134,7 @@ const { menuCollapsed } = storeToRefs(adminStore)
             height: 100px;
             background: url('/src/assets/images/logo.png') center center / cover no-repeat;
             cursor: pointer;
+            transform: translateY(-2px);
         }
 
         .header-right {
@@ -133,8 +145,8 @@ const { menuCollapsed } = storeToRefs(adminStore)
                 overflow: hidden;
                 width: 40px;
                 height: 40px;
-                border-radius: 50%;
                 border: 1px solid #fff;
+                border-radius: 50%;
             }
 
             p {

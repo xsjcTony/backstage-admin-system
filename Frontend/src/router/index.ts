@@ -17,38 +17,38 @@ import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/register',
-    name: 'Register',
+    name: 'register',
     component: Register
   },
   {
     path: '/login',
-    name: 'Login',
+    name: 'login',
     component: Login
   },
   {
     path: '/admin',
-    name: 'Admin',
+    name: 'admin',
     component: Admin,
     redirect: '/admin/welcome',
     children: [
       {
         path: 'welcome',
-        name: 'Admin -> Welcome',
+        name: 'welcome',
         component: Welcome
       },
       {
         path: 'users',
-        name: 'Admin -> Users',
+        name: 'users',
         component: Users
       },
       {
         path: 'roles',
-        name: 'Admin -> Roles',
+        name: 'roles',
         component: Roles
       },
       {
         path: 'permissions',
-        name: 'Admin -> Permissions',
+        name: 'permissions',
         component: Permissions
       }
     ]
