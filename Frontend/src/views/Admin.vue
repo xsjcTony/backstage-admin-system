@@ -33,15 +33,15 @@ const toggleMenuCollapse = (): void => {
  */
 const changeDefaultActiveMenuItem = (index: string): void => {
   defaultActiveMenuItem = index
+  sessionStorage.setItem('defaultActiveMenuItem', defaultActiveMenuItem)
 }
 
 let menuCollapsed = $ref<boolean>(sessionStorage.getItem('menuCollapsed') === 'true')
-let defaultActiveMenuItem = $ref(sessionStorage.getItem('defaultActiveMenuItem') ?? 'users')
+let defaultActiveMenuItem = $ref(sessionStorage.getItem('defaultActiveMenuItem') ?? '')
 
 const currentPath = route.name as string
 if (['users', 'roles', 'permissions'].includes(currentPath)) {
   changeDefaultActiveMenuItem(currentPath)
-  sessionStorage.setItem('defaultActiveMenuItem', defaultActiveMenuItem)
 }
 
 
