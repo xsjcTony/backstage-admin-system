@@ -214,6 +214,7 @@ const sendVerificationCode = async (): Promise<void> => {
              :model="emailRegisterData"
              :rules="emailRegisterRules"
              class="email-register-form"
+             @submit.prevent
     >
         <el-form-item class="email" prop="email" required>
             <el-input v-model.number="emailRegisterData.email"
@@ -268,7 +269,7 @@ const sendVerificationCode = async (): Promise<void> => {
         </el-form-item>
 
         <el-form-item class="register-buttons">
-            <el-button type="primary" @click="submitForm(emailRegisterRef)">Submit</el-button>
+            <el-button type="primary" native-type="submit" @click="submitForm(emailRegisterRef)">Submit</el-button>
             <el-button @click="resetForm(emailRegisterRef)">Reset</el-button>
         </el-form-item>
     </el-form>

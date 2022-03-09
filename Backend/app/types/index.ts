@@ -1,3 +1,5 @@
+/* eslint '@typescript-eslint/no-explicit-any': 'off' */
+
 // RegisterData
 export const enum RegisterType {
   Normal = 'normal',
@@ -12,6 +14,7 @@ interface BaseRegisterData {
 
 interface NormalRegisterData extends BaseRegisterData {
   username: string
+  github?: number
 }
 
 interface EmailRegisterData extends BaseRegisterData {
@@ -35,4 +38,12 @@ export interface LoginData {
   username: string
   password: string
   captcha: string
+}
+
+
+// OAuthUserData
+export interface OAuthUserData {
+  [key: string]: any
+  id: number
+  provider: string
 }

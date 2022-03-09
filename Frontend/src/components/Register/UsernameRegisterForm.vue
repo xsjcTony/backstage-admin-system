@@ -149,6 +149,7 @@ const refreshCaptcha = (): void => {
              :model="usernameRegisterData"
              :rules="usernameRegisterRules"
              class="username-register-form"
+             @submit.prevent
     >
         <el-form-item class="username" prop="username" required>
             <el-input v-model.number="usernameRegisterData.username"
@@ -211,7 +212,7 @@ const refreshCaptcha = (): void => {
         </el-form-item>
 
         <el-form-item class="register-buttons">
-            <el-button type="primary" @click="submitForm(usernameRegisterRef)">Submit</el-button>
+            <el-button type="primary" native-type="submit" @click="submitForm(usernameRegisterRef)">Submit</el-button>
             <el-button @click="resetForm(usernameRegisterRef)">Reset</el-button>
         </el-form-item>
     </el-form>

@@ -6,6 +6,7 @@ import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { loginUser } from '../api'
+import { useStore } from '../stores'
 import { FormInstance, LoginData, JWTResponseData } from '../types'
 
 
@@ -69,6 +70,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
         if (data.code === 200) {
           // Succeed
           sessionStorage.setItem('token', data.data.token) // JWT Token
+          useStore().loggedIn = true // Pinia
           await router.push('/admin')
         } else {
           // Fail
@@ -123,7 +125,11 @@ const refreshCaptcha = (): void => {
     <div class="login-container">
         <div class="login-wrapper">
             <h1>Login</h1>
-            <el-form ref="loginRef" :model="loginData" :rules="usernameRegisterRules">
+            <el-form ref="loginRef"
+                     :model="loginData"
+                     :rules="usernameRegisterRules"
+                     @submit.prevent
+            >
                 <el-form-item class="username" prop="username" required>
                     <el-input v-model.number="loginData.username"
                               :prefix-icon="User"
@@ -163,10 +169,20 @@ const refreshCaptcha = (): void => {
                     >
                 </div>
                 <el-form-item class="register-buttons">
-                    <el-button type="primary" @click="submitForm(loginRef)">Login</el-button>
+                    <el-button native-type="submit" type="primary" @click="submitForm(loginRef)">Login</el-button>
                     <el-button @click="resetForm(loginRef)">Reset</el-button>
                 </el-form-item>
             </el-form>
+            <p class="separate-line-with-text">Third Party Login</p>
+            <ul class="third-party-login">
+                <li>
+                    <a href="http://127.0.0.1:7001/github">
+                        <svg class="icon">
+                            <use role="button" xlink:href="#icon-github"/>
+                        </svg>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </template>
@@ -182,13 +198,12 @@ const refreshCaptcha = (): void => {
         top: 50%;
         left: 50%;
         width: 350px;
-        height: fit-content;
         padding: 0 20px;
         border-radius: 10px;
         background: #fff;
         transform: translate(-50%, -50%);
 
-        h1 {
+        & > h1 {
             font-size: 30px;
             text-align: center;
         }
@@ -200,20 +215,57 @@ const refreshCaptcha = (): void => {
             margin-bottom: 18px;
 
             .captcha-input {
-                margin-bottom: 0;
                 margin-right: 20px;
+                margin-bottom: 0;
             }
 
             .captcha-image {
-                cursor: pointer;
                 width: 160px;
                 height: 60px;
+                cursor: pointer;
             }
         }
 
         .register-buttons {
+            margin-bottom: 25px;
+
             :deep(.el-form-item__content) {
                 justify-content: center;
+            }
+        }
+
+        .separate-line-with-text {
+            display: flex;
+            color: #ccc;
+            font-size: 15px;
+
+            &::before,
+            &::after {
+                flex: 1;
+                margin: auto 0;
+                border-bottom: 1px solid #ccc;
+                content: '';
+            }
+
+            &::before {
+                margin-right: 10px;
+            }
+
+            &::after {
+                margin-left: 10px;
+            }
+        }
+
+        .third-party-login {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            padding: 20px 0;
+            list-style: none;
+
+            & > li {
+                padding: 0 30px;
+                font-size: 35px;
             }
         }
     }

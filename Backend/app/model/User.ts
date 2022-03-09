@@ -9,15 +9,20 @@ import {
   Table,
   AllowNull,
   Unique,
-  CreatedAt, UpdatedAt, Is, IsEmail
+  CreatedAt,
+  UpdatedAt,
+  Is,
+  IsEmail,
+  HasMany,
+  Default
 } from 'sequelize-typescript'
+import { Oauth } from './Oauth'
 
 
-const { INTEGER, STRING } = DataType
+const { INTEGER, STRING, TINYINT } = DataType
 
 @Table({
-  modelName: 'User',
-  tableName: 'users'
+  modelName: 'User'
 })
 export class User extends Model<User> {
 
@@ -42,6 +47,15 @@ export class User extends Model<User> {
   @Unique(false)
   @Column(STRING)
   public password?: string
+
+  @AllowNull(false)
+  @Unique(false)
+  @Default(0)
+  @Column(TINYINT.UNSIGNED)
+  public github!: number
+
+  @HasMany(() => Oauth)
+  public oauths!: Oauth[]
 
   @CreatedAt
   public createdAt!: Date

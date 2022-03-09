@@ -1,7 +1,7 @@
 import { Service } from 'egg'
 import { WhereOptions } from 'sequelize'
 import { User } from '../model/User'
-import { LoginData, RegisterData } from '../types'
+import type { LoginData, RegisterData } from '../types'
 
 
 export default class UserService extends Service {
@@ -16,7 +16,7 @@ export default class UserService extends Service {
 
     if ('username' in data) {
       // Normal Register
-      return this._createUserByUsername(data.username, encryptedPassword)
+      return this._createUserByUsername(data.username, encryptedPassword, data.github)
     } else {
       // Email Register
       return this._createUserByEmail(data.email, encryptedPassword)
@@ -68,10 +68,11 @@ export default class UserService extends Service {
    * Create user in database by USERNAME.
    * @param {string} username
    * @param {string} password
-   * @return {Promise<object>}
+   * @param {number} [github = 0]
+   * @return {Promise<User>}
    * @private
    */
-  private async _createUserByUsername(username: string, password: string): Promise<User> {
+  private async _createUserByUsername(username: string, password: string, github = 0): Promise<User> {
     const user = await this._findUser({ username })
     if (user) {
       throw new Error('Username already exists.')
@@ -79,7 +80,8 @@ export default class UserService extends Service {
 
     const data = await this.ctx.model.User.create({
       username,
-      password
+      password,
+      github
     })
 
     const res = data.toJSON() as User
@@ -94,7 +96,7 @@ export default class UserService extends Service {
    * Create user in database by EMAIL.
    * @param {string} email
    * @param {string} password
-   * @return {Promise<object>}
+   * @return {Promise<User>}
    * @private
    */
   private async _createUserByEmail(email: string, password: string): Promise<User> {
@@ -120,7 +122,7 @@ export default class UserService extends Service {
    * Login user by USERNAME
    * @param {string} username
    * @param {string} password
-   * @return {Promise<object>}
+   * @return {Promise<User>}
    * @private
    */
   private async _loginUserByUsername(username: string, password: string): Promise<User> {
@@ -142,7 +144,7 @@ export default class UserService extends Service {
    * Login user by EMAIL
    * @param {string} email
    * @param {string} password
-   * @return {Promise<object>}
+   * @return {Promise<User>}
    * @private
    */
   private async _loginUserByEmail(email: string, password: string): Promise<User> {
