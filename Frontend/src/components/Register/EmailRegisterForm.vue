@@ -2,7 +2,6 @@
 import { Message, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
-import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { registerUser, sendVerificationEmail } from '../../api'
@@ -16,7 +15,7 @@ const router = useRouter()
  */
 const emailRegisterRef = $ref<FormInstance | null>(null)
 
-const emailRegisterData = reactive({
+const emailRegisterData = $ref({
   email: '',
   password: '',
   confirmPassword: '',
@@ -76,7 +75,7 @@ const validateAgreement = (rule: any, value: boolean, callback: any): void => {
   }
 }
 
-const emailRegisterRules = reactive({
+const emailRegisterRules = $ref({
   email: { validator: validateEmail },
   password: { validator: validatePassword },
   confirmPassword: { validator: validateConfirmPassword },

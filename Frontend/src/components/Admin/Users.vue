@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ArrowRight } from '@element-plus/icons-vue'
-import { reactive } from 'vue'
+import { ref } from 'vue'
 
 
 /**
@@ -10,9 +10,9 @@ const resetDefaultActiveMenuItem = () => void sessionStorage.removeItem('default
 
 
 /**
- * Main -> Search
+ * Main -> Top
  */
-const searchData = reactive({
+const searchData = ref({
   role: '',
   origin: '',
   type: '',
@@ -23,6 +23,27 @@ const query = () => void undefined
 const exportQueryResult = () => void undefined
 const addUser = () => void undefined
 const importUsers = () => void undefined
+
+
+/**
+ * Main -> Table
+ */
+const tableData = [
+  {
+    username: 'jonathan',
+    email: '97606813@qq.com',
+    role: 'Administrator',
+    avatarURL: '',
+    userState: true
+  },
+  {
+    username: 'it666',
+    email: '97606814@qq.com',
+    role: 'User',
+    avatarURL: '',
+    userState: false
+  }
+]
 </script>
 
 <template>
@@ -35,6 +56,7 @@ const importUsers = () => void undefined
     </el-breadcrumb>
 
     <el-card>
+        <!-- Top bar -->
         <div class="main-top">
             <el-form inline :model="searchData" class="demo-form-inline">
                 <el-form-item>
@@ -72,6 +94,16 @@ const importUsers = () => void undefined
                 <el-button type="primary" @click="importUsers">Import users</el-button>
             </div>
         </div>
+
+        <!-- Main table -->
+        <el-table :data="tableData" border stripe>
+            <el-table-column type="index"/>
+            <el-table-column prop="username" label="Username"/>
+            <el-table-column prop="email" label="E-mail"/>
+            <el-table-column prop="role" label="Role"/>
+            <el-table-column label="Status"/>
+            <el-table-column label="Actions"/>
+        </el-table>
     </el-card>
 </template>
 

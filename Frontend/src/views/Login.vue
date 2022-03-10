@@ -2,7 +2,6 @@
 import { User, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
-import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { loginUser } from '../api'
@@ -21,7 +20,7 @@ const router = useRouter()
  */
 const loginRef = $ref<FormInstance | null>(null)
 
-const loginData: LoginData = reactive({
+const loginData: LoginData = $ref({
   username: '',
   password: '',
   captcha: ''
@@ -52,7 +51,7 @@ const validateCaptcha = (rule: any, value: string, callback: any): void => {
   }
 }
 
-const usernameRegisterRules = reactive({
+const usernameRegisterRules = $ref({
   username: { validator: validateUsername },
   password: { validator: validatePassword },
   captcha: { validator: validateCaptcha }
