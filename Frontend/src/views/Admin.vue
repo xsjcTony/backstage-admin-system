@@ -80,7 +80,7 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                                 <el-icon>
                                     <User/>
                                 </el-icon>
-                                <span>User List</span>
+                                <span>User Management</span>
                             </template>
                         </el-menu-item>
                     </el-sub-menu>
