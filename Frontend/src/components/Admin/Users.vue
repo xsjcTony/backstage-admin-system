@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { ArrowRight } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { ArrowRight, EditPen, Delete, Setting } from '@element-plus/icons-vue'
+import { $ref } from 'vue/macros'
 
 
 /**
@@ -10,9 +10,9 @@ const resetDefaultActiveMenuItem = () => void sessionStorage.removeItem('default
 
 
 /**
- * Main -> Top
+ * Main -> Top Query Form
  */
-const searchData = ref({
+const searchData = $ref({
   role: '',
   origin: '',
   type: '',
@@ -30,23 +30,31 @@ const importUsers = () => void undefined
  */
 const tableData = [
   {
-    username: 'jonathan',
-    email: '97606813@qq.com',
+    username: 'Aelita',
+    email: 'xsjcTony@126.com',
     role: 'Administrator',
     avatarURL: '',
     userState: true
   },
   {
-    username: 'it666',
-    email: '97606814@qq.com',
+    username: 'Tequila',
+    email: '123456789@qq.com',
     role: 'User',
     avatarURL: '',
     userState: false
   }
 ]
+
+
+/**
+ * Main -> Bottom Pagination
+ */
+const currentPage4 = $ref<number>(4)
+const pageSize4 = $ref<number>(100)
 </script>
 
 <template>
+    <!-- S Breadcrumb -->
     <el-breadcrumb :separator-icon="ArrowRight">
         <el-breadcrumb-item>
             <a href="/admin" @click="resetDefaultActiveMenuItem">Home Page</a>
@@ -54,9 +62,10 @@ const tableData = [
         <el-breadcrumb-item>User Management</el-breadcrumb-item>
         <el-breadcrumb-item>User List</el-breadcrumb-item>
     </el-breadcrumb>
+    <!-- E Breadcrumb -->
 
+    <!-- S Main -->
     <el-card>
-        <!-- Top bar -->
         <div class="main-top">
             <el-form inline :model="searchData" class="demo-form-inline">
                 <el-form-item>
@@ -94,17 +103,37 @@ const tableData = [
                 <el-button type="primary" @click="importUsers">Import users</el-button>
             </div>
         </div>
+        <!-- /Top bar -->
 
-        <!-- Main table -->
         <el-table :data="tableData" border stripe>
             <el-table-column type="index"/>
             <el-table-column prop="username" label="Username"/>
             <el-table-column prop="email" label="E-mail"/>
             <el-table-column prop="role" label="Role"/>
-            <el-table-column label="Status"/>
-            <el-table-column label="Actions"/>
+            <el-table-column label="State">
+                <template #default="{ row }">
+                    <el-switch v-model="row.userState" active-color="#13ce66" inactive-color="#ff4949"/>
+                </template>
+            </el-table-column>
+            <el-table-column label="Actions">
+                <template #default="{ row }">
+                    <el-button type="primary" :icon="EditPen"/>
+                    <el-button type="danger" :icon="Delete"/>
+                    <el-button type="warning" :icon="Setting"/>
+                </template>
+            </el-table-column>
         </el-table>
+        <!-- /Main table -->
+
+        <el-pagination v-model:currentPage="currentPage4"
+                       v-model:page-size="pageSize4"
+                       :page-sizes="[100, 200, 300, 400]"
+                       layout="->, total, sizes, prev, pager, next, jumper"
+                       :total="400"
+        />
+        <!-- /Bottom pagination -->
     </el-card>
+    <!-- E Main -->
 </template>
 
 <style lang="scss" scoped>
@@ -122,6 +151,10 @@ const tableData = [
         .main-top-right {
             display: flex;
         }
+    }
+
+    .el-table {
+        margin: 20px 0 30px;
     }
 }
 </style>

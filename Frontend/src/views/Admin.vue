@@ -43,11 +43,6 @@ const currentPath = route.name as string
 if (['users', 'roles', 'permissions'].includes(currentPath)) {
   changeDefaultActiveMenuItem(currentPath)
 }
-
-
-/**
- * Main
- */
 </script>
 
 <template>
@@ -67,6 +62,7 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                          class="el-menu-vertical-demo"
                          :default-active="defaultActiveMenuItem"
                          router
+                         :default-openeds="['user-management', 'permission-management']"
                 >
                     <el-sub-menu index="user-management">
                         <template #title>
@@ -76,7 +72,7 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                             <span>User Management</span>
                         </template>
                         <el-menu-item index="users" @click="changeDefaultActiveMenuItem('users')">
-                            <template #title>
+                            <template #default>
                                 <el-icon>
                                     <User/>
                                 </el-icon>
@@ -92,7 +88,7 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                             <span>Permission Management</span>
                         </template>
                         <el-menu-item index="roles" @click="changeDefaultActiveMenuItem('roles')">
-                            <template #title>
+                            <template #default>
                                 <el-icon>
                                     <View/>
                                 </el-icon>
@@ -100,7 +96,7 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                             </template>
                         </el-menu-item>
                         <el-menu-item index="permissions" @click="changeDefaultActiveMenuItem('permissions')">
-                            <template #title>
+                            <template #default>
                                 <el-icon>
                                     <Unlock/>
                                 </el-icon>

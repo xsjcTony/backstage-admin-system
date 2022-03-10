@@ -80,7 +80,7 @@ const emailRegisterRules = $ref({
   password: { validator: validatePassword },
   confirmPassword: { validator: validateConfirmPassword },
   captcha: { validator: validateCaptcha },
-  agreement: { validator: validateAgreement, trigger: 'blur' }
+  agreement: { validator: validateAgreement }
 })
 
 const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
