@@ -1,7 +1,7 @@
 import { Service } from 'egg'
-import { WhereOptions } from 'sequelize'
-import { User } from '../model/User'
+import type { User } from '../model/User'
 import type { LoginData, RegisterData } from '../types'
+import type { WhereOptions } from 'sequelize'
 
 
 export default class UserService extends Service {
