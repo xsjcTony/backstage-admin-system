@@ -1,4 +1,7 @@
 /* eslint '@typescript-eslint/explicit-function-return-type': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
 
 import {
   AutoIncrement,

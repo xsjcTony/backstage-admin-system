@@ -1,4 +1,7 @@
 /* eslint '@typescript-eslint/explicit-function-return-type': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
 
 import {
   AutoIncrement,
@@ -19,7 +22,7 @@ import {
 import { Oauth } from './Oauth'
 
 
-const { INTEGER, STRING, TINYINT } = DataType
+const { INTEGER, STRING, BOOLEAN } = DataType
 
 @Table({
   modelName: 'User'
@@ -50,9 +53,21 @@ export class User extends Model<User> {
 
   @AllowNull(false)
   @Unique(false)
-  @Default(0)
-  @Column(TINYINT.UNSIGNED)
-  public github!: number
+  @Default(false)
+  @Column(BOOLEAN)
+  public github!: boolean
+
+  @AllowNull(false)
+  @Unique(false)
+  @Default(true)
+  @Column(BOOLEAN)
+  public userState!: boolean
+
+  @AllowNull(true)
+  @Unique(false)
+  @Default('/src/assets/images/avatar.jpg')
+  @Column(STRING)
+  public avatarUrl!: string
 
   @HasMany(() => Oauth)
   public oauths!: Oauth[]

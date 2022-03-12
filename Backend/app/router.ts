@@ -26,7 +26,7 @@ export default async (app: Application): Promise<void> => {
 
 
   /**
-   * Users
+   * Users - REST API
    */
   router.get('/api/v1/users', authenticator, controller.users.getUsers)
 }

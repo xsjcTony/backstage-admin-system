@@ -14,7 +14,7 @@ interface BaseRegisterData {
 
 interface NormalRegisterData extends BaseRegisterData {
   username: string
-  github?: number
+  github?: boolean
 }
 
 interface EmailRegisterData extends BaseRegisterData {

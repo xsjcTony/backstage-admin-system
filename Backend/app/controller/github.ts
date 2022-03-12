@@ -98,7 +98,7 @@ export default class GithubController extends Controller {
         password: 'com.123456',
         captcha: '',
         registerType: RegisterType.Normal,
-        github: 1
+        github: true
       }
 
       const user = await ctx.service.user.createUser(userInfo)

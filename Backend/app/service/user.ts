@@ -68,11 +68,11 @@ export default class UserService extends Service {
    * Create user in database by USERNAME.
    * @param {string} username
    * @param {string} password
-   * @param {number} [github = 0]
+   * @param {boolean} [github = false]
    * @return {Promise<User>}
    * @private
    */
-  private async _createUserByUsername(username: string, password: string, github = 0): Promise<User> {
+  private async _createUserByUsername(username: string, password: string, github = false): Promise<User> {
     const user = await this._findUser({ username })
     if (user) {
       throw new Error('Username already exists.')
