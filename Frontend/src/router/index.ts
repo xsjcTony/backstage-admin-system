@@ -79,7 +79,7 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
 
   if (!authenticated) {
     try {
-      const data = await isLoggedIn() as ResponseData
+      const data: ResponseData = await isLoggedIn()
       if (data.code === 200) {
         store.loggedIn = true
       }

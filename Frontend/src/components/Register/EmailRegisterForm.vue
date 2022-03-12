@@ -89,7 +89,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const data: ResponseData = await registerUser(emailRegisterData) as ResponseData
+        const data: ResponseData = await registerUser(emailRegisterData)
 
         if (data.code === 200) {
           // Succeed
@@ -155,7 +155,7 @@ const sendVerificationCode = async (): Promise<void> => {
   }
 
   try {
-    const data: ResponseData = await sendVerificationEmail({ email }) as ResponseData
+    const data: ResponseData = await sendVerificationEmail({ email }) 
 
     if (data.code === 200) {
       ElMessage.success({

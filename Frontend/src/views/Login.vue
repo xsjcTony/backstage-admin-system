@@ -64,7 +64,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
     if (valid) {
       try {
         // login
-        const data: JWTResponseData = await loginUser(loginData) as JWTResponseData
+        const data: JWTResponseData = await loginUser(loginData)
 
         if (data.code === 200) {
           // Succeed

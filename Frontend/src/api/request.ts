@@ -1,4 +1,5 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios from 'axios'
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 
 
 /**
@@ -21,29 +22,22 @@ axios.interceptors.request.use((config: AxiosRequestConfig) => {
 
 axios.interceptors.response.use((config: AxiosResponse) => config, async err => Promise.reject(err))
 
-// 封装 get / post
-export async function get(path = '', data = {}): Promise<unknown> {
-  return new Promise((resolve, reject) => {
-    axios.get(path, {
-      params: data
-    })
-      .then(response => void resolve(response.data))
-      .catch(err => void reject(err))
-  })
-}
 
-export async function post(path = '', data = {}): Promise<unknown> {
-  return new Promise((resolve, reject) => {
-    axios.post(path, data)
-      .then(response => void resolve(response.data))
-      .catch(err => void reject(err))
-  })
-}
+/**
+ * GET
+ */
+export const get = async (path = '', data = {}): Promise<AxiosResponse> => axios.get(path, {
+  params: data
+})
 
-export async function all(requests: Iterable<Promise<unknown>>): Promise<unknown> {
-  return new Promise((resolve, reject) => {
-    Promise.all(requests)
-      .then(res => void resolve(res))
-      .catch(err => void reject(err))
-  })
-}
+
+/**
+ * POST
+ */
+export const post = async (path = '', data = {}): Promise<AxiosResponse> => axios.post(path, data)
+
+
+/**
+ * ALL
+ */
+export const all = async (requests: Iterable<Promise<AxiosResponse>>): Promise<Awaited<AxiosResponse>[]> => Promise.all(requests)

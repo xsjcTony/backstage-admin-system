@@ -50,3 +50,13 @@ export interface LoginData {
   password: string
   captcha: string
 }
+
+// UserData
+export interface UserData {
+  id: number
+  username: string | null
+  email: string | null
+  github: boolean
+  userState: boolean
+  avatarUrl: string
+}

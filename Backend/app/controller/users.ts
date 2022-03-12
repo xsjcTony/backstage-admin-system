@@ -20,7 +20,7 @@ export default class UsersController extends Controller {
       ctx.success(200, 'success', users)
     } catch (err) {
       if (err instanceof Error) {
-        ctx.error(500, err.message)
+        ctx.error(500, err.message, err)
       }
     }
   }

@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { ArrowRight, EditPen, Delete, Setting } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { $ref } from 'vue/macros'
+import { getAllUsers } from '../../api'
+import type { UserData } from '../../types'
 
 
 /**
@@ -28,22 +31,17 @@ const importUsers = () => void undefined
 /**
  * Main -> Table
  */
-const tableData = [
-  {
-    username: 'Aelita',
-    email: 'xsjcTony@126.com',
-    role: 'Administrator',
-    avatarURL: '',
-    userState: true
-  },
-  {
-    username: 'Tequila',
-    email: '123456789@qq.com',
-    role: 'User',
-    avatarURL: '',
-    userState: false
-  }
-]
+let tableData = $ref<UserData[]>([])
+getAllUsers()
+  .then(response => void (tableData = response.data.data))
+  .catch((err) => {
+    ElMessage.error({
+      message: err instanceof Error ? err.message : 'Error',
+      center: true,
+      showClose: true,
+      duration: 5000
+    })
+  })
 
 
 /**
@@ -112,7 +110,7 @@ const pageSize4 = $ref<number>(100)
             <el-table-column prop="role" label="Role"/>
             <el-table-column label="State">
                 <template #default="{ row }">
-                    <el-switch v-model="row.userState" active-color="#13ce66" inactive-color="#ff4949"/>
+                    <el-switch v-model="row.username" active-color="#13ce66" inactive-color="#ff4949"/>
                 </template>
             </el-table-column>
             <el-table-column label="Actions">

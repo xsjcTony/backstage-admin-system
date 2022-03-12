@@ -1,8 +1,21 @@
 import * as Request from './request'
-import type { RegisterData, LoginData } from '../types'
+import type { RegisterData, LoginData, ResponseData, JWTResponseData } from '../types'
+import type { AxiosResponse } from 'axios'
 
 
-export const registerUser = async (data: RegisterData): Promise<unknown> => Request.post('/register', data)
-export const sendVerificationEmail = async (data: { email: string }): Promise<unknown> => Request.get('/verify_email', data)
-export const loginUser = async (data: LoginData): Promise<unknown> => Request.post('/login', data)
-export const isLoggedIn = async (): Promise<unknown> => Request.get('/is_logged_in')
+/**
+ * Account
+ */
+export const registerUser = async (data: RegisterData): Promise<ResponseData> => (await Request.post('/register', data)).data
+
+export const sendVerificationEmail = async (data: { email: string }): Promise<ResponseData> => (await Request.get('/verify_email', data)).data
+
+export const loginUser = async (data: LoginData): Promise<JWTResponseData> => (await Request.post('/login', data)).data
+
+export const isLoggedIn = async (): Promise<ResponseData> => (await Request.get('/is_logged_in')).data
+
+
+/**
+ * Users - REST
+ */
+export const getAllUsers = async (): Promise<AxiosResponse> => Request.get('/api/v1/users')
