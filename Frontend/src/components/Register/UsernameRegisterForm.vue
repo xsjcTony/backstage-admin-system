@@ -45,7 +45,7 @@ const validatePassword = (rule: any, value: string, callback: any): void => {
   } else {
     if (usernameRegisterData.confirmPassword !== '') {
       if (!usernameRegisterRef) return
-      usernameRegisterRef.validateField('confirmPassword', () => null)
+      void usernameRegisterRef.validateField('confirmPassword', () => null)
     }
     callback()
   }

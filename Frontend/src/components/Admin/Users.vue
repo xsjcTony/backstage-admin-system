@@ -148,7 +148,7 @@ const validatePassword = (rule: any, value: string, callback: any): void => {
   } else {
     if (addUserData.confirmPassword !== '') {
       if (!addUserFormRef) return
-      addUserFormRef.validateField('confirmPassword', () => null)
+      void addUserFormRef.validateField('confirmPassword', () => null)
     }
     callback()
   }
