@@ -13,7 +13,7 @@ import AddUserRule from '../validator/addUserRule'
  */
 export default class UsersController extends Controller {
 
-  public async getUsers(): Promise<void> {
+  public async getAllUsers(): Promise<void> {
     const { ctx } = this
 
     try {

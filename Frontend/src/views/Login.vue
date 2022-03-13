@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { loginUser } from '../api'
 import { useStore } from '../stores'
-import type { FormInstance, LoginData, JWTResponseData } from '../types'
+import type { FormInstance, LoginData, JwtUserResponseData } from '../types'
 import type { AxiosError } from 'axios'
 
 
@@ -14,6 +14,7 @@ import type { AxiosError } from 'axios'
  * Global Constants
  */
 const router = useRouter()
+const mainStore = useStore()
 
 
 /**
@@ -65,9 +66,10 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
     if (valid) {
       try {
         // Succeed
-        const data: JWTResponseData = await loginUser(loginData)
+        const data: JwtUserResponseData = await loginUser(loginData)
         localStorage.setItem('token', data.data.token) // JWT Token
-        useStore().loggedIn = true // Pinia
+        mainStore.loggedIn = true // Pinia
+        mainStore.currentUser = data.data
         await router.push('/admin')
       } catch (err) {
         // Error

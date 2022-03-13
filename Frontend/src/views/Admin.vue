@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { Collection, Setting, Unlock, User, View } from '@element-plus/icons-vue'
+import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { $ref } from 'vue/macros'
+import { $, $ref } from 'vue/macros'
 import { useStore } from '../stores'
 
 
@@ -11,6 +13,8 @@ import { useStore } from '../stores'
 const mainStore = useStore()
 const router = useRouter()
 const route = useRoute()
+const { currentUser } = $(storeToRefs(mainStore))
+if (!currentUser) throw new Error('Please log in first')
 
 
 /**
@@ -19,6 +23,7 @@ const route = useRoute()
 const logout = async (): Promise<void> => {
   localStorage.removeItem('token')
   mainStore.loggedIn = false
+  mainStore.currentUser = null
   await router.push('/login')
 }
 
@@ -26,6 +31,11 @@ const toggleMenuCollapse = (): void => {
   menuCollapsed = !menuCollapsed
   sessionStorage.setItem('menuCollapsed', menuCollapsed.toString())
 }
+
+const displayName = computed<string>(() => currentUser.username ?
+  currentUser.username : currentUser.email ?
+    currentUser.email : 'PLACEHOLDER'
+)
 
 
 /**
@@ -50,8 +60,8 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
         <el-header>
             <div class="header-left" @click="toggleMenuCollapse"></div>
             <div class="header-right">
-                <img alt="avatar" src="/src/assets/images/avatar.jpg">
-                <p>Aelita</p>
+                <img alt="avatar" :src="currentUser.avatarUrl">
+                <p>{{ displayName }}</p>
                 <el-button @click="logout">Log out</el-button>
             </div>
         </el-header>

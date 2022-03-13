@@ -1,6 +1,16 @@
 import type { ElForm } from 'element-plus'
 
 
+/**
+ * Pinia
+ */
+// MainStore
+export interface MainStore {
+  loggedIn: boolean
+  currentUser: User | null
+}
+
+
 // RegisterData
 export const enum RegisterType {
   Normal = 'normal',
@@ -35,11 +45,11 @@ export interface ResponseData {
   data: unknown
 }
 
-// JWTResponseData
-export interface JWTResponseData {
+// JwtUserResponseData
+export interface JwtUserResponseData {
   code: number
   msg: unknown
-  data: {
+  data: User & {
     token: string
   }
 }
@@ -51,20 +61,20 @@ export interface LoginData {
   captcha: string
 }
 
-// UserData
-export interface UserData {
-  id: number
-  username: string | null
-  email: string | null
-  github: boolean
-  userState: boolean
-  avatarUrl: string
-}
-
 // UserManagementAddUserData
 export interface UserManagementAddUserData {
   username: string
   email: string | null
   password: string
   confirmPassword: string
+}
+
+// User
+export interface User {
+  id: number
+  username: string | null
+  email: string | null
+  github: boolean
+  userState: boolean
+  avatarUrl: string
 }

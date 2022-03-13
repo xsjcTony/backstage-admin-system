@@ -1,5 +1,5 @@
 import * as Request from './request'
-import type { RegisterData, LoginData, ResponseData, JWTResponseData, UserManagementAddUserData } from '../types'
+import type { RegisterData, LoginData, ResponseData, JwtUserResponseData, UserManagementAddUserData } from '../types'
 import type { AxiosResponse } from 'axios'
 
 
@@ -10,7 +10,7 @@ export const registerUser = async (data: RegisterData): Promise<ResponseData> =>
 
 export const sendVerificationEmail = async (data: { email: string }): Promise<ResponseData> => (await Request.get('/verify_email', data)).data
 
-export const loginUser = async (data: LoginData): Promise<JWTResponseData> => (await Request.post('/login', data)).data
+export const loginUser = async (data: LoginData): Promise<JwtUserResponseData> => (await Request.post('/login', data)).data
 
 export const isLoggedIn = async (): Promise<ResponseData> => (await Request.get('/is_logged_in')).data
 

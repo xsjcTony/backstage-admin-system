@@ -86,7 +86,6 @@ export default class UserService extends Service {
 
     const res = data.toJSON() as User
     delete res.password
-    delete res.email
 
     return res
   }
@@ -112,7 +111,6 @@ export default class UserService extends Service {
 
     const res = data.toJSON() as User
     delete res.password
-    delete res.username
 
     return res
   }
@@ -134,7 +132,6 @@ export default class UserService extends Service {
 
     const res = user.toJSON() as User
     delete res.password
-    delete res.email
 
     return res
   }
@@ -156,7 +153,6 @@ export default class UserService extends Service {
 
     const res = user.toJSON() as User
     delete res.password
-    delete res.username
 
     return res
   }

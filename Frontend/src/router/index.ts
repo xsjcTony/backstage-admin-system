@@ -10,6 +10,7 @@ import Register from '/src/views/Register.vue'
 import { isLoggedIn } from '../api'
 import { useStore } from '../stores'
 import { getAllRoutePaths } from '../utils'
+import type { ResponseData, User } from '../types'
 import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
 
 
@@ -66,7 +67,7 @@ const router = createRouter({
  */
 let authenticated = false
 router.beforeEach(async (to: RouteLocationNormalized) => {
-  const store = useStore()
+  const mainStore = useStore()
 
   // OAuth cookie
   const t = Cookies.get('token')
@@ -78,17 +79,18 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
 
   if (!authenticated) {
     try {
-      await isLoggedIn()
-      store.loggedIn = true
+      const data: ResponseData = await isLoggedIn()
+      mainStore.loggedIn = true
+      mainStore.currentUser = data.data as User
     } catch (err) {
-      store.loggedIn = false
+      mainStore.loggedIn = false
     }
 
     authenticated = true
   }
 
   if (to.path === '/login' || to.path === '/register') {
-    if (store.loggedIn) {
+    if (mainStore.loggedIn) {
       // redirect to '/admin' if logged in
       return '/admin'
     } else {
@@ -97,7 +99,7 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
   }
 
   // redirect to '/login' if not logged in
-  if (!store.loggedIn) {
+  if (!mainStore.loggedIn) {
     return '/login'
   }
 

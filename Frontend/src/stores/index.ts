@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
+import { MainStore } from '../types'
 
 
 export const useStore = defineStore('main', {
-  state: () => {
+  state: (): MainStore => {
     return {
-      loggedIn: false
+      loggedIn: false,
+      currentUser: null
     }
   }
 })

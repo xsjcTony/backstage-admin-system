@@ -8,6 +8,7 @@ import { Controller } from 'egg'
 import * as jwt from 'jsonwebtoken'
 import { v4 as uuidV4 } from 'uuid'
 import { RegisterType } from '../types'
+import type { User } from '../model/User'
 import type { OAuthUserData } from '../types'
 
 
@@ -73,12 +74,15 @@ export default class GithubController extends Controller {
     const { ctx } = this
 
     try {
-      const user = await ctx.service.oauth.getOAuth(data)
+      const oauth = await ctx.service.oauth.getOAuth(data)
+
+      const user = oauth.user
+      delete user.password
 
       /**
        * User already exists -> login straight away
        */
-      const token = jwt.sign(user.user, this.config.keys, { expiresIn: '7d' })
+      const token = jwt.sign(user, this.config.keys, { expiresIn: '7d' })
 
       ctx.cookies.set('token', token, {
         path: '/',
@@ -107,7 +111,6 @@ export default class GithubController extends Controller {
        * 2. Save user's OAuth info
        */
       await ctx.service.oauth.createOAuth(accessToken, data.provider, data.id, user.id)
-
 
       /**
        * 3. Login (redirect to '/admin')

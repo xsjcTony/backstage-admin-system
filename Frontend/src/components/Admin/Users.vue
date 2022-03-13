@@ -1,10 +1,20 @@
 <script lang="ts" setup>
 import { ArrowRight, EditPen, Delete, Setting, User, Lock, Message } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { $ref } from 'vue/macros'
+import { storeToRefs } from 'pinia'
+import { $, $ref } from 'vue/macros'
 import { createUser, getAllUsers } from '../../api'
-import type { UserData, FormInstance, UserManagementAddUserData } from '../../types'
+import { useStore } from '../../stores'
+import type { User as UserData, FormInstance, UserManagementAddUserData } from '../../types'
 import type { AxiosResponse, AxiosError } from 'axios'
+
+
+/**
+ * Global Constants
+ */
+const mainStore = useStore()
+const { currentUser } = $(storeToRefs(mainStore))
+if (!currentUser) throw new Error('Please log in first')
 
 
 /**
@@ -32,11 +42,21 @@ const importUsers = () => void undefined
  * Main -> Table
  */
 let tableData = $ref<UserData[]>([])
+const tableRowClassName = ({ row }: { row: UserData }): string => {
+  if (row.id === currentUser.id) return 'current-user-row'
+  return ''
+}
+
 getAllUsers()
-  .then(response => void (tableData = response.data.data))
+  .then((response) => {
+    tableData = response.data.data
+    const currentUserIndex = tableData.findIndex(user => user.id === currentUser.id)
+    const user = tableData.splice(currentUserIndex, 1)
+    tableData.unshift(...user)
+  })
   .catch((err) => {
     ElMessage.error({
-      message: err instanceof Error ? err.message : 'Error',
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
       center: true,
       showClose: true,
       duration: 5000
@@ -171,30 +191,30 @@ const resetForm = (formEl: FormInstance | undefined): void => {
     <!-- S Main -->
     <el-card>
         <div class="main-top">
-            <el-form inline :model="searchData" class="demo-form-inline">
+            <el-form :model="searchData" class="demo-form-inline" inline>
                 <el-form-item>
-                    <el-select v-model="searchData.role" placeholder="- All roles -" clearable>
+                    <el-select v-model="searchData.role" clearable placeholder="- All roles -">
                         <el-option label="Administrator" value="administrator"/>
                         <el-option label="User" value="user"/>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
-                    <el-select v-model="searchData.origin" placeholder="- All origins -" clearable>
+                    <el-select v-model="searchData.origin" clearable placeholder="- All origins -">
                         <el-option label="Local registered" value="local"/>
                         <el-option label="GitHub OAuth" value="github"/>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
-                    <el-select v-model="searchData.type" placeholder="- All Types -" clearable>
+                    <el-select v-model="searchData.type" clearable placeholder="- All Types -">
                         <el-option label="Username" value="username"/>
                         <el-option label="E-mail" value="email"/>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
                     <el-input v-model="searchData.keyword"
+                              clearable
                               placeholder="Keyword"
                               type="text"
-                              clearable
                     />
                 </el-form-item>
                 <el-form-item>
@@ -209,11 +229,19 @@ const resetForm = (formEl: FormInstance | undefined): void => {
         </div>
         <!-- /Top bar -->
 
-        <el-table :data="tableData" border stripe>
+        <div class="table-row-indicators">
+            <el-tag color="#e1f3d8" size="large" type="success">Current User (You)</el-tag>
+        </div>
+
+        <el-table :data="tableData"
+                  :row-class-name="tableRowClassName"
+                  border
+                  stripe
+        >
             <el-table-column type="index"/>
-            <el-table-column prop="username" label="Username"/>
-            <el-table-column prop="email" label="E-mail"/>
-            <el-table-column prop="role" label="Role"/>
+            <el-table-column label="Username" prop="username"/>
+            <el-table-column label="E-mail" prop="email"/>
+            <el-table-column label="Role" prop="role"/>
             <el-table-column label="State">
                 <template #default="{ row }">
                     <el-switch v-model="row.userState" active-color="#13ce66" inactive-color="#ff4949"/>
@@ -221,9 +249,9 @@ const resetForm = (formEl: FormInstance | undefined): void => {
             </el-table-column>
             <el-table-column label="Actions">
                 <template #default="{ row }">
-                    <el-button type="primary" :icon="EditPen"/>
-                    <el-button type="danger" :icon="Delete"/>
-                    <el-button type="warning" :icon="Setting"/>
+                    <el-button :icon="EditPen" type="primary"/>
+                    <el-button :icon="Setting" type="warning"/>
+                    <el-button v-if="row.id !== currentUser.id" :icon="Delete" type="danger"/>
                 </template>
             </el-table-column>
         </el-table>
@@ -232,8 +260,8 @@ const resetForm = (formEl: FormInstance | undefined): void => {
         <el-pagination v-model:currentPage="currentPage4"
                        v-model:page-size="pageSize4"
                        :page-sizes="[100, 200, 300, 400]"
-                       layout="->, total, sizes, prev, pager, next, jumper"
                        :total="400"
+                       layout="->, total, sizes, prev, pager, next, jumper"
         />
         <!-- /Bottom pagination -->
     </el-card>
@@ -241,8 +269,8 @@ const resetForm = (formEl: FormInstance | undefined): void => {
 
     <!-- S Add user dialog -->
     <el-dialog v-model="addUserDialogVisible"
-               title="Add User"
                custom-class="user-management-add-user-dialog"
+               title="Add User"
                @close="resetForm(addUserFormRef)"
     >
         <el-form ref="addUserFormRef"
@@ -322,8 +350,18 @@ const resetForm = (formEl: FormInstance | undefined): void => {
         }
     }
 
+    .table-row-indicators {
+        margin-top: 2px;
+        padding-top: 20px;
+        border-top: 1px solid #cccccc80;
+    }
+
     .el-table {
         margin: 20px 0 30px;
+
+        :deep(.current-user-row) {
+            background: #e1f3d8;
+        }
     }
 }
 </style>
