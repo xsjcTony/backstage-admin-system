@@ -6,7 +6,8 @@ import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { loginUser } from '../api'
 import { useStore } from '../stores'
-import { FormInstance, LoginData, JWTResponseData } from '../types'
+import type { FormInstance, LoginData, JWTResponseData } from '../types'
+import type { AxiosError } from 'axios'
 
 
 /**
@@ -63,27 +64,15 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        // login
+        // Succeed
         const data: JWTResponseData = await loginUser(loginData)
-
-        if (data.code === 200) {
-          // Succeed
-          localStorage.setItem('token', data.data.token) // JWT Token
-          useStore().loggedIn = true // Pinia
-          await router.push('/admin')
-        } else {
-          // Fail
-          ElMessage.error({
-            message: typeof data.msg === 'string' ? data.msg : 'Error',
-            center: true,
-            showClose: true,
-            duration: 3000
-          })
-          refreshCaptcha()
-        }
+        localStorage.setItem('token', data.data.token) // JWT Token
+        useStore().loggedIn = true // Pinia
+        await router.push('/admin')
       } catch (err) {
+        // Error
         ElMessage.error({
-          message: err instanceof Error ? err.message : 'Error',
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
           center: true,
           showClose: true,
           duration: 3000

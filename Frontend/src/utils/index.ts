@@ -1,7 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 
-export const getAllRoutePaths = (routes: RouteRecordRaw[], path: string): string[] => {
+export const getAllRoutePaths = (routes: RouteRecordRaw[], path = ''): string[] => {
   const res: string[] = []
 
   routes.forEach((route: RouteRecordRaw) => {

@@ -5,7 +5,9 @@ import 'element-plus/es/components/message/style/css'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { registerUser } from '../../api'
-import { RegisterType, FormInstance, ResponseData } from '../../types'
+import { RegisterType } from '../../types'
+import type { FormInstance } from '../../types'
+import type { AxiosError } from 'axios'
 
 
 const router = useRouter()
@@ -89,24 +91,13 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const data: ResponseData = await registerUser(usernameRegisterData)
-
-        if (data.code === 200) {
-          // Succeed
-          await router.push('/login')
-        } else {
-          // Fail
-          ElMessage.error({
-            message: typeof data.msg === 'string' ? data.msg : 'Error',
-            center: true,
-            showClose: true,
-            duration: 3000
-          })
-          refreshCaptcha()
-        }
+        // Succeed
+        await registerUser(usernameRegisterData)
+        await router.push('/login')
       } catch (err) {
+        // Error
         ElMessage.error({
-          message: err instanceof Error ? err.message : 'Error',
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
           center: true,
           showClose: true,
           duration: 3000

@@ -2,8 +2,9 @@
 import { ArrowRight, EditPen, Delete, Setting, User, Lock, Message } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { $ref } from 'vue/macros'
-import { getAllUsers } from '../../api'
+import { createUser, getAllUsers } from '../../api'
 import type { UserData, FormInstance, UserManagementAddUserData } from '../../types'
+import type { AxiosResponse, AxiosError } from 'axios'
 
 
 /**
@@ -24,7 +25,6 @@ const searchData = $ref({
 
 const query = () => void undefined
 const exportQueryResult = () => void undefined
-const addUser = () => void (addUserDialogVisible = true)
 const importUsers = () => void undefined
 
 
@@ -63,6 +63,41 @@ const addUserData = $ref<UserManagementAddUserData>({
   confirmPassword: ''
 })
 
+const addUser = async (formEl: FormInstance | undefined): Promise<void> => {
+  if (!formEl) return
+
+  await formEl.validate(async (valid) => {
+    if (valid) {
+      try {
+        const response: AxiosResponse = await createUser(addUserData)
+
+        ElMessage.success({
+          message: response.data.message || 'Success',
+          center: true,
+          showClose: true,
+          duration: 3000
+        })
+        tableData.push(response.data.data)
+        addUserDialogVisible = false
+      } catch (err) {
+        ElMessage.error({
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+          center: true,
+          showClose: true,
+          duration: 3000
+        })
+      }
+    } else {
+      ElMessage.error({
+        message: 'Invalid user data',
+        center: true,
+        showClose: true,
+        duration: 3000
+      })
+    }
+  })
+}
+
 // Validation
 const validateUsername = (rule: any, value: string, callback: any): void => {
   const regex = /^[A-Za-z0-9]{6,20}$/
@@ -74,9 +109,11 @@ const validateUsername = (rule: any, value: string, callback: any): void => {
     callback()
   }
 }
-const validateEmail = (rule: any, value: string, callback: any): void => {
-  const regex = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$|^$/
-  if (!regex.test(value)) {
+const validateEmail = (rule: any, value: string | null, callback: any): void => {
+  const regex = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+  if (value === null) {
+    callback()
+  } else if (!regex.test(value)) {
     callback(new Error('Invalid email address'))
   } else {
     callback()
@@ -166,7 +203,7 @@ const resetForm = (formEl: FormInstance | undefined): void => {
                 </el-form-item>
             </el-form>
             <div class="main-top-right">
-                <el-button type="primary" @click="addUser">Add user</el-button>
+                <el-button type="primary" @click="addUserDialogVisible = true">Add user</el-button>
                 <el-button type="primary" @click="importUsers">Import users</el-button>
             </div>
         </div>
@@ -261,7 +298,7 @@ const resetForm = (formEl: FormInstance | undefined): void => {
             <span class="dialog-footer">
                 <el-button @click="resetForm(addUserFormRef)">Reset Form</el-button>
                 <el-button @click="addUserDialogVisible = false">Cancel</el-button>
-                <el-button type="primary" @click="addUserDialogVisible = false">Confirm</el-button>
+                <el-button type="primary" @click="addUser(addUserFormRef)">Confirm</el-button>
             </span>
         </template>
     </el-dialog>

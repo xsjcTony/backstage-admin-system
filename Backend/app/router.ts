@@ -29,4 +29,5 @@ export default async (app: Application): Promise<void> => {
    * Users - REST API
    */
   router.get('/api/v1/users', authenticator, controller.users.getUsers)
+  router.post('/api/v1/users', authenticator, controller.users.createUser)
 }

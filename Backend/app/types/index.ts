@@ -47,3 +47,11 @@ export interface OAuthUserData {
   id: number
   provider: string
 }
+
+
+// AddUserData
+export interface AddUserData {
+  username: string
+  email: string | null
+  password: string
+}

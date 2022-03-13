@@ -1,5 +1,5 @@
 import * as Request from './request'
-import type { RegisterData, LoginData, ResponseData, JWTResponseData } from '../types'
+import type { RegisterData, LoginData, ResponseData, JWTResponseData, UserManagementAddUserData } from '../types'
 import type { AxiosResponse } from 'axios'
 
 
@@ -19,3 +19,5 @@ export const isLoggedIn = async (): Promise<ResponseData> => (await Request.get(
  * Users - REST
  */
 export const getAllUsers = async (): Promise<AxiosResponse> => Request.get('/api/v1/users')
+
+export const createUser = async (data: UserManagementAddUserData): Promise<AxiosResponse> => Request.post('/api/v1/users', data)

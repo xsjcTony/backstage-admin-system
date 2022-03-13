@@ -10,7 +10,6 @@ import Register from '/src/views/Register.vue'
 import { isLoggedIn } from '../api'
 import { useStore } from '../stores'
 import { getAllRoutePaths } from '../utils'
-import type { ResponseData } from '../types'
 import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
 
 
@@ -79,10 +78,8 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
 
   if (!authenticated) {
     try {
-      const data: ResponseData = await isLoggedIn()
-      if (data.code === 200) {
-        store.loggedIn = true
-      }
+      await isLoggedIn()
+      store.loggedIn = true
     } catch (err) {
       store.loggedIn = false
     }
@@ -105,7 +102,7 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
   }
 
   // logged in
-  if (getAllRoutePaths(routes, '').includes(to.path)) {
+  if (getAllRoutePaths(routes).includes(to.path)) {
     return true
   }
 
