@@ -24,7 +24,7 @@ const searchData = $ref({
 
 const query = () => void undefined
 const exportQueryResult = () => void undefined
-const addUser = () => void undefined
+const addUser = () => void (addUserDialogVisible = true)
 const importUsers = () => void undefined
 
 
@@ -49,6 +49,15 @@ getAllUsers()
  */
 const currentPage4 = $ref<number>(4)
 const pageSize4 = $ref<number>(100)
+
+
+/**
+ * Main -> Add User Dialog
+ */
+let addUserDialogVisible = $ref<boolean>(false)
+const addUserForm = $ref({
+  name: ''
+})
 </script>
 
 <template>
@@ -110,7 +119,7 @@ const pageSize4 = $ref<number>(100)
             <el-table-column prop="role" label="Role"/>
             <el-table-column label="State">
                 <template #default="{ row }">
-                    <el-switch v-model="row.username" active-color="#13ce66" inactive-color="#ff4949"/>
+                    <el-switch v-model="row.userState" active-color="#13ce66" inactive-color="#ff4949"/>
                 </template>
             </el-table-column>
             <el-table-column label="Actions">
@@ -132,6 +141,23 @@ const pageSize4 = $ref<number>(100)
         <!-- /Bottom pagination -->
     </el-card>
     <!-- E Main -->
+
+    <!-- S Add user dialog -->
+    <el-dialog v-model="addUserDialogVisible" title="Shipping address">
+        <el-form :model="addUserForm">
+            <el-form-item label="Promotion name">
+                <el-input v-model="addUserForm.name" autocomplete="off"/>
+            </el-form-item>
+        </el-form>
+
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="addUserDialogVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="addUserDialogVisible = false">Confirm</el-button>
+            </span>
+        </template>
+    </el-dialog>
+    <!-- E Add user dialog -->
 </template>
 
 <style lang="scss" scoped>

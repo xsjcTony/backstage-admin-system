@@ -130,7 +130,7 @@ module.exports = {
       'error',
       {
         ignorePatterns: [
-          /^router-view$/,
+          /^router-/,
           /^el/
         ]
       }
