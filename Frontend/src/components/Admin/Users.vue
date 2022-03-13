@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { ArrowRight, EditPen, Delete, Setting } from '@element-plus/icons-vue'
+import { ArrowRight, EditPen, Delete, Setting, User, Lock, Message } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { $ref } from 'vue/macros'
 import { getAllUsers } from '../../api'
-import type { UserData } from '../../types'
+import type { UserData, FormInstance, UserManagementAddUserData } from '../../types'
 
 
 /**
@@ -55,9 +55,69 @@ const pageSize4 = $ref<number>(100)
  * Main -> Add User Dialog
  */
 let addUserDialogVisible = $ref<boolean>(false)
-const addUserForm = $ref({
-  name: ''
+const addUserFormRef = $ref<FormInstance | null>(null)
+const addUserData = $ref<UserManagementAddUserData>({
+  username: '',
+  email: null,
+  password: '',
+  confirmPassword: ''
 })
+
+// Validation
+const validateUsername = (rule: any, value: string, callback: any): void => {
+  const regex = /^[A-Za-z0-9]{6,20}$/
+  if (value === '') {
+    callback(new Error('Please input the username'))
+  } else if (!regex.test(value)) {
+    callback(new Error('Username must be any of a-z, A-Z or 0-9, and between 6 and 20 (both inclusive) characters long'))
+  } else {
+    callback()
+  }
+}
+const validateEmail = (rule: any, value: string, callback: any): void => {
+  const regex = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$|^$/
+  if (!regex.test(value)) {
+    callback(new Error('Invalid email address'))
+  } else {
+    callback()
+  }
+}
+const validatePassword = (rule: any, value: string, callback: any): void => {
+  const regex = /^((?=.*[0-9].*)(?=.*[A-Za-z].*)(?=.*[,.#%'+*\-:;^_`].*))[,.#%'+*\-:;^_`0-9A-Za-z]{8,20}$/
+  if (value === '') {
+    callback(new Error('Please input the password'))
+  } else if (!regex.test(value)) {
+    callback(new Error('Password must include characters, numbers, symbols, and between 8 and 20 (both inclusive) characters long.'))
+  } else {
+    if (addUserData.confirmPassword !== '') {
+      if (!addUserFormRef) return
+      addUserFormRef.validateField('confirmPassword', () => null)
+    }
+    callback()
+  }
+}
+const validateConfirmPassword = (rule: any, value: string, callback: any): void => {
+  if (value === '') {
+    callback(new Error('Please input the password again'))
+  } else if (value !== addUserData.password) {
+    callback(new Error('Password doesn\'t match'))
+  } else {
+    callback()
+  }
+}
+
+const usernameRegisterRules = $ref({
+  username: { validator: validateUsername },
+  email: { validator: validateEmail },
+  password: { validator: validatePassword },
+  confirmPassword: { validator: validateConfirmPassword }
+})
+
+const resetForm = (formEl: FormInstance | undefined): void => {
+  if (!formEl) return
+  formEl.resetFields()
+  ElMessage.closeAll()
+}
 </script>
 
 <template>
@@ -143,15 +203,63 @@ const addUserForm = $ref({
     <!-- E Main -->
 
     <!-- S Add user dialog -->
-    <el-dialog v-model="addUserDialogVisible" title="Shipping address">
-        <el-form :model="addUserForm">
-            <el-form-item label="Promotion name">
-                <el-input v-model="addUserForm.name" autocomplete="off"/>
+    <el-dialog v-model="addUserDialogVisible"
+               title="Add User"
+               custom-class="user-management-add-user-dialog"
+               @close="resetForm(addUserFormRef)"
+    >
+        <el-form ref="addUserFormRef"
+                 :model="addUserData"
+                 :rules="usernameRegisterRules"
+                 class="username-register-form"
+        >
+            <el-form-item class="username" prop="username" required>
+                <el-input v-model="addUserData.username"
+                          :prefix-icon="User"
+                          clearable
+                          maxlength="20"
+                          placeholder="Username"
+                          show-word-limit
+                          type="text"
+                />
+            </el-form-item>
+            <el-form-item class="email" prop="email">
+                <el-input :model-value="addUserData.email"
+                          :prefix-icon="Message"
+                          clearable
+                          placeholder="E-mail (Optional)"
+                          type="text"
+                          @input="value => void (addUserData.email = value ? value : null)"
+                />
+            </el-form-item>
+            <el-form-item class="password" prop="password" required>
+                <el-input v-model="addUserData.password"
+                          :prefix-icon="Lock"
+                          autocomplete="off"
+                          clearable
+                          maxlength="20"
+                          placeholder="Password"
+                          show-password
+                          type="password"
+                />
+            </el-form-item>
+            <el-form-item prop="confirmPassword" required>
+                <el-input v-model="addUserData.confirmPassword"
+                          :prefix-icon="Lock"
+                          autocomplete="off"
+                          clearable
+                          maxlength="20"
+                          placeholder="Confirm password"
+                          show-password
+                          type="password"
+                />
             </el-form-item>
         </el-form>
+        <!-- /Add user form -->
 
         <template #footer>
             <span class="dialog-footer">
+                <el-button @click="resetForm(addUserFormRef)">Reset Form</el-button>
                 <el-button @click="addUserDialogVisible = false">Cancel</el-button>
                 <el-button type="primary" @click="addUserDialogVisible = false">Confirm</el-button>
             </span>
@@ -180,5 +288,11 @@ const addUserForm = $ref({
     .el-table {
         margin: 20px 0 30px;
     }
+}
+</style>
+
+<style lang="scss">
+.user-management-add-user-dialog {
+    min-width: 630px;
 }
 </style>

@@ -216,7 +216,7 @@ const sendVerificationCode = async (): Promise<void> => {
              @submit.prevent
     >
         <el-form-item class="email" prop="email" required>
-            <el-input v-model.number="emailRegisterData.email"
+            <el-input v-model="emailRegisterData.email"
                       :prefix-icon="Message"
                       clearable
                       placeholder="E-mail"

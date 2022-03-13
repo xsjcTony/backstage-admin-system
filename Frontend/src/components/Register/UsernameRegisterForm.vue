@@ -151,7 +151,7 @@ const refreshCaptcha = (): void => {
              @submit.prevent
     >
         <el-form-item class="username" prop="username" required>
-            <el-input v-model.number="usernameRegisterData.username"
+            <el-input v-model="usernameRegisterData.username"
                       :prefix-icon="User"
                       autofocus
                       clearable

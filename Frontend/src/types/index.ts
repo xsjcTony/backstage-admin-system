@@ -60,3 +60,11 @@ export interface UserData {
   userState: boolean
   avatarUrl: string
 }
+
+// UserManagementAddUserData
+export interface UserManagementAddUserData {
+  username: string
+  email: string | null
+  password: string
+  confirmPassword: string
+}
