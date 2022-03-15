@@ -14,7 +14,7 @@ import { storeToRefs } from 'pinia'
 import { $, $ref } from 'vue/macros'
 import { createUser, getAllUsers, deleteUser as destroyUser } from '../../api'
 import { useStore } from '../../stores'
-import type { User as UserData, FormInstance, UserManagementAddUserData } from '../../types'
+import type { User as UserData, FormInstance, UserManagementAddUserData, UserManagementEditUserData } from '../../types'
 import type { AxiosResponse, AxiosError } from 'axios'
 
 
@@ -190,11 +190,11 @@ const resetForm = (formEl: FormInstance | undefined): void => {
  */
 let editUserDialogVisible = $ref<boolean>(false)
 const editUserFormRef = $ref<FormInstance | null>(null)
-const editUserData = $ref<UserManagementAddUserData>({
+const editUserData = $ref<UserManagementEditUserData>({
   username: '',
   email: null,
-  password: '',
-  confirmPassword: ''
+  password: undefined,
+  confirmPassword: undefined
 })
 
 const showEditUserDialog = (user: UserData): void => {
@@ -242,11 +242,31 @@ const editUser = async (formEl: FormInstance | undefined): Promise<void> => {
 }
 
 // Validation
+const validateEditUserPassword = (rule: any, value: string | undefined, callback: any): void => {
+  const regex = /^((?=.*[0-9].*)(?=.*[A-Za-z].*)(?=.*[,.#%'+*\-:;^_`].*))[,.#%'+*\-:;^_`0-9A-Za-z]{8,20}$/
+  if (value && !regex.test(value)) {
+    callback(new Error('Password must include characters, numbers, symbols, and between 8 and 20 (both inclusive) characters long.'))
+  } else {
+    if (addUserData.confirmPassword !== '') {
+      if (!editUserFormRef) return
+      void editUserFormRef.validateField('confirmPassword', () => null)
+    }
+    callback()
+  }
+}
+const validateEditUserConfirmPassword = (rule: any, value: string | undefined, callback: any): void => {
+  if (value && value !== editUserData.password) {
+    callback(new Error('Password doesn\'t match'))
+  } else {
+    callback()
+  }
+}
+
 const editUserRules = $ref({
   username: { validator: validateUsername },
   email: { validator: validateEmail },
-  password: { validator: validatePassword },
-  confirmPassword: { validator: validateConfirmPassword }
+  password: { validator: validateEditUserPassword },
+  confirmPassword: { validator: validateEditUserConfirmPassword }
 })
 
 
@@ -338,9 +358,9 @@ const deleteUser = async (id: number): Promise<void> => {
                   stripe
         >
             <el-table-column type="index"/>
-            <el-table-column label="Username" prop="username" min-width="200"/>
-            <el-table-column label="E-mail" prop="email" min-width="250"/>
-            <el-table-column label="Role" prop="role" min-width="150"/>
+            <el-table-column label="Username" min-width="200" prop="username"/>
+            <el-table-column label="E-mail" min-width="250" prop="email"/>
+            <el-table-column label="Role" min-width="150" prop="role"/>
             <el-table-column label="State" width="100">
                 <template #default="{ row }">
                     <el-switch v-model="row.userState" active-color="#13ce66" inactive-color="#ff4949"/>
@@ -464,26 +484,28 @@ const deleteUser = async (id: number): Promise<void> => {
                           @input="value => void (editUserData.email = value ? value : null)"
                 />
             </el-form-item>
-            <el-form-item class="password" prop="password" required>
-                <el-input v-model="editUserData.password"
+            <el-form-item class="password" prop="password">
+                <el-input :model-value="editUserData.password"
                           :prefix-icon="Lock"
                           autocomplete="off"
                           clearable
                           maxlength="20"
-                          placeholder="Password"
+                          placeholder="Password (Leave blank if no change)"
                           show-password
                           type="password"
+                          @input="value => void (editUserData.password = value ? value : undefined)"
                 />
             </el-form-item>
-            <el-form-item prop="confirmPassword" required>
-                <el-input v-model="editUserData.confirmPassword"
+            <el-form-item prop="confirmPassword">
+                <el-input :model-value="editUserData.confirmPassword"
                           :prefix-icon="Lock"
                           autocomplete="off"
                           clearable
                           maxlength="20"
-                          placeholder="Confirm password"
+                          placeholder="Confirm password (Leave blank if no change)"
                           show-password
                           type="password"
+                          @input="value => void (editUserData.confirmPassword = value ? value : undefined)"
                 />
             </el-form-item>
         </el-form>

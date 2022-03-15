@@ -55,3 +55,10 @@ export interface AddUserData {
   email: string | null
   password: string
 }
+
+// EditUserData
+export interface EditUserData {
+  username: string
+  email: string | null
+  password: string | undefined
+}

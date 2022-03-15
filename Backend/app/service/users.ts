@@ -1,8 +1,6 @@
-/* eslint '@typescript-eslint/no-unsafe-return': 'off' */
-
 import { Service } from 'egg'
 import type { User } from '../model/User'
-import type { AddUserData } from '../types'
+import type { AddUserData, EditUserData } from '../types'
 import type { WhereOptions } from 'sequelize'
 
 
@@ -62,8 +60,32 @@ export default class UserService extends Service {
    */
   public async deleteUser(id: string): Promise<User> {
     const user = await this.ctx.model.User.findByPk(id)
+
     if (user) {
       await user.destroy()
+      const res = user.toJSON() as User
+      delete res.password
+      return res
+    } else {
+      throw new Error('User doesn\'t exist.')
+    }
+  }
+
+
+  /**
+   * Update user in database (REST API - PUT)
+   * @param {string} id
+   * @param {AddUserData} data
+   * @return {Promise<User>}
+   */
+  public async updateUser(id: string, data: EditUserData): Promise<User> {
+    const user = await this.ctx.model.User.findByPk(id)
+    if (data.password) {
+      data.password = this.ctx.helper.encryptByMd5(data.password)
+    }
+
+    if (user) {
+      await user.update(data)
       const res = user.toJSON() as User
       delete res.password
       return res

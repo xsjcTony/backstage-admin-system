@@ -69,6 +69,14 @@ export interface UserManagementAddUserData {
   confirmPassword: string
 }
 
+// UserManagementEditUserData
+export interface UserManagementEditUserData {
+  username: string
+  email: string | null
+  password?: string
+  confirmPassword?: string
+}
+
 // User
 export interface User {
   id: number
