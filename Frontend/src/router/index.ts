@@ -7,7 +7,7 @@ import Welcome from '/src/components/Admin/Welcome.vue'
 import Admin from '/src/views/Admin.vue'
 import Login from '/src/views/Login.vue'
 import Register from '/src/views/Register.vue'
-import { isLoggedIn } from '../api'
+import { getUserById, isLoggedIn } from '../api'
 import { useStore } from '../stores'
 import { getAllRoutePaths } from '../utils'
 import type { ResponseData, User } from '../types'
@@ -81,7 +81,9 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
     try {
       const data: ResponseData = await isLoggedIn()
       mainStore.loggedIn = true
-      mainStore.currentUser = data.data as User
+
+      const id = (data.data as User).id
+      mainStore.currentUser = (await getUserById(id)).data.data as User
     } catch (err) {
       mainStore.loggedIn = false
     }

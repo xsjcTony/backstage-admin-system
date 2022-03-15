@@ -32,4 +32,6 @@ export default async (app: Application): Promise<void> => {
   router.post('/api/v1/users', authenticator, controller.users.createUser)
   router.delete('/api/v1/users/:id', authenticator, controller.users.deleteUser)
   router.put('/api/v1/users/:id', authenticator, controller.users.updateUser)
+
+  router.get('/api/v1/users/:id', authenticator, controller.users.getUserById)
 }

@@ -12,7 +12,7 @@ import {
 import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import { $, $ref } from 'vue/macros'
-import { createUser, getAllUsers, deleteUser as destroyUser } from '../../api'
+import { createUser, getAllUsers, deleteUser as destroyUser, updateUser, getUserById } from '../../api'
 import { useStore } from '../../stores'
 import type { User as UserData, FormInstance, UserManagementAddUserData, UserManagementEditUserData } from '../../types'
 import type { AxiosResponse, AxiosError } from 'axios'
@@ -22,8 +22,7 @@ import type { AxiosResponse, AxiosError } from 'axios'
  * Global Constants
  */
 const mainStore = useStore()
-const { currentUser } = $(storeToRefs(mainStore))
-if (!currentUser) throw new Error('Please log in first')
+let { currentUser } = $(storeToRefs(mainStore))
 
 
 /**
@@ -52,7 +51,7 @@ const importUsers = () => void undefined
  */
 let tableData = $ref<UserData[]>([])
 const tableRowClassName = ({ row }: { row: UserData }): string => {
-  if (row.id === currentUser.id) return 'current-user-row'
+  if (currentUser && row.id === currentUser.id) return 'current-user-row'
   return ''
 }
 
@@ -191,6 +190,7 @@ const resetForm = (formEl: FormInstance | undefined): void => {
 let editUserDialogVisible = $ref<boolean>(false)
 const editUserFormRef = $ref<FormInstance | null>(null)
 const editUserData = $ref<UserManagementEditUserData>({
+  id: 0,
   username: '',
   email: null,
   password: undefined,
@@ -201,16 +201,21 @@ const showEditUserDialog = (user: UserData): void => {
   editUserDialogVisible = true
   editUserData.username = user.username ?? ''
   editUserData.email = user.email
+  editUserData.id = user.id
+  editUserData.password = undefined
+  editUserData.confirmPassword = undefined
 }
 
 const editUser = async (formEl: FormInstance | undefined): Promise<void> => {
   if (!formEl) return
+  if (!editUserData.id) return
+
+  const id = editUserData.id
 
   await formEl.validate(async (valid) => {
     if (valid) {
-      /*
       try {
-        const response: AxiosResponse = await createUser(addUserData)
+        const response: AxiosResponse = await updateUser(id, editUserData)
 
         ElMessage.success({
           message: response.data.msg || 'Success',
@@ -219,7 +224,12 @@ const editUser = async (formEl: FormInstance | undefined): Promise<void> => {
           duration: 3000
         })
 
-        tableData.push(response.data.data)
+        const newUser = (await getUserById(id)).data.data as UserData
+        tableData[tableData.findIndex(user => user.id === id)] = newUser
+        if (currentUser && id === currentUser.id) {
+          currentUser = newUser
+        }
+
         editUserDialogVisible = false
       } catch (err) {
         ElMessage.error({
@@ -229,7 +239,6 @@ const editUser = async (formEl: FormInstance | undefined): Promise<void> => {
           duration: 3000
         })
       }
-      */
     } else {
       ElMessage.error({
         message: 'Invalid user data',

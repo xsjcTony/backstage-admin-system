@@ -71,10 +71,11 @@ export interface UserManagementAddUserData {
 
 // UserManagementEditUserData
 export interface UserManagementEditUserData {
+  id?: number
   username: string
   email: string | null
-  password?: string
-  confirmPassword?: string
+  password: string | undefined
+  confirmPassword: string | undefined
 }
 
 // User

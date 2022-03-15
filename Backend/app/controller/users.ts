@@ -7,6 +7,7 @@
  */
 import { Controller } from 'egg'
 import AddUserRule from '../validator/addUserRule'
+import EditUserRule from '../validator/editUserRule'
 
 
 /**
@@ -90,17 +91,38 @@ export default class UsersController extends Controller {
 
     try {
       // validate
-      ctx.validate(AddUserRule, data)
+      ctx.validate(EditUserRule, data)
 
       // save into database
       const user = await ctx.service.users.updateUser(ctx.params.id, data)
 
       ctx.success(200, 'User has been updated', user)
     } catch (err) {
+      console.log(err)
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
       } else {
         ctx.error(400, 'Error', err)
+      }
+    }
+  }
+
+
+  /**
+   * Get user by ID (Primary key) (REST API - GET)
+   * @return {Promise<void>}
+   */
+  public async getUserById(): Promise<void> {
+    const { ctx } = this
+
+    try {
+      const user = await ctx.service.users.getUserById(ctx.params.id)
+      ctx.success(200, 'success', user)
+    } catch (err) {
+      if (err instanceof Error) {
+        ctx.error(500, err.message, err)
+      } else {
+        ctx.error(500, 'Error', err)
       }
     }
   }

@@ -49,6 +49,15 @@ export const deleteRequest = async (path = '', data = {}): Promise<AxiosResponse
 
 
 /**
+ * PUT
+ * @param {string} path
+ * @param {{}} data
+ * @return {Promise<AxiosResponse>}
+ */
+export const put = async (path = '', data = {}): Promise<AxiosResponse> => axios.put(path, data)
+
+
+/**
  * ALL
  */
 export const all = async (requests: Iterable<Promise<AxiosResponse>>): Promise<Awaited<AxiosResponse>[]> => Promise.all(requests)

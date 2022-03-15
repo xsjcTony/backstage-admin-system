@@ -1,5 +1,12 @@
 import * as Request from './request'
-import type { RegisterData, LoginData, ResponseData, JwtUserResponseData, UserManagementAddUserData } from '../types'
+import type {
+  RegisterData,
+  LoginData,
+  ResponseData,
+  JwtUserResponseData,
+  UserManagementAddUserData,
+  UserManagementEditUserData
+} from '../types'
 import type { AxiosResponse } from 'axios'
 
 
@@ -23,3 +30,7 @@ export const getAllUsers = async (): Promise<AxiosResponse> => Request.get('/api
 export const createUser = async (data: UserManagementAddUserData): Promise<AxiosResponse> => Request.post('/api/v1/users', data)
 
 export const deleteUser = async (id: number): Promise<AxiosResponse> => Request.deleteRequest(`/api/v1/users/${ id }`)
+
+export const updateUser = async (id: number, data: UserManagementEditUserData): Promise<AxiosResponse> => Request.put(`/api/v1/users/${ id }`, data)
+
+export const getUserById = async (id: number): Promise<AxiosResponse> => Request.get(`/api/v1/users/${ id }`)

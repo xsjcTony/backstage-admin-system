@@ -11,12 +11,12 @@ export default class UserService extends Service {
    * @return {Promise<User[]>}
    */
   public async getAllUsers(): Promise<User[]> {
-    const users = await this.ctx.model.User.findAll()
-    return users.map((user) => {
-      const res = user.toJSON() as User
-      delete res.password
-      return res
+    const users = await this.ctx.model.User.findAll({
+      attributes: {
+        exclude: ['password']
+      }
     })
+    return users.map(user => user.toJSON() as User)
   }
 
 
@@ -89,6 +89,26 @@ export default class UserService extends Service {
       const res = user.toJSON() as User
       delete res.password
       return res
+    } else {
+      throw new Error('User doesn\'t exist.')
+    }
+  }
+
+
+  /**
+   * Get user by ID (Primary key) (REST API - GET)
+   * @param {string} id
+   * @return {Promise<User>}
+   */
+  public async getUserById(id: string): Promise<User> {
+    const user = await this.ctx.model.User.findByPk(id, {
+      attributes: {
+        exclude: ['password']
+      }
+    })
+
+    if (user) {
+      return user.toJSON() as User
     } else {
       throw new Error('User doesn\'t exist.')
     }

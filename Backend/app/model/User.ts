@@ -38,13 +38,13 @@ export class User extends Model<User> {
   @Unique(true)
   @Is(/^[A-Za-z0-9]{6,20}$/)
   @Column(STRING)
-  public username?: string
+  public username!: string
 
   @AllowNull(true)
   @Unique(true)
   @IsEmail
   @Column(STRING)
-  public email?: string
+  public email!: string
 
   @AllowNull(false)
   @Unique(false)
