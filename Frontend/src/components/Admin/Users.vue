@@ -141,9 +141,7 @@ const validateUsername = (rule: any, value: string, callback: any): void => {
 }
 const validateEmail = (rule: any, value: string | null, callback: any): void => {
   const regex = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
-  if (value === null) {
-    callback()
-  } else if (!regex.test(value)) {
+  if (value && !regex.test(value)) {
     callback(new Error('Invalid email address'))
   } else {
     callback()
@@ -173,7 +171,7 @@ const validateConfirmPassword = (rule: any, value: string, callback: any): void 
   }
 }
 
-const usernameRegisterRules = $ref({
+const addUserRules = $ref({
   username: { validator: validateUsername },
   email: { validator: validateEmail },
   password: { validator: validatePassword },
@@ -185,6 +183,71 @@ const resetForm = (formEl: FormInstance | undefined): void => {
   formEl.resetFields()
   ElMessage.closeAll()
 }
+
+
+/**
+ * Main -> Edit User
+ */
+let editUserDialogVisible = $ref<boolean>(false)
+const editUserFormRef = $ref<FormInstance | null>(null)
+const editUserData = $ref<UserManagementAddUserData>({
+  username: '',
+  email: null,
+  password: '',
+  confirmPassword: ''
+})
+
+const showEditUserDialog = (user: UserData): void => {
+  editUserDialogVisible = true
+  editUserData.username = user.username ?? ''
+  editUserData.email = user.email
+}
+
+const editUser = async (formEl: FormInstance | undefined): Promise<void> => {
+  if (!formEl) return
+
+  await formEl.validate(async (valid) => {
+    if (valid) {
+      /*
+      try {
+        const response: AxiosResponse = await createUser(addUserData)
+
+        ElMessage.success({
+          message: response.data.msg || 'Success',
+          center: true,
+          showClose: true,
+          duration: 3000
+        })
+
+        tableData.push(response.data.data)
+        editUserDialogVisible = false
+      } catch (err) {
+        ElMessage.error({
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+          center: true,
+          showClose: true,
+          duration: 3000
+        })
+      }
+      */
+    } else {
+      ElMessage.error({
+        message: 'Invalid user data',
+        center: true,
+        showClose: true,
+        duration: 3000
+      })
+    }
+  })
+}
+
+// Validation
+const editUserRules = $ref({
+  username: { validator: validateUsername },
+  email: { validator: validateEmail },
+  password: { validator: validatePassword },
+  confirmPassword: { validator: validateConfirmPassword }
+})
 
 
 /**
@@ -266,7 +329,7 @@ const deleteUser = async (id: number): Promise<void> => {
         <!-- /Top bar -->
 
         <div class="table-row-indicators">
-            <el-tag color="#e1f3d8" size="large" type="success">Current User (You)</el-tag>
+            <el-tag color="#e1f3d8" size="large" type="success">You</el-tag>
         </div>
 
         <el-table :data="tableData"
@@ -285,7 +348,7 @@ const deleteUser = async (id: number): Promise<void> => {
             </el-table-column>
             <el-table-column label="Actions" width="200">
                 <template #default="{ row }">
-                    <el-button :icon="EditPen" type="primary"/>
+                    <el-button :icon="EditPen" type="primary" @click="showEditUserDialog(row)"/>
                     <el-button :icon="Setting" type="warning"/>
                     <el-popconfirm v-if="row.id !== currentUser.id"
                                    :icon="InfoFilled"
@@ -321,11 +384,7 @@ const deleteUser = async (id: number): Promise<void> => {
                title="Add User"
                @close="resetForm(addUserFormRef)"
     >
-        <el-form ref="addUserFormRef"
-                 :model="addUserData"
-                 :rules="usernameRegisterRules"
-                 class="username-register-form"
-        >
+        <el-form ref="addUserFormRef" :model="addUserData" :rules="addUserRules">
             <el-form-item class="username" prop="username" required>
                 <el-input v-model="addUserData.username"
                           :prefix-icon="User"
@@ -379,6 +438,65 @@ const deleteUser = async (id: number): Promise<void> => {
         </template>
     </el-dialog>
     <!-- E Add user dialog -->
+
+    <!-- S Edit user dialog -->
+    <el-dialog v-model="editUserDialogVisible"
+               custom-class="user-management-add-user-dialog"
+               title="Edit User"
+    >
+        <el-form ref="editUserFormRef" :model="editUserData" :rules="editUserRules">
+            <el-form-item class="username" prop="username" required>
+                <el-input v-model="editUserData.username"
+                          :prefix-icon="User"
+                          clearable
+                          maxlength="20"
+                          placeholder="Username"
+                          show-word-limit
+                          type="text"
+                />
+            </el-form-item>
+            <el-form-item class="email" prop="email">
+                <el-input :model-value="editUserData.email"
+                          :prefix-icon="Message"
+                          clearable
+                          placeholder="E-mail (Optional)"
+                          type="text"
+                          @input="value => void (editUserData.email = value ? value : null)"
+                />
+            </el-form-item>
+            <el-form-item class="password" prop="password" required>
+                <el-input v-model="editUserData.password"
+                          :prefix-icon="Lock"
+                          autocomplete="off"
+                          clearable
+                          maxlength="20"
+                          placeholder="Password"
+                          show-password
+                          type="password"
+                />
+            </el-form-item>
+            <el-form-item prop="confirmPassword" required>
+                <el-input v-model="editUserData.confirmPassword"
+                          :prefix-icon="Lock"
+                          autocomplete="off"
+                          clearable
+                          maxlength="20"
+                          placeholder="Confirm password"
+                          show-password
+                          type="password"
+                />
+            </el-form-item>
+        </el-form>
+        <!-- /Add user form -->
+
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="editUserDialogVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="editUser(editUserFormRef)">Confirm</el-button>
+            </span>
+        </template>
+    </el-dialog>
+    <!-- E Edit user dialog -->
 </template>
 
 <style lang="scss" scoped>
