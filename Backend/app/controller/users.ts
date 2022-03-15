@@ -1,5 +1,6 @@
 /* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
 /* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
 
 /**
  * imports
@@ -22,6 +23,8 @@ export default class UsersController extends Controller {
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(500, err.message, err)
+      } else {
+        ctx.error(500, 'Error', err)
       }
     }
   }
@@ -43,7 +46,23 @@ export default class UsersController extends Controller {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
       } else {
-        ctx.error(400, 'error', err)
+        ctx.error(400, 'Error', err)
+      }
+    }
+  }
+
+
+  public async deleteUser(): Promise<void> {
+    const { ctx } = this
+
+    try {
+      const user = await ctx.service.users.deleteUser(ctx.params.id)
+      ctx.success(200, 'User has been deleted', user)
+    } catch (err) {
+      if (err instanceof Error) {
+        ctx.error(400, err.message, err)
+      } else {
+        ctx.error(400, 'Error', err)
       }
     }
   }

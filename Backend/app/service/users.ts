@@ -56,12 +56,30 @@ export default class UserService extends Service {
 
 
   /**
+   * Delete user in database (REST API - DELETE)
+   * @param {string} id
+   * @return {Promise<User>}
+   */
+  public async deleteUser(id: string): Promise<User> {
+    const user = await this.ctx.model.User.findByPk(id)
+    if (user) {
+      await user.destroy()
+      const res = user.toJSON() as User
+      delete res.password
+      return res
+    } else {
+      throw new Error('User doesn\'t exist.')
+    }
+  }
+
+
+  /**
    * Helper functions
    */
 
 
   /**
-   * Look for **ONE** user from database based on given where options.
+   * Look for **ONE** user from database based on given `WHERE` options.
    * @param {WhereOptions} options
    * @return {Promise<User | null>}
    * @private

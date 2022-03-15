@@ -38,6 +38,17 @@ export const post = async (path = '', data = {}): Promise<AxiosResponse> => axio
 
 
 /**
+ * DELETE
+ * @param {string} path
+ * @param {{}} data
+ * @return {Promise<AxiosResponse>}
+ */
+export const deleteRequest = async (path = '', data = {}): Promise<AxiosResponse> => axios.delete(path, {
+  params: data
+})
+
+
+/**
  * ALL
  */
 export const all = async (requests: Iterable<Promise<AxiosResponse>>): Promise<Awaited<AxiosResponse>[]> => Promise.all(requests)

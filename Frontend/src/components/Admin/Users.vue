@@ -1,9 +1,18 @@
 <script lang="ts" setup>
-import { ArrowRight, EditPen, Delete, Setting, User, Lock, Message } from '@element-plus/icons-vue'
+import {
+  ArrowRight,
+  EditPen,
+  Delete,
+  Setting,
+  User,
+  Lock,
+  Message,
+  InfoFilled
+} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import { $, $ref } from 'vue/macros'
-import { createUser, getAllUsers } from '../../api'
+import { createUser, getAllUsers, deleteUser as destroyUser } from '../../api'
 import { useStore } from '../../stores'
 import type { User as UserData, FormInstance, UserManagementAddUserData } from '../../types'
 import type { AxiosResponse, AxiosError } from 'axios'
@@ -72,7 +81,7 @@ const pageSize4 = $ref<number>(100)
 
 
 /**
- * Main -> Add User Dialog
+ * Main -> Add User
  */
 let addUserDialogVisible = $ref<boolean>(false)
 const addUserFormRef = $ref<FormInstance | null>(null)
@@ -92,11 +101,12 @@ const addUser = async (formEl: FormInstance | undefined): Promise<void> => {
         const response: AxiosResponse = await createUser(addUserData)
 
         ElMessage.success({
-          message: response.data.message || 'Success',
+          message: response.data.msg || 'Success',
           center: true,
           showClose: true,
           duration: 3000
         })
+
         tableData.push(response.data.data)
         addUserDialogVisible = false
       } catch (err) {
@@ -175,6 +185,32 @@ const resetForm = (formEl: FormInstance | undefined): void => {
   formEl.resetFields()
   ElMessage.closeAll()
 }
+
+
+/**
+ * Main -> Delete User
+ */
+const deleteUser = async (id: number): Promise<void> => {
+  try {
+    const response: AxiosResponse = await destroyUser(id)
+
+    ElMessage.success({
+      message: response.data.msg || 'Success',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+
+    tableData.splice(tableData.findIndex(user => user.id === id), 1)
+  } catch (err) {
+    ElMessage.error({
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+  }
+}
 </script>
 
 <template>
@@ -239,19 +275,31 @@ const resetForm = (formEl: FormInstance | undefined): void => {
                   stripe
         >
             <el-table-column type="index"/>
-            <el-table-column label="Username" prop="username"/>
-            <el-table-column label="E-mail" prop="email"/>
-            <el-table-column label="Role" prop="role"/>
-            <el-table-column label="State">
+            <el-table-column label="Username" prop="username" min-width="200"/>
+            <el-table-column label="E-mail" prop="email" min-width="250"/>
+            <el-table-column label="Role" prop="role" min-width="150"/>
+            <el-table-column label="State" width="100">
                 <template #default="{ row }">
                     <el-switch v-model="row.userState" active-color="#13ce66" inactive-color="#ff4949"/>
                 </template>
             </el-table-column>
-            <el-table-column label="Actions">
+            <el-table-column label="Actions" width="200">
                 <template #default="{ row }">
                     <el-button :icon="EditPen" type="primary"/>
                     <el-button :icon="Setting" type="warning"/>
-                    <el-button v-if="row.id !== currentUser.id" :icon="Delete" type="danger"/>
+                    <el-popconfirm v-if="row.id !== currentUser.id"
+                                   :icon="InfoFilled"
+                                   cancel-button-text="Cancel"
+                                   confirm-button-text="Delete"
+                                   confirm-button-type="danger"
+                                   icon-color="#f00"
+                                   title="Are you sure to delete this user?"
+                                   @confirm="deleteUser(row.id)"
+                    >
+                        <template #reference>
+                            <el-button :icon="Delete" type="danger"/>
+                        </template>
+                    </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>

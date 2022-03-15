@@ -1,8 +1,9 @@
 /* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
 /* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
 
-import svgCaptcha from 'svg-captcha'
 import { Context } from 'egg'
+import svgCaptcha from 'svg-captcha'
+
 
 export const generateCaptcha = (ctx: Context): string => {
   // generate captcha
