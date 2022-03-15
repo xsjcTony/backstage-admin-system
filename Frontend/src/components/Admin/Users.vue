@@ -12,7 +12,7 @@ import {
 import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import { $, $ref } from 'vue/macros'
-import { createUser, getAllUsers, deleteUser as destroyUser, updateUser, getUserById } from '../../api'
+import { createUser, getAllUsers, deleteUser as destroyUser, updateUser } from '../../api'
 import { useStore } from '../../stores'
 import type { User as UserData, FormInstance, UserManagementAddUserData, UserManagementEditUserData } from '../../types'
 import type { AxiosResponse, AxiosError } from 'axios'
@@ -51,16 +51,18 @@ const importUsers = () => void undefined
  */
 let tableData = $ref<UserData[]>([])
 const tableRowClassName = ({ row }: { row: UserData }): string => {
-  if (currentUser && row.id === currentUser.id) return 'current-user-row'
+  if (row.id === currentUser?.id) return 'current-user-row'
   return ''
 }
 
 getAllUsers()
   .then((response) => {
     tableData = response.data.data
-    const currentUserIndex = tableData.findIndex(user => user.id === currentUser.id)
-    const user = tableData.splice(currentUserIndex, 1)
-    tableData.unshift(...user)
+    const currentUserIndex = tableData.findIndex(user => user.id === (currentUser?.id ?? -1))
+    if (currentUserIndex !== -1) {
+      const user = tableData.splice(currentUserIndex, 1)
+      tableData.unshift(...user)
+    }
   })
   .catch((err) => {
     ElMessage.error({
@@ -180,7 +182,6 @@ const addUserRules = $ref({
 const resetForm = (formEl: FormInstance | undefined): void => {
   if (!formEl) return
   formEl.resetFields()
-  ElMessage.closeAll()
 }
 
 
@@ -224,9 +225,9 @@ const editUser = async (formEl: FormInstance | undefined): Promise<void> => {
           duration: 3000
         })
 
-        const newUser = (await getUserById(id)).data.data as UserData
+        const newUser = response.data.data
         tableData[tableData.findIndex(user => user.id === id)] = newUser
-        if (currentUser && id === currentUser.id) {
+        if (id === currentUser?.id) {
           currentUser = newUser
         }
 

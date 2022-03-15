@@ -73,10 +73,10 @@ export class User extends Model<User> {
   public oauths!: Oauth[]
 
   @CreatedAt
-  public createdAt!: Date
+  public createdAt?: Date
 
   @UpdatedAt
-  public updatedAt!: Date
+  public updatedAt?: Date
 }
 
 export default () => User

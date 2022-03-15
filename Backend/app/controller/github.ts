@@ -77,7 +77,6 @@ export default class GithubController extends Controller {
       const oauth = await ctx.service.oauth.getOAuth(data)
 
       const user = oauth.user
-      delete user.password
 
       /**
        * User already exists -> login straight away

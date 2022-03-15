@@ -12,12 +12,16 @@ export default class OauthService extends Service {
         uid: data.id,
         provider: data.provider
       },
-      include: [{ model: User }]
+      include: [{
+        model: User,
+        attributes: {
+          exclude: ['password', 'createdAt', 'updatedAt']
+        }
+      }]
     })
 
     if (res) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return res.toJSON()
+      return res.toJSON() as Oauth
     } else {
       throw new Error('OAuth user does not exist')
     }
@@ -25,14 +29,11 @@ export default class OauthService extends Service {
 
 
   public async createOAuth(accessToken: string, provider: string, uid: number, userId: number): Promise<Oauth> {
-    const res = await this.ctx.model.Oauth.create({
+    return this.ctx.model.Oauth.create({
       accessToken,
       provider,
       uid,
       userId
     })
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return res.toJSON()
   }
 }

@@ -60,7 +60,12 @@ export default class UserService extends Service {
    * @private
    */
   private async _findUser(options: WhereOptions): Promise<User | null> {
-    return this.ctx.model.User.findOne({ where: options })
+    return this.ctx.model.User.findOne({
+      where: options,
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
+      }
+    })
   }
 
 
@@ -86,6 +91,8 @@ export default class UserService extends Service {
 
     const res = data.toJSON() as User
     delete res.password
+    delete res.createdAt
+    delete res.updatedAt
 
     return res
   }
@@ -111,6 +118,8 @@ export default class UserService extends Service {
 
     const res = data.toJSON() as User
     delete res.password
+    delete res.createdAt
+    delete res.updatedAt
 
     return res
   }
@@ -130,10 +139,7 @@ export default class UserService extends Service {
       throw new Error('Incorrect login credential')
     }
 
-    const res = user.toJSON() as User
-    delete res.password
-
-    return res
+    return user.toJSON() as User
   }
 
 
@@ -151,9 +157,6 @@ export default class UserService extends Service {
       throw new Error('Incorrect login credential')
     }
 
-    const res = user.toJSON() as User
-    delete res.password
-
-    return res
+    return user.toJSON() as User
   }
 }

@@ -11,9 +11,9 @@ export default class UserService extends Service {
    * @return {Promise<User[]>}
    */
   public async getAllUsers(): Promise<User[]> {
-    const users = await this.ctx.model.User.findAll({
+    const users = await this.ctx.model.User.findAll( {
       attributes: {
-        exclude: ['password']
+        exclude: ['password', 'createdAt', 'updatedAt']
       }
     })
     return users.map(user => user.toJSON() as User)
@@ -45,9 +45,12 @@ export default class UserService extends Service {
       email,
       password: this.ctx.helper.encryptByMd5(password)
     })
+    console.log(res)
 
     const newUser = res.toJSON() as User
     delete newUser.password
+    delete newUser.createdAt
+    delete newUser.updatedAt
 
     return newUser
   }
@@ -59,13 +62,14 @@ export default class UserService extends Service {
    * @return {Promise<User>}
    */
   public async deleteUser(id: string): Promise<User> {
-    const user = await this.ctx.model.User.findByPk(id)
+    const user = await this.ctx.model.User.findByPk(id, {
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
+      }
+    })
 
     if (user) {
-      await user.destroy()
-      const res = user.toJSON() as User
-      delete res.password
-      return res
+      return user.toJSON() as User
     } else {
       throw new Error('User doesn\'t exist.')
     }
@@ -86,9 +90,7 @@ export default class UserService extends Service {
 
     if (user) {
       await user.update(data)
-      const res = user.toJSON() as User
-      delete res.password
-      return res
+      return this.getUserById(user.id.toString())
     } else {
       throw new Error('User doesn\'t exist.')
     }
@@ -103,7 +105,7 @@ export default class UserService extends Service {
   public async getUserById(id: string): Promise<User> {
     const user = await this.ctx.model.User.findByPk(id, {
       attributes: {
-        exclude: ['password']
+        exclude: ['password', 'createdAt', 'updatedAt']
       }
     })
 
