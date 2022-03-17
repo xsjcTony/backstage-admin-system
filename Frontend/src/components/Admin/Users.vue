@@ -7,7 +7,8 @@ import {
   User,
   Lock,
   Message,
-  InfoFilled
+  InfoFilled,
+  Plus
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
@@ -16,6 +17,8 @@ import { createUser, getAllUsers, deleteUser as destroyUser, updateUser } from '
 import { useStore } from '../../stores'
 import type { User as UserData, FormInstance, UserManagementAddUserData, UserManagementEditUserData } from '../../types'
 import type { AxiosResponse, AxiosError } from 'axios'
+import type { UploadFile, UploadProgressEvent, UploadRawFile } from 'element-plus'
+import type { Awaitable } from 'element-plus/es/utils'
 
 
 /**
@@ -195,7 +198,8 @@ const editUserData = $ref<UserManagementEditUserData>({
   username: '',
   email: null,
   password: undefined,
-  confirmPassword: undefined
+  confirmPassword: undefined,
+  avatarUrl: '/src/assets/images/avatar.jpg'
 })
 
 const showEditUserDialog = (user: UserData): void => {
@@ -278,6 +282,23 @@ const editUserRules = $ref({
   password: { validator: validateEditUserPassword },
   confirmPassword: { validator: validateEditUserConfirmPassword }
 })
+
+// Avatar
+const handleAvatarSuccess = (res: UploadProgressEvent, file: UploadFile): void => {
+  editUserData.avatarUrl = URL.createObjectURL(file.raw)
+}
+const beforeAvatarUpload = (file: UploadRawFile): Awaitable<Blob | File | boolean | null | undefined> => {
+  const isJPG = file.type === 'image/jpeg'
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isJPG) {
+    ElMessage.error('Avatar picture must be JPG format!')
+  }
+  if (!isLt2M) {
+    ElMessage.error('Avatar picture size can not exceed 2MB!')
+  }
+  return isJPG && isLt2M
+}
 
 
 /**
@@ -474,7 +495,11 @@ const deleteUser = async (id: number): Promise<void> => {
                custom-class="user-management-add-user-dialog"
                title="Edit User"
     >
-        <el-form ref="editUserFormRef" :model="editUserData" :rules="editUserRules">
+        <el-form ref="editUserFormRef"
+                 :model="editUserData"
+                 :rules="editUserRules"
+                 label-position="top"
+        >
             <el-form-item class="username" prop="username" required>
                 <el-input v-model="editUserData.username"
                           :prefix-icon="User"
@@ -518,6 +543,21 @@ const deleteUser = async (id: number): Promise<void> => {
                           @input="value => void (editUserData.confirmPassword = value ? value : undefined)"
                 />
             </el-form-item>
+            <el-form-item label="Avatar">
+                <el-upload :before-upload="beforeAvatarUpload"
+                           :on-success="handleAvatarSuccess"
+                           :show-file-list="false"
+                           action="https://jsonplaceholder.typicode.com/posts/"
+                           class="avatar-uploader"
+                >
+                    <img v-if="editUserData.avatarUrl"
+                         :src="editUserData.avatarUrl"
+                         alt
+                         class="avatar"
+                    >
+                    <el-icon v-else class="avatar-uploader-icon"><Plus/></el-icon>
+                </el-upload>
+            </el-form-item>
         </el-form>
         <!-- /Add user form -->
 
@@ -560,6 +600,35 @@ const deleteUser = async (id: number): Promise<void> => {
         :deep(.current-user-row) {
             background: #e1f3d8;
         }
+    }
+}
+
+.avatar-uploader{
+    :deep(.el-upload) {
+        position: relative;
+        overflow: hidden;
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: var(--el-transition-duration-fast);
+
+        &:hover {
+            border-color: var(--el-color-primary);
+        }
+    }
+
+    .avatar-uploader-icon {
+        width: 178px;
+        height: 178px;
+        color: #8c939d;
+        font-size: 28px;
+        text-align: center;
+    }
+
+    .avatar {
+        display: block;
+        width: 178px;
+        height: 178px;
     }
 }
 </style>

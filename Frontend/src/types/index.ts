@@ -76,6 +76,7 @@ export interface UserManagementEditUserData {
   email: string | null
   password: string | undefined
   confirmPassword: string | undefined
+  avatarUrl: string
 }
 
 // User

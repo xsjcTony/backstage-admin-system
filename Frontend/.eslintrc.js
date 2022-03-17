@@ -545,7 +545,7 @@ module.exports = {
       'error',
       {
         allowInGenericTypeArguments: true,
-        allowAsThisParameter: false
+        allowAsThisParameter: true
       }
     ],
     '@typescript-eslint/no-loop-func': 'error',

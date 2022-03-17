@@ -32,6 +32,7 @@ declare module 'vue' {
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTag: typeof import('element-plus/es')['ElTag']
+    ElUpload: typeof import('element-plus/es')['ElUpload']
     EmailRegisterForm: typeof import('./src/components/Register/EmailRegisterForm.vue')['default']
     Permissions: typeof import('./src/components/Admin/Permissions.vue')['default']
     Roles: typeof import('./src/components/Admin/Roles.vue')['default']
