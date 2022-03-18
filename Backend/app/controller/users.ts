@@ -5,6 +5,8 @@
 /**
  * imports
  */
+import path from 'node:path'
+import * as fs from 'node:fs/promises'
 import { Controller } from 'egg'
 import AddUserRule from '../validator/addUserRule'
 import EditUserRule from '../validator/editUserRule'
@@ -125,5 +127,31 @@ export default class UsersController extends Controller {
         ctx.error(500, 'Error', err)
       }
     }
+  }
+
+
+  /**
+   * Upload user's avatar file
+   * @return {Promise<void>}
+   */
+  public async uploadAvatar(): Promise<void> {
+    const { ctx } = this
+    const avatar = ctx.request.files[0]
+
+    const fileName = ctx.helper.encryptByMd5(`${ avatar.filename }${ Date.now() }`) + path.extname(avatar.filename)
+    const filePath = path.join('/public/assets/images/avatars', fileName).replace(/\\/g, '/')
+    const absoluteFilePath = path.join(this.config.baseDir, 'app', filePath)
+
+    // copy file
+    try {
+      const avatarContent = await fs.readFile(avatar.filepath)
+      await fs.writeFile(absoluteFilePath, avatarContent)
+    } catch (err) {
+      ctx.error(500, 'error', err)
+    } finally {
+      void ctx.cleanupRequestFiles() // clear temp file
+    }
+
+    ctx.success(200, 'Avatar has been uploaded', filePath)
   }
 }

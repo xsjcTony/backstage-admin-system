@@ -15,9 +15,15 @@ import { storeToRefs } from 'pinia'
 import { $, $ref } from 'vue/macros'
 import { createUser, getAllUsers, deleteUser as destroyUser, updateUser } from '../../api'
 import { useStore } from '../../stores'
-import type { User as UserData, FormInstance, UserManagementAddUserData, UserManagementEditUserData } from '../../types'
+import type {
+  User as UserData,
+  FormInstance,
+  UserManagementAddUserData,
+  UserManagementEditUserData,
+  StringResponseData
+} from '../../types'
 import type { AxiosResponse, AxiosError } from 'axios'
-import type { UploadFile, UploadProgressEvent, UploadRawFile } from 'element-plus'
+import type { UploadFile, UploadRawFile } from 'element-plus'
 import type { Awaitable } from 'element-plus/es/utils'
 
 
@@ -26,6 +32,7 @@ import type { Awaitable } from 'element-plus/es/utils'
  */
 const mainStore = useStore()
 let { currentUser, assetBaseUrl } = $(storeToRefs(mainStore))
+const jwt = localStorage.getItem('token') ?? ''
 
 
 /**
@@ -64,7 +71,7 @@ getAllUsers()
     const currentUserIndex = tableData.findIndex(user => user.id === (currentUser?.id ?? -1))
     if (currentUserIndex !== -1) {
       const user = tableData.splice(currentUserIndex, 1)
-      tableData.unshift(...user)
+      tableData.unshift(currentUser ?? user[0])
     }
   })
   .catch((err) => {
@@ -209,7 +216,7 @@ const showEditUserDialog = (user: UserData): void => {
   editUserData.id = user.id
   editUserData.password = undefined
   editUserData.confirmPassword = undefined
-  editUserData.avatarUrl = `${ assetBaseUrl }${ user.avatarUrl }`
+  editUserData.avatarUrl = user.avatarUrl
 }
 
 const editUser = async (formEl: FormInstance | undefined): Promise<void> => {
@@ -285,19 +292,45 @@ const editUserRules = $ref({
 })
 
 // Avatar
-const handleAvatarSuccess = (res: UploadProgressEvent, file: UploadFile): void => {
-  editUserData.avatarUrl = URL.createObjectURL(file.raw)
+const handleAvatarSuccess = (response: StringResponseData, file: UploadFile): void => {
+  if (response.code === 200) {
+    editUserData.avatarUrl = response.data
+    ElMessage.success({
+      message: typeof response.msg === 'string' ? response.msg : 'Avatar has been uploaded',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+  } else {
+    ElMessage.error({
+      message: typeof response.msg === 'string' ? response.msg : 'Error',
+      center: true,
+      showClose: true,
+      duration: 5000
+    })
+  }
 }
 const beforeAvatarUpload = (file: UploadRawFile): Awaitable<Blob | File | boolean | null | undefined> => {
   const isJPG = file.type === 'image/jpeg'
   const isLt2M = file.size / 1024 / 1024 < 2
 
   if (!isJPG) {
-    ElMessage.error('Avatar picture must be JPG format!')
+    ElMessage.error({
+      message: 'Avatar picture must be "image/jpeg" format',
+      center: true,
+      showClose: true,
+      duration: 5000
+    })
   }
   if (!isLt2M) {
-    ElMessage.error('Avatar picture size can not exceed 2MB!')
+    ElMessage.error({
+      message: 'Avatar picture size can not exceed 2MB',
+      center: true,
+      showClose: true,
+      duration: 5000
+    })
   }
+
   return isJPG && isLt2M
 }
 
@@ -546,13 +579,15 @@ const deleteUser = async (id: number): Promise<void> => {
             </el-form-item>
             <el-form-item label="Avatar">
                 <el-upload :before-upload="beforeAvatarUpload"
+                           :headers="{ Authorization: jwt }"
                            :on-success="handleAvatarSuccess"
                            :show-file-list="false"
-                           action="https://jsonplaceholder.typicode.com/posts/"
+                           accept="image/jpeg"
+                           action="http://127.0.0.1:7001/api/v1/users/avatar"
                            class="avatar-uploader"
                 >
                     <img v-if="editUserData.avatarUrl"
-                         :src="editUserData.avatarUrl"
+                         :src="`${ assetBaseUrl }${ editUserData.avatarUrl }`"
                          alt
                          class="avatar"
                     >

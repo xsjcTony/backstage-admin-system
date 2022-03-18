@@ -69,6 +69,7 @@ export default class UserService extends Service {
     })
 
     if (user) {
+      await user.destroy()
       return user.toJSON() as User
     } else {
       throw new Error('User doesn\'t exist.')

@@ -55,6 +55,13 @@ export interface JwtUserResponseData {
   }
 }
 
+// StringResponseData
+export interface StringResponseData {
+  code: number
+  msg: unknown
+  data: string
+}
+
 // loginData
 export interface LoginData {
   username: string
