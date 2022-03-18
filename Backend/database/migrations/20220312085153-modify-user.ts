@@ -16,7 +16,7 @@ module.exports = {
       type: DataTypes.STRING,
       allowNull: true,
       unique: false,
-      defaultValue: '/src/assets/images/avatar.jpg'
+      defaultValue: '/public/assets/images/avatars/avatar.jpg'
     })
 
     await queryInterface.changeColumn('users', 'github', {

@@ -8,7 +8,6 @@ import { Controller } from 'egg'
 import * as jwt from 'jsonwebtoken'
 import { v4 as uuidV4 } from 'uuid'
 import { RegisterType } from '../types'
-import type { User } from '../model/User'
 import type { OAuthUserData } from '../types'
 
 

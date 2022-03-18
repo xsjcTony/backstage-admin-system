@@ -22,7 +22,7 @@ import {
 import { Oauth } from './Oauth'
 
 
-const { INTEGER, STRING, BOOLEAN } = DataType
+const { INTEGER, STRING, BOOLEAN, VIRTUAL } = DataType
 
 @Table({
   modelName: 'User'
@@ -65,7 +65,7 @@ export class User extends Model<User> {
 
   @AllowNull(true)
   @Unique(false)
-  @Default('/src/assets/images/avatar.jpg')
+  @Default('/public/assets/images/avatars/avatar.jpg')
   @Column(STRING)
   public avatarUrl!: string
 

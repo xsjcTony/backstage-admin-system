@@ -13,7 +13,7 @@ import { useStore } from '../stores'
 const mainStore = useStore()
 const router = useRouter()
 const route = useRoute()
-const { currentUser } = $(storeToRefs(mainStore))
+const { currentUser, assetBaseUrl } = $(storeToRefs(mainStore))
 if (!currentUser) throw new Error('Please log in first')
 
 
@@ -60,7 +60,7 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
         <el-header>
             <div class="header-left" @click="toggleMenuCollapse"></div>
             <div class="header-right">
-                <img alt="avatar" :src="currentUser.avatarUrl">
+                <img alt="avatar" :src="`${ assetBaseUrl }${ currentUser.avatarUrl }`">
                 <p>{{ displayName }}</p>
                 <el-button @click="logout">Log out</el-button>
             </div>

@@ -25,7 +25,7 @@ import type { Awaitable } from 'element-plus/es/utils'
  * Global Constants
  */
 const mainStore = useStore()
-let { currentUser } = $(storeToRefs(mainStore))
+let { currentUser, assetBaseUrl } = $(storeToRefs(mainStore))
 
 
 /**
@@ -199,7 +199,7 @@ const editUserData = $ref<UserManagementEditUserData>({
   email: null,
   password: undefined,
   confirmPassword: undefined,
-  avatarUrl: '/src/assets/images/avatar.jpg'
+  avatarUrl: '/public/assets/images/avatars/avatar.jpg'
 })
 
 const showEditUserDialog = (user: UserData): void => {
@@ -209,6 +209,7 @@ const showEditUserDialog = (user: UserData): void => {
   editUserData.id = user.id
   editUserData.password = undefined
   editUserData.confirmPassword = undefined
+  editUserData.avatarUrl = `${ assetBaseUrl }${ user.avatarUrl }`
 }
 
 const editUser = async (formEl: FormInstance | undefined): Promise<void> => {

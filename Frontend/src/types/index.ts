@@ -8,6 +8,7 @@ import type { ElForm } from 'element-plus'
 export interface MainStore {
   loggedIn: boolean
   currentUser: User | null
+  assetBaseUrl: string
 }
 
 
