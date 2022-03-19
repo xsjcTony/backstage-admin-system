@@ -23,7 +23,7 @@
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
     "@vitejs/plugin-vue": "^2.2.4",
-    "autoprefixer": "^10.4.2",
+    "autoprefixer": "^10.4.4",
     "eslint": "^8.11.0",
     "eslint-import-resolver-node": "^0.3.6",
     "eslint-import-resolver-typescript": "^2.5.0",
@@ -31,8 +31,8 @@
     "eslint-plugin-vue": "^8.5.0",
     "sass": "^1.49.9",
     "typescript": "^4.6.2",
-    "unplugin-auto-import": "^0.6.4",
-    "unplugin-vue-components": "^0.18.0",
+    "unplugin-auto-import": "^0.6.6",
+    "unplugin-vue-components": "^0.18.3",
     "vite": "^2.8.6",
     "vue-tsc": "^0.33.2"
   }

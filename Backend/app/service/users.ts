@@ -11,12 +11,12 @@ export default class UserService extends Service {
    * @return {Promise<User[]>}
    */
   public async getAllUsers(): Promise<User[]> {
-    const users = await this.ctx.model.User.findAll( {
+    const users = await this.ctx.model.User.findAll({
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
       }
     })
-    return users.map(user => user.toJSON() as User)
+    return users
   }
 
 
@@ -70,7 +70,7 @@ export default class UserService extends Service {
 
     if (user) {
       await user.destroy()
-      return user.toJSON() as User
+      return user
     } else {
       throw new Error('User doesn\'t exist.')
     }
@@ -84,17 +84,17 @@ export default class UserService extends Service {
    * @return {Promise<User>}
    */
   public async updateUser(id: string, data: EditUserData): Promise<User> {
-    const user = await this.ctx.model.User.findByPk(id)
+    const user = await this.getUserById(id)
+
     if (data.password) {
       data.password = this.ctx.helper.encryptByMd5(data.password)
     }
 
-    if (user) {
-      await user.update(data)
-      return this.getUserById(user.id.toString())
-    } else {
-      throw new Error('User doesn\'t exist.')
-    }
+    await user.update(data)
+
+    const res = user.toJSON() as User
+    delete res.updatedAt
+    return res
   }
 
 
@@ -111,7 +111,7 @@ export default class UserService extends Service {
     })
 
     if (user) {
-      return user.toJSON() as User
+      return user
     } else {
       throw new Error('User doesn\'t exist.')
     }

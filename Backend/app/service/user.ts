@@ -139,7 +139,7 @@ export default class UserService extends Service {
       throw new Error('Incorrect login credential')
     }
 
-    return user.toJSON() as User
+    return user
   }
 
 
@@ -157,6 +157,6 @@ export default class UserService extends Service {
       throw new Error('Incorrect login credential')
     }
 
-    return user.toJSON() as User
+    return user
   }
 }

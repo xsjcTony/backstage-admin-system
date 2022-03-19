@@ -21,7 +21,7 @@ export default class OauthService extends Service {
     })
 
     if (res) {
-      return res.toJSON() as Oauth
+      return res
     } else {
       throw new Error('OAuth user does not exist')
     }

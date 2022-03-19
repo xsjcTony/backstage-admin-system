@@ -35,6 +35,7 @@ declare module 'vue' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     EmailRegisterForm: typeof import('./src/components/Register/EmailRegisterForm.vue')['default']
     Permissions: typeof import('./src/components/Admin/Permissions.vue')['default']
+    Query: typeof import('./src/components/Admin/Users/Query.vue')['default']
     Roles: typeof import('./src/components/Admin/Roles.vue')['default']
     UsernameRegisterForm: typeof import('./src/components/Register/UsernameRegisterForm.vue')['default']
     Users: typeof import('./src/components/Admin/Users.vue')['default']
