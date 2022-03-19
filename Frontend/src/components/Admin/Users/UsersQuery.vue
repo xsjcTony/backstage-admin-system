@@ -5,7 +5,7 @@ import {
   Lock
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { defineProps } from 'vue'
+import { defineProps, defineEmits } from 'vue'
 import { $ref } from 'vue/macros'
 import { createUser } from '../../../api'
 import type {
@@ -256,5 +256,11 @@ const resetForm = (formEl: FormInstance | undefined): void => {
     .main-top-right {
         display: flex;
     }
+}
+</style>
+
+<style lang="scss">
+.user-management-add-user-dialog {
+    min-width: 630px;
 }
 </style>
