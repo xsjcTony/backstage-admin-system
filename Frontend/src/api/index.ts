@@ -34,3 +34,5 @@ export const deleteUser = async (id: number): Promise<AxiosResponse> => Request.
 export const updateUser = async (id: number, data: UserManagementEditUserData): Promise<AxiosResponse> => Request.put(`/api/v1/users/${ id }`, data)
 
 export const getUserById = async (id: number): Promise<AxiosResponse> => Request.get(`/api/v1/users/${ id }`)
+
+export const updateUserState = async (id: number, userState: boolean): Promise<AxiosResponse> => Request.put(`/api/v1/users/${ id }`, { userState })

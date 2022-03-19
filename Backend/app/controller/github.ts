@@ -77,6 +77,11 @@ export default class GithubController extends Controller {
 
       const user = oauth.user
 
+      if (!user.userState) {
+        await ctx.service.oauth.deleteOAuth(oauth.id)
+        throw new Error('Account is closed, create a new account')
+      }
+
       /**
        * User already exists -> login straight away
        */
@@ -96,7 +101,9 @@ export default class GithubController extends Controller {
        * 1. Create a user
        */
       const userInfo = {
-        username: uuidV4().replace(/-/g, '').substring(0, 20),
+        username: uuidV4()
+          .replace(/-/g, '')
+          .substring(0, 20),
         password: 'com.123456',
         captcha: '',
         registerType: RegisterType.Normal,

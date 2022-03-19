@@ -13,7 +13,13 @@ import {
 import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import { $, $ref } from 'vue/macros'
-import { createUser, getAllUsers, deleteUser as destroyUser, updateUser } from '../../api'
+import {
+  createUser,
+  getAllUsers,
+  deleteUser as destroyUser,
+  updateUser,
+  updateUserState
+} from '../../api'
 import { useStore } from '../../stores'
 import type {
   User as UserData,
@@ -334,6 +340,31 @@ const beforeAvatarUpload = (file: UploadRawFile): Awaitable<Blob | File | boolea
   return isJPG && isLt2M
 }
 
+// User State
+const changeUserState = async (user: UserData): Promise<void> => {
+  let { id, userState } = $(user)
+
+  try {
+    await updateUserState(id, userState)
+
+    ElMessage.success({
+      message: 'User state has been updated',
+      center: true,
+      showClose: true,
+      duration: 2000
+    })
+  } catch (err) {
+    ElMessage.error({
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+
+    userState = !userState
+  }
+}
+
 
 /**
  * Main -> Delete User
@@ -428,7 +459,12 @@ const deleteUser = async (id: number): Promise<void> => {
             <el-table-column label="Role" min-width="150" prop="role"/>
             <el-table-column label="State" width="100">
                 <template #default="{ row }">
-                    <el-switch v-model="row.userState" active-color="#13ce66" inactive-color="#ff4949"/>
+                    <el-switch v-if="row.id !== currentUser.id"
+                               v-model="row.userState"
+                               active-color="#13ce66"
+                               inactive-color="#ff4949"
+                               @change="changeUserState(row)"
+                    />
                 </template>
             </el-table-column>
             <el-table-column label="Actions" width="200">
@@ -591,7 +627,9 @@ const deleteUser = async (id: number): Promise<void> => {
                          alt
                          class="avatar"
                     >
-                    <el-icon v-else class="avatar-uploader-icon"><Plus/></el-icon>
+                    <el-icon v-else class="avatar-uploader-icon">
+                        <Plus/>
+                    </el-icon>
                 </el-upload>
             </el-form-item>
         </el-form>
@@ -639,7 +677,7 @@ const deleteUser = async (id: number): Promise<void> => {
     }
 }
 
-.avatar-uploader{
+.avatar-uploader {
     :deep(.el-upload) {
         position: relative;
         overflow: hidden;

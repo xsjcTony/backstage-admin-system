@@ -135,7 +135,7 @@ export default class UserService extends Service {
   private async _loginUserByUsername(username: string, password: string): Promise<User> {
     const user = await this._findUser({ username, password })
 
-    if (!user) {
+    if (!user || !user.userState) {
       throw new Error('Incorrect login credential')
     }
 
@@ -153,7 +153,7 @@ export default class UserService extends Service {
   private async _loginUserByEmail(email: string, password: string): Promise<User> {
     const user = await this._findUser({ email, password })
 
-    if (!user) {
+    if (!user || !user.userState) {
       throw new Error('Incorrect login credential')
     }
 

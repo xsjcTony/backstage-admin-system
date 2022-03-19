@@ -92,15 +92,16 @@ export default class UsersController extends Controller {
     const data = ctx.request.body
 
     try {
-      // validate
-      ctx.validate(EditUserRule, data)
+      if (!('userState' in data)) {
+        // validate
+        ctx.validate(EditUserRule, data)
+      }
 
       // save into database
       const user = await ctx.service.users.updateUser(ctx.params.id, data)
 
       ctx.success(200, 'User has been updated', user)
     } catch (err) {
-      console.log(err)
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
       } else {

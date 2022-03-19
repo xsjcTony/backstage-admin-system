@@ -61,4 +61,5 @@ export interface EditUserData {
   username: string
   email: string | null
   password: string | undefined
+  userState?: boolean
 }
