@@ -89,12 +89,17 @@ export default class UserService extends Service {
       github
     })
 
-    const res = data.toJSON() as User
-    delete res.password
-    delete res.createdAt
-    delete res.updatedAt
+    const res = await this.ctx.model.User.findByPk(data.id, {
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
+      }
+    })
 
-    return res
+    if (res) {
+      return res
+    } else {
+      throw new Error()
+    }
   }
 
 
@@ -116,12 +121,17 @@ export default class UserService extends Service {
       password
     })
 
-    const res = data.toJSON() as User
-    delete res.password
-    delete res.createdAt
-    delete res.updatedAt
+    const res = await this.ctx.model.User.findByPk(data.id, {
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
+      }
+    })
 
-    return res
+    if (res) {
+      return res
+    } else {
+      throw new Error()
+    }
   }
 
 

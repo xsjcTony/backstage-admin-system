@@ -1,15 +1,21 @@
 /* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
 /* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
 /* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
+/* eslint '@typescript-eslint/ban-ts-comment': 'off' */
 
 /**
  * imports
  */
-import path from 'node:path'
 import * as fs from 'node:fs/promises'
+import path from 'node:path'
 import { Controller } from 'egg'
+import xlsx from 'node-xlsx'
 import AddUserRule from '../validator/addUserRule'
 import EditUserRule from '../validator/editUserRule'
+import type { ImportUserData } from '../types'
+import type { EggFile } from 'egg-multipart'
+import type { Sequelize } from 'sequelize'
+import type { User } from '../model/User'
 
 
 /**
@@ -140,7 +146,8 @@ export default class UsersController extends Controller {
     const avatar = ctx.request.files[0]
 
     const fileName = ctx.helper.encryptByMd5(`${ avatar.filename }${ Date.now() }`) + path.extname(avatar.filename)
-    const filePath = path.join('/public/assets/images/avatars', fileName).replace(/\\/g, '/')
+    const filePath = path.join('/public/assets/images/avatars', fileName)
+      .replace(/\\/g, '/')
     const absoluteFilePath = path.join(this.config.baseDir, 'app', filePath)
 
     // copy file
@@ -154,5 +161,81 @@ export default class UsersController extends Controller {
     }
 
     ctx.success(200, 'Avatar has been uploaded', filePath)
+  }
+
+
+  public async importUsers(): Promise<void> {
+    const { ctx } = this
+
+    let users: ImportUserData[] = []
+
+    try {
+      users = this._parseExcelToUsers(ctx.request.files[0])
+    } catch (err) {
+      if (err instanceof Error) {
+        ctx.error(400, err.message, err)
+      } else {
+        ctx.error(400, 'error', err)
+      }
+    } finally {
+      void ctx.cleanupRequestFiles()
+    }
+
+    const transaction = await (ctx.model as unknown as Sequelize).transaction()
+
+    const res: User[] = []
+
+    try {
+      for (const user of users) {
+        // @ts-ignore
+        const r = await ctx.service.users.createUser(user, { transaction })
+        res.push(r)
+      }
+
+      await transaction.commit()
+      ctx.success(200, 'Users have been imported', res)
+    } catch (err) {
+      await transaction.rollback()
+
+      if (err instanceof Error) {
+        ctx.error(500, err.message, err)
+      } else {
+        ctx.error(500, 'error', err)
+      }
+    } finally {
+      void ctx.cleanupRequestFiles()
+    }
+  }
+
+
+  /**
+   * Helper Functions
+   */
+
+  private _parseExcelToUsers(excel: EggFile): ImportUserData[] {
+    const w = xlsx.parse(excel.filepath)
+    const data = w[0] ? w[0].data : []
+    const keys = data.shift() as string[]
+
+    if (!keys.includes('password') || !keys.includes('username') && !keys.includes('email')) {
+      throw new Error('Invalid user data')
+    }
+
+    const users: ImportUserData[] = []
+
+    data.forEach((row) => {
+      if (row instanceof Array) {
+        const user: ImportUserData = { password: '' }
+        row.forEach((col, index) => {
+          Object.defineProperty<ImportUserData>(user, keys[index], {
+            value: col === 0 ? false : col === 1 ? true : col,
+            enumerable: true
+          })
+        })
+        users.push(user)
+      }
+    })
+
+    return users
   }
 }

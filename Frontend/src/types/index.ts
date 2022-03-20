@@ -9,6 +9,7 @@ export interface MainStore {
   loggedIn: boolean
   currentUser: User | null
   assetBaseUrl: string
+  apiBaseUrl: string
 }
 
 
@@ -39,28 +40,31 @@ export type RegisterData = EmailRegisterData | NormalRegisterData
 export type FormInstance = InstanceType<typeof ElForm>
 
 
-// ResponseData
-export interface ResponseData {
+/**
+ * Response Data
+ */
+
+interface BaseResponseData {
   code: number
   msg: unknown
+}
+
+export interface ResponseData extends BaseResponseData {
   data: unknown
 }
 
-// JwtUserResponseData
-export interface JwtUserResponseData {
-  code: number
-  msg: unknown
-  data: User & {
-    token: string
-  }
+export interface JwtUserResponseData extends BaseResponseData {
+  data: User & { token: string }
 }
 
-// StringResponseData
-export interface StringResponseData {
-  code: number
-  msg: unknown
+export interface StringResponseData extends BaseResponseData {
   data: string
 }
+
+export interface ImportUsersResponseData extends BaseResponseData {
+  data: User[]
+}
+
 
 // loginData
 export interface LoginData {

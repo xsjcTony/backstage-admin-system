@@ -1,58 +1,54 @@
 import { Service } from 'egg'
 import type { User } from '../model/User'
-import type { AddUserData, EditUserData } from '../types'
+import type { AddUserData, EditUserData, ImportUserData } from '../types'
 import type { WhereOptions } from 'sequelize'
+import type { ICreateOptions } from 'sequelize-typescript'
 
 
-export default class UserService extends Service {
+export default class UsersService extends Service {
 
   /**
    * Get all users from database (REST API - GET)
    * @return {Promise<User[]>}
    */
   public async getAllUsers(): Promise<User[]> {
-    const users = await this.ctx.model.User.findAll({
+    return this.ctx.model.User.findAll({
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
       }
     })
-    return users
   }
 
 
   /**
    * Add user to database (REST API - POST)
-   * @param {AddUserData} data
+   * @param {AddUserData | ImportUserData} data
+   * @param {ICreateOptions} options
    * @return {Promise<User>}
    */
-  public async createUser(data: AddUserData): Promise<User> {
-    const { username, email, password } = data
+  public async createUser(data: AddUserData | ImportUserData, options?: ICreateOptions): Promise<User> {
+    const { username, email } = data
+    data.password = this.ctx.helper.encryptByMd5(data.password)
 
-    const user1 = await this._findUser({ username })
-    if (user1) {
-      throw new Error('Username already exists')
-    }
-
-    if (email) {
-      const user2 = await this._findUser({ email })
-      if (user2) {
-        throw new Error('Email already exists')
+    if (username) {
+      const user = await this._findUser({ username })
+      if (user) {
+        throw new Error(`Username "${ username }" already exists`)
       }
     }
 
-    const res = await this.ctx.model.User.create({
-      username,
-      email,
-      password: this.ctx.helper.encryptByMd5(password)
-    })
-    console.log(res)
+    if (email) {
+      const user = await this._findUser({ email })
+      if (user) {
+        throw new Error(`Email "${ email }" already exists`)
+      }
+    }
 
-    const newUser = res.toJSON() as User
-    delete newUser.password
-    delete newUser.createdAt
-    delete newUser.updatedAt
+    if (!username && !email) {
+      throw new Error('Require at least one of username and email')
+    }
 
-    return newUser
+    return this.ctx.model.User.create(data, options)
   }
 
 

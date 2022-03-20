@@ -34,4 +34,5 @@ export default async (app: Application): Promise<void> => {
   router.put('/api/v1/users/:id', authenticator, controller.users.updateUser)
   router.get('/api/v1/users/:id', authenticator, controller.users.getUserById)
   router.post('/api/v1/users/avatar', authenticator, controller.users.uploadAvatar)
+  router.post('/api/v1/users/import', authenticator, controller.users.importUsers)
 }

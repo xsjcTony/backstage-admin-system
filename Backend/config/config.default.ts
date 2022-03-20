@@ -22,7 +22,8 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
 
   // file
   config.multipart = {
-    mode: 'file'
+    mode: 'file',
+    fileExtensions: ['.xlsx']
   }
 
   // add your special config in here

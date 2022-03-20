@@ -85,7 +85,7 @@ export default class GithubController extends Controller {
       /**
        * User already exists -> login straight away
        */
-      const token = jwt.sign(user, this.config.keys, { expiresIn: '7d' })
+      const token = jwt.sign(user.toJSON(), this.config.keys, { expiresIn: '7d' })
 
       ctx.cookies.set('token', token, {
         path: '/',
@@ -120,7 +120,7 @@ export default class GithubController extends Controller {
       /**
        * 3. Login (redirect to '/admin')
        */
-      const token = jwt.sign(user, this.config.keys, { expiresIn: '7d' })
+      const token = jwt.sign(user.toJSON(), this.config.keys, { expiresIn: '7d' })
 
       ctx.cookies.set('token', token, {
         path: '/',

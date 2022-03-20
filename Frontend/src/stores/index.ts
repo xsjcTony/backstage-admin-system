@@ -7,7 +7,8 @@ export const useStore = defineStore('main', {
     return {
       loggedIn: false,
       currentUser: null,
-      assetBaseUrl: 'http://127.0.0.7:7001'
+      assetBaseUrl: 'http://127.0.0.7:7001',
+      apiBaseUrl: 'http://127.0.0.7:7001'
     }
   }
 })

@@ -35,7 +35,7 @@ import type { Awaitable } from 'element-plus/es/utils'
  * Global Constants
  */
 const mainStore = useStore()
-let { currentUser, assetBaseUrl } = $(storeToRefs(mainStore))
+let { currentUser, assetBaseUrl, apiBaseUrl } = $(storeToRefs(mainStore))
 const jwt = localStorage.getItem('token') ?? ''
 
 
@@ -410,12 +410,12 @@ const deleteUser = async (id: number): Promise<void> => {
                 />
             </el-form-item>
             <el-form-item label="Avatar">
-                <el-upload :before-upload="beforeAvatarUpload"
+                <el-upload :action="`${ apiBaseUrl }/api/v1/users/avatar`"
+                           :before-upload="beforeAvatarUpload"
                            :headers="{ Authorization: jwt }"
                            :on-success="handleAvatarSuccess"
                            :show-file-list="false"
                            accept="image/jpeg"
-                           action="http://127.0.0.1:7001/api/v1/users/avatar"
                            class="avatar-uploader"
                 >
                     <img v-if="editUserData.avatarUrl"

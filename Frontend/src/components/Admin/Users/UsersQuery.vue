@@ -5,15 +5,28 @@ import {
   Lock
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { Awaitable } from 'element-plus/es/utils'
+import { storeToRefs } from 'pinia'
 import { defineProps, defineEmits } from 'vue'
-import { $ref } from 'vue/macros'
+import { $, $ref } from 'vue/macros'
 import { createUser } from '../../../api'
+import { useStore } from '../../../stores'
 import type {
   FormInstance,
   UserManagementAddUserData,
-  User as UserData
+  User as UserData,
+  ImportUsersResponseData
 } from '../../../types'
 import type { AxiosError, AxiosResponse } from 'axios'
+import type { UploadFile, UploadRawFile } from 'element-plus'
+
+
+/**
+ * Global Constants
+ */
+const mainStore = useStore()
+const { apiBaseUrl } = $(storeToRefs(mainStore))
+const jwt = localStorage.getItem('token') ?? ''
 
 
 /**
@@ -40,7 +53,6 @@ const searchData = $ref({
 
 const query = () => void undefined
 const exportQueryResult = () => void undefined
-const importUsers = () => void undefined
 
 
 /**
@@ -145,6 +157,54 @@ const resetForm = (formEl: FormInstance | undefined): void => {
   if (!formEl) return
   formEl.resetFields()
 }
+
+
+/**
+ * Import Users
+ */
+const importUsersSuccess = (response: ImportUsersResponseData, file: UploadFile): void => {
+  if (response.code === 200) {
+    emit('update:tableData', [...props.tableData, ...response.data])
+
+    ElMessage.success({
+      message: typeof response.msg === 'string' ? response.msg : 'Users have been imported',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+  }
+}
+const beforeSheetUpload = (file: UploadRawFile): Awaitable<Blob | File | boolean | null | undefined> => {
+  const isXLSX = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // .xlsx
+  const isLt500KB = file.size / 1024 <= 500 // <= 500kb
+
+  if (!isXLSX) {
+    ElMessage.error({
+      message: 'User data must be ".xlsx" file',
+      center: true,
+      showClose: true,
+      duration: 5000
+    })
+  }
+  if (!isLt500KB) {
+    ElMessage.error({
+      message: 'File size can not exceed 500kb',
+      center: true,
+      showClose: true,
+      duration: 5000
+    })
+  }
+
+  return isXLSX && isLt500KB
+}
+const importUsersFailed = (err: string): void => {
+  ElMessage.error({
+    message: err,
+    center: true,
+    showClose: true,
+    duration: 5000
+  })
+}
 </script>
 
 <template>
@@ -182,7 +242,22 @@ const resetForm = (formEl: FormInstance | undefined): void => {
         </el-form>
         <div class="main-top-right">
             <el-button type="primary" @click="addUserDialogVisible = true">Add user</el-button>
-            <el-button type="primary" @click="importUsers">Import users</el-button>
+            <el-upload :action="`${ apiBaseUrl }/api/v1/users/import`"
+                       :before-upload="beforeSheetUpload"
+                       :headers="{ Authorization: jwt }"
+                       :on-error="importUsersFailed"
+                       :on-success="importUsersSuccess"
+                       :show-file-list="false"
+                       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                       class="import-user-upload"
+            >
+                <el-tooltip content="&quot;.xlsx&quot; file no larger than 500kb"
+                            placement="top-end"
+                            trigger="hover"
+                >
+                    <el-button type="primary">Import users</el-button>
+                </el-tooltip>
+            </el-upload>
         </div>
     </div>
 
@@ -255,6 +330,10 @@ const resetForm = (formEl: FormInstance | undefined): void => {
 
     .main-top-right {
         display: flex;
+
+        .import-user-upload {
+            margin-left: 12px;
+        }
     }
 }
 </style>

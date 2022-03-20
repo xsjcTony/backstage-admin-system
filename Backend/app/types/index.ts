@@ -54,6 +54,9 @@ export interface AddUserData {
   username: string
   email: string | null
   password: string
+  github?: boolean
+  userState?: boolean
+  avatarUrl?: string
 }
 
 // EditUserData
@@ -62,4 +65,14 @@ export interface EditUserData {
   email: string | null
   password: string | undefined
   userState?: boolean
+}
+
+// ImportUserData
+export interface ImportUserData {
+  username?: string
+  email?: string
+  password: string
+  userState?: boolean
+  github?: boolean
+  avatarUrl?: string
 }
