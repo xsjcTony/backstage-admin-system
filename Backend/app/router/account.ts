@@ -11,7 +11,7 @@ export default (app: Application): void => {
    */
   router.post('/register', controller.user.create)
   router.post('/login', controller.user.login)
-  router.get('/is_logged_in', controller.user.isLoggedIn)
+  router.get('/is-logged-in', controller.user.isLoggedIn)
 
 
   /**

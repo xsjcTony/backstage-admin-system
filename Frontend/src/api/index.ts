@@ -15,11 +15,11 @@ import type { AxiosResponse } from 'axios'
  */
 export const registerUser = async (data: RegisterData): Promise<ResponseData> => (await Request.post('/register', data)).data
 
-export const sendVerificationEmail = async (data: { email: string }): Promise<ResponseData> => (await Request.get('/verify_email', data)).data
+export const sendVerificationEmail = async (data: { email: string }): Promise<ResponseData> => (await Request.get('/verify-email', data)).data
 
 export const loginUser = async (data: LoginData): Promise<JwtUserResponseData> => (await Request.post('/login', data)).data
 
-export const isLoggedIn = async (): Promise<ResponseData> => (await Request.get('/is_logged_in')).data
+export const isLoggedIn = async (): Promise<ResponseData> => (await Request.get('/is-logged-in')).data
 
 
 /**
@@ -36,3 +36,5 @@ export const updateUser = async (id: number, data: UserManagementEditUserData): 
 export const getUserById = async (id: number): Promise<AxiosResponse> => Request.get(`/api/v1/users/${ id }`)
 
 export const updateUserState = async (id: number, userState: boolean): Promise<AxiosResponse> => Request.put(`/api/v1/users/${ id }`, { userState })
+
+export const exportAllUsers = async (): Promise<AxiosResponse> => Request.getFile('/api/v1/export-all-users')

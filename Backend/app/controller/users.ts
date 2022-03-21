@@ -3,6 +3,7 @@
 /* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
 /* eslint '@typescript-eslint/ban-ts-comment': 'off' */
 
+
 /**
  * imports
  */
@@ -12,10 +13,9 @@ import { Controller } from 'egg'
 import xlsx from 'node-xlsx'
 import AddUserRule from '../validator/addUserRule'
 import EditUserRule from '../validator/editUserRule'
-import type { ImportUserData } from '../types'
-import type { EggFile } from 'egg-multipart'
-import type { Sequelize } from 'sequelize'
 import type { User } from '../model/User'
+import type { ExcelUserData, ImportUserData } from '../types'
+import type { Sequelize } from 'sequelize'
 
 
 /**
@@ -164,13 +164,17 @@ export default class UsersController extends Controller {
   }
 
 
+  /**
+   * Import users from EXCEL
+   * @return {Promise<void>}
+   */
   public async importUsers(): Promise<void> {
     const { ctx } = this
 
     let users: ImportUserData[] = []
 
     try {
-      users = this._parseExcelToUsers(ctx.request.files[0])
+      users = ctx.helper.excelToUsers(ctx.request.files[0])
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
@@ -208,34 +212,28 @@ export default class UsersController extends Controller {
   }
 
 
-  /**
-   * Helper Functions
-   */
+  public async exportAllUsers(): Promise<void> {
+    const { ctx } = this
+    const users = (await ctx.service.users.getAllUsers()).map(user => user.toJSON() as User)
 
-  private _parseExcelToUsers(excel: EggFile): ImportUserData[] {
-    const w = xlsx.parse(excel.filepath)
-    const data = w[0] ? w[0].data : []
-    const keys = data.shift() as string[]
-
-    if (!keys.includes('password') || !keys.includes('username') && !keys.includes('email')) {
-      throw new Error('Invalid user data')
+    if (users.length === 0) {
+      ctx.error(500, 'No users')
+      return
     }
 
-    const users: ImportUserData[] = []
+    const keys = Object.keys(users[0])
 
-    data.forEach((row) => {
-      if (row instanceof Array) {
-        const user: ImportUserData = { password: '' }
-        row.forEach((col, index) => {
-          Object.defineProperty<ImportUserData>(user, keys[index], {
-            value: col === 0 ? false : col === 1 ? true : col,
-            enumerable: true
-          })
-        })
-        users.push(user)
-      }
-    })
+    const data: (ExcelUserData[] | string[])[] = [keys]
+    users.forEach(user => void data.push(ctx.helper.userToExcel(user)))
 
-    return users
+    const buffer = xlsx.build([{
+      name: 'Users',
+      data,
+      options: {}
+    }])
+
+    ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    ctx.attachment('users.xlsx')
+    ctx.body = buffer
   }
 }

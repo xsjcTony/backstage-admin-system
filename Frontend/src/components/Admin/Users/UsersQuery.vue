@@ -9,8 +9,9 @@ import { Awaitable } from 'element-plus/es/utils'
 import { storeToRefs } from 'pinia'
 import { defineProps, defineEmits } from 'vue'
 import { $, $ref } from 'vue/macros'
-import { createUser } from '../../../api'
+import { createUser, exportAllUsers as exportAllUsersAPI } from '../../../api'
 import { useStore } from '../../../stores'
+import { downloadFile } from '../../../utils'
 import type {
   FormInstance,
   UserManagementAddUserData,
@@ -202,8 +203,26 @@ const importUsersFailed = (err: string): void => {
     message: err,
     center: true,
     showClose: true,
-    duration: 5000
+    duration: 3000
   })
+}
+
+
+/**
+ * Export All Users
+ */
+const exportAllUsers = async (): Promise<void> => {
+  try {
+    const res = await exportAllUsersAPI()
+    downloadFile(res.data, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'users.xlsx')
+  } catch (err) {
+    ElMessage.error({
+      message: (err as AxiosError).message || (err instanceof Error ? err.message : 'Error'),
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+  }
 }
 </script>
 
@@ -242,7 +261,7 @@ const importUsersFailed = (err: string): void => {
         </el-form>
         <div class="main-top-right">
             <el-button type="primary" @click="addUserDialogVisible = true">Add user</el-button>
-            <el-upload :action="`${ apiBaseUrl }/api/v1/users/import`"
+            <el-upload :action="`${ apiBaseUrl }/api/v1/import-users`"
                        :before-upload="beforeSheetUpload"
                        :headers="{ Authorization: jwt }"
                        :on-error="importUsersFailed"
@@ -252,12 +271,18 @@ const importUsersFailed = (err: string): void => {
                        class="import-user-upload"
             >
                 <el-tooltip content="&quot;.xlsx&quot; file no larger than 500kb"
-                            placement="top-end"
+                            placement="top"
                             trigger="hover"
                 >
                     <el-button type="primary">Import users</el-button>
                 </el-tooltip>
             </el-upload>
+            <el-tooltip content="Export all users to a &quot;.xlsx&quot; file"
+                        placement="top-end"
+                        trigger="hover"
+            >
+                <el-button type="primary" @click="exportAllUsers">Export all users</el-button>
+            </el-tooltip>
         </div>
     </div>
 
@@ -332,7 +357,7 @@ const importUsersFailed = (err: string): void => {
         display: flex;
 
         .import-user-upload {
-            margin-left: 12px;
+            margin: 0 12px;
         }
     }
 }

@@ -76,3 +76,16 @@ export interface ImportUserData {
   github?: boolean
   avatarUrl?: string
 }
+
+// ExcelUserData
+export type ExcelUserData = number | string | null
+
+// UserResponse
+export interface UserResponse {
+  id: number
+  username: string | null
+  email: string | null
+  github: boolean
+  userState: boolean
+  avatarUrl: string
+}

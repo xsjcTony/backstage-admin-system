@@ -22,7 +22,7 @@ import {
 import { Oauth } from './Oauth'
 
 
-const { INTEGER, STRING, BOOLEAN, VIRTUAL } = DataType
+const { INTEGER, STRING, BOOLEAN } = DataType
 
 @Table({
   modelName: 'User'

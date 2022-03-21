@@ -410,7 +410,7 @@ const deleteUser = async (id: number): Promise<void> => {
                 />
             </el-form-item>
             <el-form-item label="Avatar">
-                <el-upload :action="`${ apiBaseUrl }/api/v1/users/avatar`"
+                <el-upload :action="`${ apiBaseUrl }/api/v1/upload-user-avatar`"
                            :before-upload="beforeAvatarUpload"
                            :headers="{ Authorization: jwt }"
                            :on-success="handleAvatarSuccess"

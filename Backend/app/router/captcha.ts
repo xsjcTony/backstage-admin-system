@@ -7,5 +7,5 @@ export default (app: Application): void => {
   const { controller, router } = app
 
   router.get('/captcha', controller.util.generateCaptcha)
-  router.get('/verify_email', controller.util.sendVerificationEmail)
+  router.get('/verify-email', controller.util.sendVerificationEmail)
 }

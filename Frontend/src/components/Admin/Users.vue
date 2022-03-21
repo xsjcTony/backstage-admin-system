@@ -46,6 +46,6 @@ const tableData = $ref<User[]>([])
 }
 
 .el-card {
-    min-width: 520px;
+    min-width: 700px;
 }
 </style>

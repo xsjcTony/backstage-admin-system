@@ -61,3 +61,9 @@ export const put = async (path = '', data = {}): Promise<AxiosResponse> => axios
  * ALL
  */
 export const all = async (requests: Iterable<Promise<AxiosResponse>>): Promise<Awaited<AxiosResponse>[]> => Promise.all(requests)
+
+
+export const getFile = async (path = '', data = {}): Promise<AxiosResponse> => axios.get(path, {
+  params: data,
+  responseType: 'blob'
+})
