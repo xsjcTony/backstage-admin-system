@@ -11,7 +11,7 @@ export default (app: Application, authenticator: any): void => {
   /**
    * Users - REST API
    */
-  router.get('/api/v1/users', authenticator, controller.users.getAllUsers)
+  router.get('/api/v1/users', authenticator, controller.users.getUsersByQuery)
   router.get('/api/v1/users/:id', authenticator, controller.users.getUserById)
   router.post('/api/v1/users', authenticator, controller.users.createUser)
   router.delete('/api/v1/users/:id', authenticator, controller.users.deleteUser)

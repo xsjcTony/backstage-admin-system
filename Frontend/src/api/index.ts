@@ -5,7 +5,8 @@ import type {
   ResponseData,
   JwtUserResponseData,
   UserManagementAddUserData,
-  UserManagementEditUserData
+  UserManagementEditUserData,
+  QueryData
 } from '../types'
 import type { AxiosResponse } from 'axios'
 
@@ -25,7 +26,7 @@ export const isLoggedIn = async (): Promise<ResponseData> => (await Request.get(
 /**
  * Users - REST
  */
-export const getAllUsers = async (): Promise<AxiosResponse> => Request.get('/api/v1/users')
+export const getUsersByQuery = async (data: QueryData): Promise<AxiosResponse> => Request.get('/api/v1/users', data)
 
 export const createUser = async (data: UserManagementAddUserData): Promise<AxiosResponse> => Request.post('/api/v1/users', data)
 

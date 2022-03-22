@@ -1,21 +1,13 @@
 <script lang="ts" setup>
 import { ArrowRight } from '@element-plus/icons-vue'
-import { $ref } from 'vue/macros'
 import UsersQuery from './Users/UsersQuery.vue'
 import UsersTable from './Users/UsersTable.vue'
-import type { User } from '../../types'
 
 
 /**
  * Header (Breadcrumb)
  */
 const resetDefaultActiveMenuItem = () => void sessionStorage.removeItem('defaultActiveMenuItem')
-
-
-/**
- * Table
- */
-const tableData = $ref<User[]>([])
 </script>
 
 <template>
@@ -31,10 +23,10 @@ const tableData = $ref<User[]>([])
 
     <!-- S Main -->
     <el-card>
-        <UsersQuery v-model:table-data="tableData"/>
+        <UsersQuery/>
         <!-- /Top bar -->
 
-        <UsersTable v-model:table-data="tableData"/>
+        <UsersTable/>
         <!-- /Main table -->
     </el-card>
     <!-- E Main -->

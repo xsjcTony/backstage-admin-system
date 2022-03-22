@@ -89,3 +89,13 @@ export interface UserResponse {
   userState: boolean
   avatarUrl: string
 }
+
+// QueryData
+export interface QueryData {
+  role: string
+  origin: string
+  type: string
+  keyword: string
+  currentPageNumber: string
+  pageSize: string
+}

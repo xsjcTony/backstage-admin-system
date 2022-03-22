@@ -12,7 +12,16 @@ export interface MainStore {
   apiBaseUrl: string
 }
 
+// UserStore
+export interface UserStore {
+  tableData: User[]
+  queryData: QueryData
+}
 
+
+/**
+ * Vue
+ */
 // RegisterData
 export const enum RegisterType {
   Normal = 'normal',
@@ -99,4 +108,14 @@ export interface User {
   github: boolean
   userState: boolean
   avatarUrl: string
+}
+
+// QueryData
+export interface QueryData {
+  role: string
+  origin: string
+  type: string
+  keyword: string
+  currentPageNumber: number
+  pageSize: number
 }

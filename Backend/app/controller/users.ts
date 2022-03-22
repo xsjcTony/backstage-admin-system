@@ -14,7 +14,7 @@ import xlsx from 'node-xlsx'
 import AddUserRule from '../validator/addUserRule'
 import EditUserRule from '../validator/editUserRule'
 import type { User } from '../model/User'
-import type { ExcelUserData, ImportUserData } from '../types'
+import type { ExcelUserData, ImportUserData, QueryData } from '../types'
 import type { Sequelize } from 'sequelize'
 
 
@@ -32,6 +32,26 @@ export default class UsersController extends Controller {
 
     try {
       const users = await ctx.service.users.getAllUsers()
+      ctx.success(200, 'success', users)
+    } catch (err) {
+      if (err instanceof Error) {
+        ctx.error(500, err.message, err)
+      } else {
+        ctx.error(500, 'Error', err)
+      }
+    }
+  }
+
+
+  /**
+   * Get users by query info (REST API - GET)
+   * @return {Promise<void>}
+   */
+  public async getUsersByQuery(): Promise<void> {
+    const { ctx } = this
+
+    try {
+      const users = await ctx.service.users.getUsersByQuery(ctx.query as unknown as QueryData)
       ctx.success(200, 'success', users)
     } catch (err) {
       if (err instanceof Error) {

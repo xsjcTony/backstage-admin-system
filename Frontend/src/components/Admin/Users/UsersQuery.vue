@@ -7,15 +7,14 @@ import {
 import { ElMessage } from 'element-plus'
 import { Awaitable } from 'element-plus/es/utils'
 import { storeToRefs } from 'pinia'
-import { defineProps, defineEmits } from 'vue'
 import { $, $ref } from 'vue/macros'
 import { createUser, exportAllUsers as exportAllUsersAPI } from '../../../api'
 import { useStore } from '../../../stores'
+import { useUserStore } from '../../../stores/userStore'
 import { downloadFile } from '../../../utils'
 import type {
   FormInstance,
   UserManagementAddUserData,
-  User as UserData,
   ImportUsersResponseData
 } from '../../../types'
 import type { AxiosError, AxiosResponse } from 'axios'
@@ -26,32 +25,15 @@ import type { UploadFile, UploadRawFile } from 'element-plus'
  * Global Constants
  */
 const mainStore = useStore()
+const userStore = useUserStore()
 const { apiBaseUrl } = $(storeToRefs(mainStore))
+const { tableData, queryData } = $(storeToRefs(userStore))
 const jwt = localStorage.getItem('token') ?? ''
-
-
-/**
- * Props
- */
-const props = defineProps<{ tableData: UserData[] }>()
-
-
-/**
- * Emits
- */
-const emit = defineEmits<(e: 'update:tableData', value: UserData[]) => void>()
 
 
 /**
  * Query
  */
-const searchData = $ref({
-  role: '',
-  origin: '',
-  type: '',
-  keyword: ''
-})
-
 const query = () => void undefined
 const exportQueryResult = () => void undefined
 
@@ -84,7 +66,7 @@ const addUser = async (formEl: FormInstance | undefined): Promise<void> => {
         })
 
         addUserDialogVisible = false
-        emit('update:tableData', [...props.tableData, response.data.data])
+        tableData.push(response.data.data)
       } catch (err) {
         ElMessage.error({
           message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
@@ -165,7 +147,7 @@ const resetForm = (formEl: FormInstance | undefined): void => {
  */
 const importUsersSuccess = (response: ImportUsersResponseData, file: UploadFile): void => {
   if (response.code === 200) {
-    emit('update:tableData', [...props.tableData, ...response.data])
+    tableData.push(...response.data)
 
     ElMessage.success({
       message: typeof response.msg === 'string' ? response.msg : 'Users have been imported',
@@ -228,27 +210,27 @@ const exportAllUsers = async (): Promise<void> => {
 
 <template>
     <div class="main-top">
-        <el-form :model="searchData" class="demo-form-inline" inline>
+        <el-form :model="queryData" class="demo-form-inline" inline>
             <el-form-item>
-                <el-select v-model="searchData.role" clearable placeholder="- All roles -">
+                <el-select v-model="queryData.role" clearable placeholder="- All roles -">
                     <el-option label="Administrator" value="administrator"/>
                     <el-option label="User" value="user"/>
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-select v-model="searchData.origin" clearable placeholder="- All origins -">
+                <el-select v-model="queryData.origin" clearable placeholder="- All origins -">
                     <el-option label="Local registered" value="local"/>
                     <el-option label="GitHub OAuth" value="github"/>
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-select v-model="searchData.type" clearable placeholder="- All Types -">
+                <el-select v-model="queryData.type" clearable placeholder="- All Types -">
                     <el-option label="Username" value="username"/>
                     <el-option label="E-mail" value="email"/>
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-input v-model="searchData.keyword"
+                <el-input v-model="queryData.keyword"
                           clearable
                           placeholder="Keyword"
                           type="text"

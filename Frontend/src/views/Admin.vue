@@ -65,7 +65,7 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                 <el-button @click="logout">Log out</el-button>
             </div>
         </el-header>
-        <el-container>
+        <el-container class="main-container">
             <el-aside :width="menuCollapsed ? '64px' : '250px'">
                 <el-menu :collapse="menuCollapsed"
                          :collapse-transition="false"
@@ -160,6 +160,10 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                 font-weight: 700;
             }
         }
+    }
+
+    &.main-container {
+        height: calc(100% - 60px);
     }
 
     .el-aside {

@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+/* eslint 'vue/no-mutating-props': 'off' */
+
 import {
   EditPen,
   Delete,
@@ -11,17 +13,19 @@ import {
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
-import { defineProps, defineEmits } from 'vue'
+import { watch } from 'vue'
 import { $, $ref } from 'vue/macros'
 import {
   deleteUser as destroyUser,
-  getAllUsers,
+  getUsersByQuery,
   updateUser,
   updateUserState
 } from '../../../api'
 import { useStore } from '../../../stores'
+import { useUserStore } from '../../../stores/userStore'
 import type {
   FormInstance,
+  QueryData,
   StringResponseData,
   User as UserData,
   UserManagementEditUserData
@@ -36,55 +40,38 @@ import type { Awaitable } from 'element-plus/es/utils'
  */
 const mainStore = useStore()
 let { currentUser, assetBaseUrl, apiBaseUrl } = $(storeToRefs(mainStore))
+const userStore = useUserStore()
+let { tableData, queryData } = $(storeToRefs(userStore))
 const jwt = localStorage.getItem('token') ?? ''
-
-
-/**
- * Props
- */
-const props = defineProps<{ tableData: UserData[] }>()
-
-
-/**
- * Emits
- */
-const emit = defineEmits<(e: 'update:tableData', value: UserData[]) => void>()
 
 
 /**
  * Table
  */
+let totalUserCounts = $ref<number>(0)
 const tableRowClassName = ({ row }: { row: UserData }): string => {
   if (row.id === currentUser?.id) return 'current-user-row'
   return ''
 }
 
-getAllUsers()
-  .then((response) => {
-    const users: UserData[] = response.data.data
-    const currentUserIndex = users.findIndex(user => user.id === (currentUser?.id ?? -1))
-    if (currentUserIndex !== -1) {
-      const user = users.splice(currentUserIndex, 1)
-      users.unshift(currentUser ?? user[0])
-    }
-
-    emit('update:tableData', users)
-  })
-  .catch((err) => {
-    ElMessage.error({
-      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
-      center: true,
-      showClose: true,
-      duration: 5000
+const queryUsers = (queryData: QueryData): void => {
+  getUsersByQuery(queryData)
+    .then((response) => {
+      const users: UserData[] = response.data.data.rows
+      totalUserCounts = response.data.data.count
+      tableData = users
     })
-  })
+    .catch((err) => {
+      ElMessage.error({
+        message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+        center: true,
+        showClose: true,
+        duration: 5000
+      })
+    })
+}
 
-
-/**
- * Pagination
- */
-const currentPage4 = $ref<number>(4)
-const pageSize4 = $ref<number>(100)
+queryUsers(queryData)
 
 
 /**
@@ -130,13 +117,11 @@ const editUser = async (formEl: FormInstance | undefined): Promise<void> => {
         })
 
         const newUser = response.data.data
-        const tableData = props.tableData
         tableData[tableData.findIndex(user => user.id === id)] = newUser
         if (id === currentUser?.id) {
           currentUser = newUser
         }
 
-        emit('update:tableData', tableData)
         editUserDialogVisible = false
       } catch (err) {
         ElMessage.error({
@@ -286,9 +271,7 @@ const deleteUser = async (id: number): Promise<void> => {
       duration: 3000
     })
 
-    const tableData = props.tableData
     tableData.splice(tableData.findIndex(user => user.id === id), 1)
-    emit('update:tableData', tableData)
   } catch (err) {
     ElMessage.error({
       message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
@@ -298,6 +281,21 @@ const deleteUser = async (id: number): Promise<void> => {
     })
   }
 }
+
+
+/**
+ * Pagination
+ */
+watch(() => queryData.currentPageNumber, (newValue, oldValue) => {
+  queryUsers(queryData)
+})
+watch(() => queryData.pageSize, (newValue, oldValue) => {
+  if (queryData.currentPageNumber !== 1) {
+    queryData.currentPageNumber = 1
+  } else {
+    queryUsers(queryData)
+  }
+})
 </script>
 
 <template>
@@ -348,10 +346,10 @@ const deleteUser = async (id: number): Promise<void> => {
     <!-- E Table -->
 
     <!-- S Pagination -->
-    <el-pagination v-model:currentPage="currentPage4"
-                   v-model:page-size="pageSize4"
-                   :page-sizes="[100, 200, 300, 400]"
-                   :total="400"
+    <el-pagination v-model:currentPage="queryData.currentPageNumber"
+                   v-model:page-size="queryData.pageSize"
+                   :page-sizes="[10, 20, 30, 50]"
+                   :total="totalUserCounts"
                    layout="->, total, sizes, prev, pager, next, jumper"
     />
     <!-- E Pagination -->

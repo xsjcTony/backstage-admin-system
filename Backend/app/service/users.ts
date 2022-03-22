@@ -1,6 +1,11 @@
 import { Service } from 'egg'
 import type { User } from '../model/User'
-import type { AddUserData, EditUserData, ImportUserData } from '../types'
+import type {
+  AddUserData,
+  EditUserData,
+  ImportUserData,
+  QueryData
+} from '../types'
 import type { WhereOptions } from 'sequelize'
 import type { ICreateOptions } from 'sequelize-typescript'
 
@@ -16,6 +21,25 @@ export default class UsersService extends Service {
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
       }
+    })
+  }
+
+
+  /**
+   * Get users by query info (REST API - GET)
+   * @param {QueryData} query
+   * @return {Promise<User[]>}
+   */
+  public async getUsersByQuery(query: QueryData): Promise<{ rows: User[], count: number }> {
+    const currentPageNumber = parseInt(query.currentPageNumber) || 1
+    const pageSize = parseInt(query.pageSize) || 10
+
+    return this.ctx.model.User.findAndCountAll({
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
+      },
+      limit: pageSize,
+      offset: (currentPageNumber - 1) * pageSize
     })
   }
 
