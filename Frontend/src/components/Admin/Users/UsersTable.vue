@@ -41,37 +41,56 @@ import type { Awaitable } from 'element-plus/es/utils'
 const mainStore = useStore()
 let { currentUser, assetBaseUrl, apiBaseUrl } = $(storeToRefs(mainStore))
 const userStore = useUserStore()
-let { tableData, queryData } = $(storeToRefs(userStore))
+let { tableData, queryData, totalUserCounts } = $(storeToRefs(userStore))
 const jwt = localStorage.getItem('token') ?? ''
 
 
 /**
  * Table
  */
-let totalUserCounts = $ref<number>(0)
 const tableRowClassName = ({ row }: { row: UserData }): string => {
   if (row.id === currentUser?.id) return 'current-user-row'
   return ''
 }
 
-const queryUsers = (queryData: QueryData): void => {
-  getUsersByQuery(queryData)
-    .then((response) => {
-      const users: UserData[] = response.data.data.rows
-      totalUserCounts = response.data.data.count
-      tableData = users
+const queryUsers = async (queryData: QueryData): Promise<void> => {
+  try {
+    const response = await getUsersByQuery(queryData)
+
+    const users: UserData[] = response.data.data.rows
+    totalUserCounts = response.data.data.count
+    tableData = users
+  } catch (err) {
+    ElMessage.error({
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      center: true,
+      showClose: true,
+      duration: 2000
     })
-    .catch((err) => {
-      ElMessage.error({
-        message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
-        center: true,
-        showClose: true,
-        duration: 5000
-      })
-    })
+  }
 }
 
-queryUsers(queryData)
+void queryUsers(queryData)
+
+const refreshUsers = async (): Promise<void> => {
+  queryData.role = ''
+  queryData.origin = ''
+  queryData.type = ''
+  queryData.keyword = ''
+
+  if (queryData.currentPageNumber !== 1) {
+    queryData.currentPageNumber = 1
+  } else {
+    await queryUsers(queryData)
+  }
+
+  ElMessage.success({
+    message: 'Refresh success',
+    center: true,
+    showClose: true,
+    duration: 2000
+  })
+}
 
 
 /**
@@ -286,21 +305,27 @@ const deleteUser = async (id: number): Promise<void> => {
 /**
  * Pagination
  */
-watch(() => queryData.currentPageNumber, (newValue, oldValue) => {
-  queryUsers(queryData)
+watch(() => queryData.currentPageNumber, async (newValue, oldValue) => {
+  await queryUsers(queryData)
 })
-watch(() => queryData.pageSize, (newValue, oldValue) => {
+watch(() => queryData.pageSize, async (newValue, oldValue) => {
+  sessionStorage.setItem('userTablePageSize', newValue.toString())
+
   if (queryData.currentPageNumber !== 1) {
     queryData.currentPageNumber = 1
   } else {
-    queryUsers(queryData)
+    await queryUsers(queryData)
   }
 })
+
+// must be initialized after watch has been defined
+queryData.pageSize = parseInt(sessionStorage.getItem('userTablePageSize') ?? '10') || 10
 </script>
 
 <template>
     <div class="table-row-indicators">
         <el-tag color="#e1f3d8" size="large" type="success">You</el-tag>
+        <el-button color="#ffc0cb" @click="refreshUsers">Clear query conditions and Refresh</el-button>
     </div>
 
     <!-- S Table -->
@@ -441,9 +466,15 @@ watch(() => queryData.pageSize, (newValue, oldValue) => {
 
 <style lang="scss" scoped>
 .table-row-indicators {
+    display: flex;
+    justify-content: space-between;
     margin-top: 2px;
     padding-top: 20px;
     border-top: 1px solid #cccccc80;
+
+    .el-button {
+        color: #fff;
+    }
 }
 
 .el-table {

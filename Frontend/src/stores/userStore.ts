@@ -13,7 +13,8 @@ export const useUserStore = defineStore('user', {
         keyword: '',
         currentPageNumber: 1,
         pageSize: 10
-      }
+      },
+      totalUserCounts: 0
     }
   }
 })

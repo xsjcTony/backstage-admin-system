@@ -16,6 +16,7 @@ export interface MainStore {
 export interface UserStore {
   tableData: User[]
   queryData: QueryData
+  totalUserCounts: number
 }
 
 
@@ -112,9 +113,9 @@ export interface User {
 
 // QueryData
 export interface QueryData {
-  role: string
-  origin: string
-  type: string
+  role: '' | 'administrator' | 'user'
+  origin: '' | 'github' | 'local'
+  type: '' | 'email' | 'username'
   keyword: string
   currentPageNumber: number
   pageSize: number

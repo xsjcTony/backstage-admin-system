@@ -92,9 +92,9 @@ export interface UserResponse {
 
 // QueryData
 export interface QueryData {
-  role: string
-  origin: string
-  type: string
+  role: '' | 'administrator' | 'user'
+  origin: '' | 'github' | 'local'
+  type: '' | 'email' | 'username'
   keyword: string
   currentPageNumber: string
   pageSize: string

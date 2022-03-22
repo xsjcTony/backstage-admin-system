@@ -8,9 +8,10 @@ import { ElMessage } from 'element-plus'
 import { Awaitable } from 'element-plus/es/utils'
 import { storeToRefs } from 'pinia'
 import { $, $ref } from 'vue/macros'
-import { createUser, exportAllUsers as exportAllUsersAPI } from '../../../api'
+import { createUser, exportAllUsers as exportAllUsersAPI, getUsersByQuery } from '../../../api'
 import { useStore } from '../../../stores'
 import { useUserStore } from '../../../stores/userStore'
+import { QueryData, User as UserData } from '../../../types'
 import { downloadFile } from '../../../utils'
 import type {
   FormInstance,
@@ -27,14 +28,61 @@ import type { UploadFile, UploadRawFile } from 'element-plus'
 const mainStore = useStore()
 const userStore = useUserStore()
 const { apiBaseUrl } = $(storeToRefs(mainStore))
-const { tableData, queryData } = $(storeToRefs(userStore))
+let { tableData, queryData, totalUserCounts } = $(storeToRefs(userStore))
 const jwt = localStorage.getItem('token') ?? ''
 
 
 /**
  * Query
  */
-const query = () => void undefined
+const queryUsers = async (queryData: QueryData): Promise<void> => {
+  try {
+    const response = await getUsersByQuery(queryData)
+
+    const users: UserData[] = response.data.data.rows
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    totalUserCounts = response.data.data.count
+    tableData = users
+  } catch (err) {
+    ElMessage.error({
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      center: true,
+      showClose: true,
+      duration: 2000
+    })
+  }
+}
+
+const query = async (): Promise<void> => {
+  if (
+    !queryData.role &&
+    !queryData.origin &&
+    !queryData.type &&
+    !queryData.keyword
+  ) {
+    ElMessage.error({
+      message: 'Provide at least one condition to query for users',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+
+    return
+  }
+
+  if (queryData.currentPageNumber !== 1) {
+    queryData.currentPageNumber = 1
+  } else {
+    await queryUsers(queryData)
+  }
+
+  ElMessage.success({
+    message: 'Query success',
+    center: true,
+    showClose: true,
+    duration: 2000
+  })
+}
 const exportQueryResult = () => void undefined
 
 

@@ -1,4 +1,7 @@
+/* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
+
 import { Service } from 'egg'
+import { Op } from 'sequelize'
 import type { User } from '../model/User'
 import type {
   AddUserData,
@@ -7,7 +10,8 @@ import type {
   QueryData
 } from '../types'
 import type { WhereOptions } from 'sequelize'
-import type { ICreateOptions } from 'sequelize-typescript'
+import type { ICreateOptions, IFindOptions } from 'sequelize-typescript'
+import type { IWhereOptions } from 'sequelize-typescript/lib/interfaces/IWhereOptions'
 
 
 export default class UsersService extends Service {
@@ -33,13 +37,56 @@ export default class UsersService extends Service {
   public async getUsersByQuery(query: QueryData): Promise<{ rows: User[], count: number }> {
     const currentPageNumber = parseInt(query.currentPageNumber) || 1
     const pageSize = parseInt(query.pageSize) || 10
+    const { role, origin, type, keyword } = query
 
-    return this.ctx.model.User.findAndCountAll({
+    const baseOptions: IFindOptions<User> = {
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
       },
       limit: pageSize,
       offset: (currentPageNumber - 1) * pageSize
+    }
+    let whereOptions: IWhereOptions<unknown> = {}
+
+    // origin indicated
+    if (origin) {
+      if (origin === 'github') {
+        whereOptions = {
+          ...whereOptions,
+          github: true
+        }
+      } else {
+        whereOptions = {
+          ...whereOptions,
+          github: false
+        }
+      }
+    }
+
+    // type indicated
+    if (type) {
+      whereOptions = {
+        ...whereOptions,
+        [type]: { [Op.substring]: keyword }
+      }
+    } else {
+      whereOptions = {
+        ...whereOptions,
+        [Op.or]: [
+          { username: { [Op.substring]: keyword } },
+          { email: { [Op.substring]: keyword } }
+        ]
+      }
+    }
+
+    // role indicated
+    if (role) {
+
+    }
+
+    return this.ctx.model.User.findAndCountAll({
+      ...baseOptions,
+      where: whereOptions
     })
   }
 
