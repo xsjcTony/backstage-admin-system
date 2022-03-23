@@ -91,7 +91,7 @@ export interface UserResponse {
 }
 
 // QueryData
-export interface QueryData {
+export interface UserQueryData {
   role: '' | 'administrator' | 'user'
   origin: '' | 'github' | 'local'
   type: '' | 'email' | 'username'

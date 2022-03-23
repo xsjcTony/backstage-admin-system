@@ -309,7 +309,7 @@ watch(() => queryData.currentPageNumber, async (newValue, oldValue) => {
   await queryUsers(queryData)
 })
 watch(() => queryData.pageSize, async (newValue, oldValue) => {
-  sessionStorage.setItem('userTablePageSize', newValue.toString())
+  sessionStorage.setItem('userTablePageSize', newValue?.toString() ?? '10')
 
   if (queryData.currentPageNumber !== 1) {
     queryData.currentPageNumber = 1
@@ -317,9 +317,6 @@ watch(() => queryData.pageSize, async (newValue, oldValue) => {
     await queryUsers(queryData)
   }
 })
-
-// must be initialized after watch has been defined
-queryData.pageSize = parseInt(sessionStorage.getItem('userTablePageSize') ?? '10') || 10
 </script>
 
 <template>

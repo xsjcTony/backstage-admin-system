@@ -15,7 +15,7 @@ export interface MainStore {
 // UserStore
 export interface UserStore {
   tableData: User[]
-  queryData: QueryData
+  queryData: UserQueryData
   totalUserCounts: number
 }
 
@@ -23,7 +23,11 @@ export interface UserStore {
 /**
  * Vue
  */
-// RegisterData
+
+
+/**
+ * Registration
+ */
 export const enum RegisterType {
   Normal = 'normal',
   Email = 'email'
@@ -53,7 +57,6 @@ export type FormInstance = InstanceType<typeof ElForm>
 /**
  * Response Data
  */
-
 interface BaseResponseData {
   code: number
   msg: unknown
@@ -76,14 +79,19 @@ export interface ImportUsersResponseData extends BaseResponseData {
 }
 
 
-// loginData
+/**
+ * Login
+ */
 export interface LoginData {
   username: string
   password: string
   captcha: string
 }
 
-// UserManagementAddUserData
+
+/**
+ * Users
+ */
 export interface UserManagementAddUserData {
   username: string
   email: string | null
@@ -91,7 +99,6 @@ export interface UserManagementAddUserData {
   confirmPassword: string
 }
 
-// UserManagementEditUserData
 export interface UserManagementEditUserData {
   id?: number
   username: string
@@ -101,7 +108,6 @@ export interface UserManagementEditUserData {
   avatarUrl: string
 }
 
-// User
 export interface User {
   id: number
   username: string | null
@@ -111,8 +117,7 @@ export interface User {
   avatarUrl: string
 }
 
-// QueryData
-export interface QueryData {
+export interface UserQueryData {
   role: '' | 'administrator' | 'user'
   origin: '' | 'github' | 'local'
   type: '' | 'email' | 'username'
@@ -121,5 +126,18 @@ export interface QueryData {
   pageSize?: number
 }
 
-// ExcelUserData
 export type ExcelUserData = number | string | null
+
+
+/**
+ * Roles
+ */
+export interface Role {
+
+}
+
+export interface RoleQueryData {
+  keyword: string
+  currentPageNumber?: number
+  pageSize?: number
+}

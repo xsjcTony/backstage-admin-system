@@ -7,7 +7,7 @@ import type {
   AddUserData,
   EditUserData,
   ImportUserData,
-  QueryData
+  UserQueryData
 } from '../types'
 import type { WhereOptions } from 'sequelize'
 import type { ICreateOptions, IFindOptions } from 'sequelize-typescript'
@@ -34,7 +34,7 @@ export default class UsersService extends Service {
    * @param {QueryData} query
    * @return {Promise<User[]>}
    */
-  public async getUsersByQuery(query: QueryData): Promise<{
+  public async getUsersByQuery(query: UserQueryData): Promise<{
     rows: User[]
     count: number
   }> {

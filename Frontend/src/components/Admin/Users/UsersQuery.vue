@@ -17,7 +17,7 @@ import type {
   FormInstance,
   UserManagementAddUserData,
   ImportUsersResponseData,
-  QueryData,
+  UserQueryData,
   User as UserData,
   ExcelUserData
 } from '../../../types'
@@ -38,7 +38,7 @@ const jwt = localStorage.getItem('token') ?? ''
 /**
  * Query
  */
-const queryUsers = async (queryData: QueryData): Promise<void> => {
+const queryUsers = async (queryData: UserQueryData): Promise<void> => {
   try {
     const response = await getUsersByQuery(queryData)
 

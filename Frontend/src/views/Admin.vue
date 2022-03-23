@@ -45,6 +45,7 @@ const changeDefaultActiveMenuItem = (index: string): void => {
   defaultActiveMenuItem = index
   sessionStorage.setItem('defaultActiveMenuItem', defaultActiveMenuItem)
 }
+const resetDefaultActiveMenuItem = () => void sessionStorage.removeItem('defaultActiveMenuItem')
 
 let menuCollapsed = $ref<boolean>(sessionStorage.getItem('menuCollapsed') === 'true')
 let defaultActiveMenuItem = $ref(sessionStorage.getItem('defaultActiveMenuItem') ?? '')
@@ -117,7 +118,7 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                 </el-menu>
             </el-aside>
             <el-main>
-                <router-view/>
+                <router-view @reset-default-active-menu-item="resetDefaultActiveMenuItem"/>
             </el-main>
         </el-container>
     </el-container>
@@ -168,6 +169,10 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
 
     .el-aside {
         background: #fff;
+
+        .el-menu {
+            border-right: none;
+        }
     }
 }
 </style>
