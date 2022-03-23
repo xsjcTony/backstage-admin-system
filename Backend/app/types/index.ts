@@ -96,6 +96,6 @@ export interface QueryData {
   origin: '' | 'github' | 'local'
   type: '' | 'email' | 'username'
   keyword: string
-  currentPageNumber: string
-  pageSize: string
+  currentPageNumber?: string
+  pageSize?: string
 }

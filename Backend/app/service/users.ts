@@ -34,18 +34,29 @@ export default class UsersService extends Service {
    * @param {QueryData} query
    * @return {Promise<User[]>}
    */
-  public async getUsersByQuery(query: QueryData): Promise<{ rows: User[], count: number }> {
-    const currentPageNumber = parseInt(query.currentPageNumber) || 1
-    const pageSize = parseInt(query.pageSize) || 10
-    const { role, origin, type, keyword } = query
-
-    const baseOptions: IFindOptions<User> = {
+  public async getUsersByQuery(query: QueryData): Promise<{
+    rows: User[]
+    count: number
+  }> {
+    let baseOptions: IFindOptions<User> = {
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
-      },
-      limit: pageSize,
-      offset: (currentPageNumber - 1) * pageSize
+      }
     }
+
+    if (query.currentPageNumber && query.pageSize) {
+      const currentPageNumber = parseInt(query.currentPageNumber) || 1
+      const pageSize = parseInt(query.pageSize) || 10
+
+      baseOptions = {
+        ...baseOptions,
+        limit: pageSize,
+        offset: (currentPageNumber - 1) * pageSize
+      }
+    }
+
+    const { role, origin, type, keyword } = query
+
     let whereOptions: IWhereOptions<unknown> = {}
 
     // origin indicated
@@ -53,7 +64,7 @@ export default class UsersService extends Service {
       if (origin === 'github') {
         whereOptions = {
           ...whereOptions,
-          github: true
+          [origin]: true
         }
       } else {
         whereOptions = {

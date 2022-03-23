@@ -8,15 +8,18 @@ import { ElMessage } from 'element-plus'
 import { Awaitable } from 'element-plus/es/utils'
 import { storeToRefs } from 'pinia'
 import { $, $ref } from 'vue/macros'
+import * as xlsx from 'xlsx'
 import { createUser, exportAllUsers as exportAllUsersAPI, getUsersByQuery } from '../../../api'
 import { useStore } from '../../../stores'
 import { useUserStore } from '../../../stores/userStore'
-import { QueryData, User as UserData } from '../../../types'
-import { downloadFile } from '../../../utils'
+import { downloadFile, userToExcel } from '../../../utils'
 import type {
   FormInstance,
   UserManagementAddUserData,
-  ImportUsersResponseData
+  ImportUsersResponseData,
+  QueryData,
+  User as UserData,
+  ExcelUserData
 } from '../../../types'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { UploadFile, UploadRawFile } from 'element-plus'
@@ -83,7 +86,46 @@ const query = async (): Promise<void> => {
     duration: 2000
   })
 }
-const exportQueryResult = () => void undefined
+const exportQueryResult = async (): Promise<void> => {
+  try {
+    const response = await getUsersByQuery({
+      role: queryData.role,
+      origin: queryData.origin,
+      type: queryData.type,
+      keyword: queryData.keyword
+    })
+    const users: UserData[] = response.data.data.rows
+
+    if (users.length === 0) {
+      ElMessage.error({
+        message: 'No user data can be exported',
+        center: true,
+        showClose: true,
+        duration: 2000
+      })
+
+      return
+    }
+
+    const keys = Object.keys(users[0])
+    const data: (ExcelUserData[] | string[])[] = [keys]
+
+    users.forEach(user => void data.push(userToExcel(user)))
+
+    // create and download Excel
+    const sheet = xlsx.utils.aoa_to_sheet(data)
+    const workbook = xlsx.utils.book_new()
+    xlsx.utils.book_append_sheet(workbook, sheet, 'Users')
+    xlsx.writeFileXLSX(workbook, 'users.xlsx')
+  } catch (err) {
+    ElMessage.error({
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      center: true,
+      showClose: true,
+      duration: 2000
+    })
+  }
+}
 
 
 /**

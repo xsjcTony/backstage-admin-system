@@ -1,8 +1,9 @@
+import type { User, ExcelUserData } from '../types'
 import type { RouteRecordRaw } from 'vue-router'
 
 
 /**
- * Get all vue-router paths
+ * Get all vue-router paths (no dynamic route)
  * @param {RouteRecordRaw[]} routes
  * @param {string} path
  * @return {string[]}
@@ -49,4 +50,26 @@ export const downloadFile = (blob: BlobPart, mime = '', filename = ''): void => 
   setTimeout(() => {
     URL.revokeObjectURL(url)
   }, 1000)
+}
+
+
+/**
+ * Convert user to excel ready format (true => 1, false => 0)
+ * @param {User} user
+ * @return {ExcelUserData[]}
+ */
+export const userToExcel = (user: User): ExcelUserData[] => {
+  const res: ExcelUserData[] = []
+
+  for (const key in user) {
+    const data = user[key as keyof User]
+
+    if (typeof data === 'boolean') {
+      res.push(data ? 1 : 0)
+    } else {
+      res.push(data)
+    }
+  }
+
+  return res
 }

@@ -117,6 +117,9 @@ export interface QueryData {
   origin: '' | 'github' | 'local'
   type: '' | 'email' | 'username'
   keyword: string
-  currentPageNumber: number
-  pageSize: number
+  currentPageNumber?: number
+  pageSize?: number
 }
+
+// ExcelUserData
+export type ExcelUserData = number | string | null
