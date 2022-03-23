@@ -90,7 +90,10 @@ export interface UserResponse {
   avatarUrl: string
 }
 
-// QueryData
+
+/**
+ * Query
+ */
 export interface UserQueryData {
   role: '' | 'administrator' | 'user'
   origin: '' | 'github' | 'local'
@@ -98,4 +101,21 @@ export interface UserQueryData {
   keyword: string
   currentPageNumber?: string
   pageSize?: string
+}
+
+export interface RoleQueryData {
+  keyword: string
+  currentPageNumber?: number
+  pageSize?: number
+}
+
+export interface AddRoleData {
+  roleName: string
+  description: string
+}
+
+export interface EditRoleData {
+  id: number
+  roleName: string
+  description: string
 }

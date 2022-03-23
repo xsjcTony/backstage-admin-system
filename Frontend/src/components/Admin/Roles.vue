@@ -4,7 +4,13 @@ import { AxiosError, AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
 import { watch } from 'vue'
 import { $, $ref } from 'vue/macros'
-import type { Role, RoleQueryData, FormInstance } from '../../types'
+import type {
+  Role,
+  RoleQueryData,
+  FormInstance,
+  PermissionManagementAddRoleData,
+  PermissionManagementEditRoleData
+} from '../../types'
 
 
 /**
@@ -66,10 +72,8 @@ const refreshRoles = async (): Promise<void> => {
 let addRoleDialogVisible = $ref<boolean>(false)
 const addRoleFormRef = $ref<FormInstance | null>(null)
 const addRoleData = $ref<PermissionManagementAddRoleData>({
-  username: '',
-  email: null,
-  password: '',
-  confirmPassword: ''
+  roleName: '',
+  description: ''
 })
 
 const addRole = async (formEl: FormInstance | undefined): Promise<void> => {
@@ -144,7 +148,7 @@ const resetForm = (formEl: FormInstance | undefined): void => {
 /**
  * Table
  */
-const tableData = $ref<Role>([])
+const tableData = $ref<Role[]>([])
 
 
 /**
@@ -172,7 +176,9 @@ watch(() => queryData.pageSize, async (newValue, oldValue) => {
 let editRoleDialogVisible = $ref<boolean>(false)
 const editRoleFormRef = $ref<FormInstance | null>(null)
 const editRoleData = $ref<PermissionManagementEditRoleData>({
-
+  id: 0,
+  roleName: '',
+  description: ''
 })
 
 const editRole = async (formEl: FormInstance | undefined): Promise<void> => {
@@ -230,6 +236,8 @@ const editRoleRules = $ref({
 const showEditRoleDialog = (role: Role): void => {
   editRoleDialogVisible = true
   editRoleData.id = role.id
+  editRoleData.roleName = role.roleName
+  editRoleData.description = role.description
 }
 
 

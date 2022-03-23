@@ -133,11 +133,25 @@ export type ExcelUserData = number | string | null
  * Roles
  */
 export interface Role {
-
+  id: number
+  roleName: string
+  description: string
+  roleState: boolean
 }
 
 export interface RoleQueryData {
   keyword: string
   currentPageNumber?: number
   pageSize?: number
+}
+
+export interface PermissionManagementAddRoleData {
+  roleName: string
+  description: string
+}
+
+export interface PermissionManagementEditRoleData {
+  id: number
+  roleName: string
+  description: string
 }
