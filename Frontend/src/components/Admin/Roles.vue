@@ -12,7 +12,11 @@ import { AxiosError, AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
 import { watch } from 'vue'
 import { $, $ref } from 'vue/macros'
-import { createRole, getRolesByQuery } from '../../api'
+import {
+  createRole,
+  getRolesByQuery,
+  deleteRole as destroyRole
+} from '../../api'
 import type {
   Role,
   RoleQueryData,
@@ -55,7 +59,31 @@ const queryRoles = async (queryData: RoleQueryData): Promise<void> => {
   }
 }
 
-const query = () => void undefined
+const query = async (): Promise<void> => {
+  if (!queryData.keyword) {
+    ElMessage.error({
+      message: 'Provide keyword to query for users',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+
+    return
+  }
+
+  if (queryData.currentPageNumber !== 1) {
+    queryData.currentPageNumber = 1
+  } else {
+    await queryRoles(queryData)
+  }
+
+  ElMessage.success({
+    message: 'Query success',
+    center: true,
+    showClose: true,
+    duration: 2000
+  })
+}
 
 const refreshRoles = async (): Promise<void> => {
   queryData.keyword = ''
@@ -280,9 +308,8 @@ const changeRoleState = async (role: Role): Promise<void> => {
  * Delete Role
  */
 const deleteRole = async (id: number): Promise<void> => {
-  /*
   try {
-    const response: AxiosResponse = await destroyUser(id)
+    const response: AxiosResponse = await destroyRole(id)
 
     ElMessage.success({
       message: response.data.msg || 'Success',
@@ -291,7 +318,7 @@ const deleteRole = async (id: number): Promise<void> => {
       duration: 3000
     })
 
-    tableData.splice(tableData.findIndex(user => user.id === id), 1)
+    tableData.splice(tableData.findIndex(role => role.id === id), 1)
   } catch (err) {
     ElMessage.error({
       message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
@@ -300,7 +327,6 @@ const deleteRole = async (id: number): Promise<void> => {
       duration: 3000
     })
   }
-  */
 }
 </script>
 

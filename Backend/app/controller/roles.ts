@@ -67,12 +67,11 @@ export default class RolesController extends Controller {
    * @return {Promise<void>}
    */
   public async deleteRole(): Promise<void> {
-    /*
     const { ctx } = this
 
     try {
-      const user = await ctx.service.roles.deleteUser(ctx.params.id)
-      ctx.success(200, 'User has been deleted', user)
+      const role = await ctx.service.roles.deleteRole(ctx.params.id)
+      ctx.success(200, 'Role has been deleted', role)
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
@@ -80,7 +79,6 @@ export default class RolesController extends Controller {
         ctx.error(400, 'Error', err)
       }
     }
-    */
   }
 
 

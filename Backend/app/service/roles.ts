@@ -13,7 +13,9 @@ import type { IFindOptions } from 'sequelize-typescript'
 export default class RolesService extends Service {
 
   /**
-   * Get users by query info (REST API - GET)
+   * Get roles by query info (REST API - GET)
+   * @param {RoleQueryData} query
+   * @return {Promise<{rows: Role[], count: number}>}
    */
   public async getRolesByQuery(query: RoleQueryData): Promise<{
     rows: Role[]
@@ -46,7 +48,9 @@ export default class RolesService extends Service {
 
 
   /**
-   * Add user to database (REST API - POST)
+   * Add role to database (REST API - POST)
+   * @param {AddRoleData} data
+   * @return {Promise<Role>}
    */
   public async createRole(data: AddRoleData): Promise<Role> {
     const { roleName, roleDescription } = data
@@ -66,24 +70,24 @@ export default class RolesService extends Service {
 
 
   /**
-   * Delete user in database (REST API - DELETE)
+   * Delete role in database (REST API - DELETE)
+   * @param {string} id
+   * @return {Promise<Role>}
    */
-  /*
   public async deleteRole(id: string): Promise<Role> {
-    const user = await this.ctx.model.Role.findByPk(id, {
+    const role = await this.ctx.model.Role.findByPk(id, {
       attributes: {
-        exclude: ['password', 'createdAt', 'updatedAt']
+        exclude: ['createdAt', 'updatedAt']
       }
     })
 
-    if (user) {
-      await user.destroy()
-      return user
+    if (role) {
+      await role.destroy()
+      return role
     } else {
-      throw new Error('User doesn\'t exist.')
+      throw new Error('Role doesn\'t exist.')
     }
   }
-  */
 
 
   /**

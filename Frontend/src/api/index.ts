@@ -48,3 +48,5 @@ export const exportAllUsers = async (): Promise<AxiosResponse> => Request.getFil
 export const getRolesByQuery = async (data: RoleQueryData): Promise<AxiosResponse> => Request.get('api/v1/roles', data)
 
 export const createRole = async (data: PermissionManagementAddRoleData): Promise<AxiosResponse> => Request.post('api/v1/roles', data)
+
+export const deleteRole = async (id: number): Promise<AxiosResponse> => Request.deleteRequest(`api/v1/roles/${ id }`)
