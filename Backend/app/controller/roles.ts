@@ -87,20 +87,19 @@ export default class RolesController extends Controller {
    * @return {Promise<void>}
    */
   public async updateRole(): Promise<void> {
-    /*
     const { ctx } = this
     const data = ctx.request.body
 
     try {
-      if (!('userState' in data)) {
+      if (!('roleState' in data)) {
         // validate
-        ctx.validate(EditUserRule, data)
+        ctx.validate(RoleRule, data)
       }
 
       // save into database
-      const user = await ctx.service.roles.updateUser(ctx.params.id, data)
+      const user = await ctx.service.roles.updateRole(ctx.params.id, data)
 
-      ctx.success(200, 'User has been updated', user)
+      ctx.success(200, 'Role has been updated', user)
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
@@ -108,6 +107,5 @@ export default class RolesController extends Controller {
         ctx.error(400, 'Error', err)
       }
     }
-    */
   }
 }

@@ -1,28 +1,16 @@
 <script lang="ts" setup>
-import {
-  ArrowRight,
-  EditPen,
-  Setting,
-  Delete,
-  WarningFilled,
-  User,
-  InfoFilled
-} from '@element-plus/icons-vue'
+import { ArrowRight, Delete, EditPen, InfoFilled, Setting, User, WarningFilled } from '@element-plus/icons-vue'
 import { AxiosError, AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
 import { watch } from 'vue'
 import { $, $ref } from 'vue/macros'
-import {
-  createRole,
-  getRolesByQuery,
-  deleteRole as destroyRole
-} from '../../api'
+import { createRole, deleteRole as destroyRole, getRolesByQuery, updateRole, updateRoleState } from '../../api'
 import type {
-  Role,
-  RoleQueryData,
   FormInstance,
   PermissionManagementAddRoleData,
-  PermissionManagementEditRoleData
+  PermissionManagementEditRoleData,
+  Role,
+  RoleQueryData
 } from '../../types'
 
 
@@ -215,7 +203,6 @@ const editRoleData = $ref<PermissionManagementEditRoleData>({
 })
 
 const editRole = async (formEl: FormInstance | undefined): Promise<void> => {
-  /*
   if (!formEl) return
   if (!editRoleData.id) return
 
@@ -224,7 +211,7 @@ const editRole = async (formEl: FormInstance | undefined): Promise<void> => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const response: AxiosResponse = await updateUser(id, editRoleData)
+        const response: AxiosResponse = await updateRole(id, editRoleData)
 
         ElMessage.success({
           message: response.data.msg || 'Success',
@@ -233,13 +220,9 @@ const editRole = async (formEl: FormInstance | undefined): Promise<void> => {
           duration: 3000
         })
 
-        const newUser = response.data.data
-        tableData[tableData.findIndex(user => user.id === id)] = newUser
-        if (id === currentUser?.id) {
-          currentUser = newUser
-        }
+        tableData[tableData.findIndex(user => user.id === id)] = response.data.data
 
-        editUserDialogVisible = false
+        editRoleDialogVisible = false
       } catch (err) {
         ElMessage.error({
           message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
@@ -250,14 +233,13 @@ const editRole = async (formEl: FormInstance | undefined): Promise<void> => {
       }
     } else {
       ElMessage.error({
-        message: 'Invalid user data',
+        message: 'Invalid role data',
         center: true,
         showClose: true,
         duration: 3000
       })
     }
   })
-  */
 }
 
 // Validation
@@ -278,14 +260,13 @@ const showEditRoleDialog = (role: Role): void => {
  * Change Role State
  */
 const changeRoleState = async (role: Role): Promise<void> => {
-  /*
-  let { id, userState } = $(user)
+  let { id, roleState } = $(role)
 
   try {
-    await updateUserState(id, userState)
+    await updateRoleState(id, roleState)
 
     ElMessage.success({
-      message: 'User state has been updated',
+      message: 'Role state has been updated',
       center: true,
       showClose: true,
       duration: 2000
@@ -298,9 +279,8 @@ const changeRoleState = async (role: Role): Promise<void> => {
       duration: 3000
     })
 
-    userState = !userState
+    roleState = !roleState
   }
-  */
 }
 
 

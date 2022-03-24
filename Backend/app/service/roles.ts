@@ -4,8 +4,8 @@ import { Service } from 'egg'
 import { Op } from 'sequelize'
 import type { Role } from '../model/Role'
 import type {
-  AddRoleData,
-  RoleQueryData
+  RoleQueryData,
+  ModifyRoleData
 } from '../types'
 import type { IFindOptions } from 'sequelize-typescript'
 
@@ -52,7 +52,7 @@ export default class RolesService extends Service {
    * @param {AddRoleData} data
    * @return {Promise<Role>}
    */
-  public async createRole(data: AddRoleData): Promise<Role> {
+  public async createRole(data: ModifyRoleData): Promise<Role> {
     const { roleName, roleDescription } = data
 
     const r1 = await this._findRole({ roleName })
@@ -75,6 +75,49 @@ export default class RolesService extends Service {
    * @return {Promise<Role>}
    */
   public async deleteRole(id: string): Promise<Role> {
+    const role = await this._getRoleById(id)
+
+    await role.destroy()
+    return role
+  }
+
+
+  /**
+   * Update user in database (REST API - PUT)
+   */
+  public async updateRole(id: string, data: ModifyRoleData): Promise<Role> {
+    const role = await this._getRoleById(id)
+
+    await role.update(data)
+
+    const res = role.toJSON() as Role
+    delete res.updatedAt
+    return res
+  }
+
+
+  /**
+   * Helper functions
+   */
+
+  /**
+   * Look for **ONE** role from database based on given `WHERE` options
+   * @param {IFindOptions<Role>["where"]} options
+   * @return {Promise<Role|null>}
+   * @private
+   */
+  private async _findRole(options: IFindOptions<Role>['where']): Promise<Role | null> {
+    return this.ctx.model.Role.findOne({ where: options })
+  }
+
+
+  /**
+   * Look for role based on given `PRIMARY KEY`
+   * @param {string} id
+   * @return {Promise<Role>}
+   * @private
+   */
+  private async _getRoleById(id: string): Promise<Role> {
     const role = await this.ctx.model.Role.findByPk(id, {
       attributes: {
         exclude: ['createdAt', 'updatedAt']
@@ -82,43 +125,9 @@ export default class RolesService extends Service {
     })
 
     if (role) {
-      await role.destroy()
       return role
     } else {
       throw new Error('Role doesn\'t exist.')
     }
-  }
-
-
-  /**
-   * Update user in database (REST API - PUT)
-   */
-  /*
-  public async updateRole(id: string, data: EditRoleData): Promise<Role> {
-    const user = await this.getUserById(id)
-
-    if (data.password) {
-      data.password = this.ctx.helper.encryptByMd5(data.password)
-    }
-
-    await user.update(data)
-
-    const res = user.toJSON() as User
-    delete res.updatedAt
-    return res
-  }
-  */
-
-
-  /**
-   * Helper functions
-   */
-
-
-  /**
-   * Look for **ONE** user from database based on given `WHERE` options.
-   */
-  private async _findRole(options: IFindOptions<Role>['where']): Promise<Role | null> {
-    return this.ctx.model.Role.findOne({ where: options })
   }
 }

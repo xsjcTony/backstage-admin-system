@@ -109,13 +109,8 @@ export interface RoleQueryData {
   pageSize?: string
 }
 
-export interface AddRoleData {
+export interface ModifyRoleData {
   roleName: string
   roleDescription: string
-}
-
-export interface EditRoleData {
-  id: number
-  roleName: string
-  roleDescription: string
+  roleState?: boolean
 }
