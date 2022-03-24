@@ -90,12 +90,8 @@ export interface UserResponse {
   avatarUrl: string
 }
 
-
-/**
- * Query
- */
 export interface UserQueryData {
-  role: '' | 'administrator' | 'user'
+  role: string
   origin: '' | 'github' | 'local'
   type: '' | 'email' | 'username'
   keyword: string
@@ -103,19 +99,23 @@ export interface UserQueryData {
   pageSize?: string
 }
 
+
+/**
+ * Role
+ */
 export interface RoleQueryData {
   keyword: string
-  currentPageNumber?: number
-  pageSize?: number
+  currentPageNumber?: string
+  pageSize?: string
 }
 
 export interface AddRoleData {
   roleName: string
-  description: string
+  roleDescription: string
 }
 
 export interface EditRoleData {
   id: number
   roleName: string
-  description: string
+  roleDescription: string
 }

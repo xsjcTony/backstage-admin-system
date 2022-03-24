@@ -43,7 +43,7 @@ export class Role extends Model<Role> {
   @Unique(true)
   // @Is(/^(?!\s*$).+/)
   @Column(STRING)
-  public description!: string
+  public roleDescription!: string
 
   @AllowNull(false)
   @Unique(false)

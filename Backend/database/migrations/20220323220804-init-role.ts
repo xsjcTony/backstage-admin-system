@@ -17,10 +17,10 @@ module.exports = {
         allowNull: false,
         unique: true
       },
-      description: {
+      role_description: {
         type: STRING,
         allowNull: false,
-        unique: true
+        unique: false
       },
       role_state: {
         type: BOOLEAN,

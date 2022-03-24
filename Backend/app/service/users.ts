@@ -31,8 +31,8 @@ export default class UsersService extends Service {
 
   /**
    * Get users by query info (REST API - GET)
-   * @param {QueryData} query
-   * @return {Promise<User[]>}
+   * @param {UserQueryData} query
+   * @return {Promise<{rows: User[], count: number}>}
    */
   public async getUsersByQuery(query: UserQueryData): Promise<{
     rows: User[]

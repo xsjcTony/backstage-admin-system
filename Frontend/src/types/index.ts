@@ -118,7 +118,7 @@ export interface User {
 }
 
 export interface UserQueryData {
-  role: '' | 'administrator' | 'user'
+  role: string
   origin: '' | 'github' | 'local'
   type: '' | 'email' | 'username'
   keyword: string
@@ -135,7 +135,7 @@ export type ExcelUserData = number | string | null
 export interface Role {
   id: number
   roleName: string
-  description: string
+  roleDescription: string
   roleState: boolean
 }
 
@@ -147,11 +147,11 @@ export interface RoleQueryData {
 
 export interface PermissionManagementAddRoleData {
   roleName: string
-  description: string
+  roleDescription: string
 }
 
 export interface PermissionManagementEditRoleData {
   id: number
   roleName: string
-  description: string
+  roleDescription: string
 }

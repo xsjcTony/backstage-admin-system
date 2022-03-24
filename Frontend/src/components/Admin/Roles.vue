@@ -1,9 +1,18 @@
 <script lang="ts" setup>
-import { ArrowRight, EditPen, Setting, Delete, WarningFilled } from '@element-plus/icons-vue'
+import {
+  ArrowRight,
+  EditPen,
+  Setting,
+  Delete,
+  WarningFilled,
+  User,
+  InfoFilled
+} from '@element-plus/icons-vue'
 import { AxiosError, AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
 import { watch } from 'vue'
 import { $, $ref } from 'vue/macros'
+import { createRole, getRolesByQuery } from '../../api'
 import type {
   Role,
   RoleQueryData,
@@ -29,12 +38,12 @@ const queryData = $ref<RoleQueryData>({
 })
 
 const queryRoles = async (queryData: RoleQueryData): Promise<void> => {
-  /* try {
-    const response = await getUsersByQuery(queryData)
+  try {
+    const response = await getRolesByQuery(queryData)
 
-    const users: UserData[] = response.data.data.rows
+    const users: Role[] = response.data.data.rows
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    totalUserCounts = response.data.data.count
+    totalRoleCounts = response.data.data.count
     tableData = users
   } catch (err) {
     ElMessage.error({
@@ -43,7 +52,7 @@ const queryRoles = async (queryData: RoleQueryData): Promise<void> => {
       showClose: true,
       duration: 2000
     })
-  } */
+  }
 }
 
 const query = () => void undefined
@@ -73,17 +82,16 @@ let addRoleDialogVisible = $ref<boolean>(false)
 const addRoleFormRef = $ref<FormInstance | null>(null)
 const addRoleData = $ref<PermissionManagementAddRoleData>({
   roleName: '',
-  description: ''
+  roleDescription: ''
 })
 
 const addRole = async (formEl: FormInstance | undefined): Promise<void> => {
-  /*
   if (!formEl) return
 
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const response: AxiosResponse = await createUser(addUserData)
+        const response: AxiosResponse = await createRole(addRoleData)
 
         ElMessage.success({
           message: response.data.msg || 'Success',
@@ -92,7 +100,7 @@ const addRole = async (formEl: FormInstance | undefined): Promise<void> => {
           duration: 3000
         })
 
-        addUserDialogVisible = false
+        addRoleDialogVisible = false
         tableData.push(response.data.data)
       } catch (err) {
         ElMessage.error({
@@ -104,39 +112,34 @@ const addRole = async (formEl: FormInstance | undefined): Promise<void> => {
       }
     } else {
       ElMessage.error({
-        message: 'Invalid user data',
+        message: 'Invalid role data',
         center: true,
         showClose: true,
         duration: 3000
       })
     }
   })
-  */
 }
 
 // Validation
-const validateUsername = (rule: any, value: string, callback: any): void => {
-  const regex = /^[A-Za-z0-9]{6,20}$/
-  if (value === '') {
-    callback(new Error('Please input the username'))
-  } else if (!regex.test(value)) {
-    callback(new Error('Username must be any of a-z, A-Z or 0-9, and between 6 and 20 (both inclusive) characters long'))
+const validateRoleName = (rule: any, value: string, callback: any): void => {
+  if (value.trim() === '') {
+    callback(new Error('Please input the role name'))
   } else {
     callback()
   }
 }
-const validateEmail = (rule: any, value: string | null, callback: any): void => {
-  const regex = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
-  if (value && !regex.test(value)) {
-    callback(new Error('Invalid email address'))
+const validateRoleDescription = (rule: any, value: string, callback: any): void => {
+  if (value.trim() === '') {
+    callback(new Error('Please input the role description'))
   } else {
     callback()
   }
 }
 
 const addRoleRules = $ref({
-  username: { validator: validateUsername },
-  email: { validator: validateEmail }
+  roleName: { validator: validateRoleName },
+  roleDescription: { validator: validateRoleDescription }
 })
 
 const resetForm = (formEl: FormInstance | undefined): void => {
@@ -148,7 +151,9 @@ const resetForm = (formEl: FormInstance | undefined): void => {
 /**
  * Table
  */
-const tableData = $ref<Role[]>([])
+let tableData = $ref<Role[]>([])
+
+void queryRoles(queryData)
 
 
 /**
@@ -178,7 +183,7 @@ const editRoleFormRef = $ref<FormInstance | null>(null)
 const editRoleData = $ref<PermissionManagementEditRoleData>({
   id: 0,
   roleName: '',
-  description: ''
+  roleDescription: ''
 })
 
 const editRole = async (formEl: FormInstance | undefined): Promise<void> => {
@@ -229,15 +234,15 @@ const editRole = async (formEl: FormInstance | undefined): Promise<void> => {
 
 // Validation
 const editRoleRules = $ref({
-  username: { validator: validateUsername },
-  email: { validator: validateEmail }
+  roleName: { validator: validateRoleName },
+  roleDescription: { validator: validateRoleDescription }
 })
 
 const showEditRoleDialog = (role: Role): void => {
   editRoleDialogVisible = true
   editRoleData.id = role.id
   editRoleData.roleName = role.roleName
-  editRoleData.description = role.description
+  editRoleData.roleDescription = role.roleDescription
 }
 
 
@@ -326,11 +331,11 @@ const deleteRole = async (id: number): Promise<void> => {
 
         <el-table :data="tableData" border stripe>
             <el-table-column type="index"/>
-            <el-table-column label="Role" min-width="150" prop="role"/>
-            <el-table-column label="Description" min-width="250" prop="name"/>
+            <el-table-column label="Role" min-width="150" prop="roleName"/>
+            <el-table-column label="Description" min-width="250" prop="roleDescription"/>
             <el-table-column label="State" width="100">
                 <template #default="{ row }">
-                    <el-switch v-model="row.userState"
+                    <el-switch v-model="row.roleState"
                                active-color="#13ce66"
                                inactive-color="#ff4949"
                                @change="changeRoleState(row)"
@@ -375,21 +380,19 @@ const deleteRole = async (id: number): Promise<void> => {
                @close="resetForm(addRoleFormRef)"
     >
         <el-form ref="addRoleFormRef" :model="addRoleData" :rules="addRoleRules">
-            <el-form-item class="username" prop="username" required>
-                <el-input v-model="addRoleData.username"
+            <el-form-item prop="roleName" required>
+                <el-input v-model="addRoleData.roleName"
                           :prefix-icon="User"
                           clearable
-                          maxlength="20"
-                          placeholder="Username"
-                          show-word-limit
+                          placeholder="Role name"
                           type="text"
                 />
             </el-form-item>
-            <el-form-item class="email" prop="email">
-                <el-input v-model="addRoleData.email"
-                          :prefix-icon="Message"
+            <el-form-item prop="roleDescription" required>
+                <el-input v-model="addRoleData.roleDescription"
+                          :prefix-icon="InfoFilled"
                           clearable
-                          placeholder="E-mail (Optional)"
+                          placeholder="Role description"
                           type="text"
                 />
             </el-form-item>
@@ -412,21 +415,19 @@ const deleteRole = async (id: number): Promise<void> => {
                title="Edit User"
     >
         <el-form ref="editRoleFormRef" :model="editRoleData" :rules="editRoleRules">
-            <el-form-item class="username" prop="username" required>
-                <el-input v-model="editRoleData.username"
+            <el-form-item prop="roleName" required>
+                <el-input v-model="editRoleData.roleName"
                           :prefix-icon="User"
                           clearable
-                          maxlength="20"
-                          placeholder="Username"
-                          show-word-limit
+                          placeholder="Role name"
                           type="text"
                 />
             </el-form-item>
-            <el-form-item class="email" prop="email">
-                <el-input v-model="editRoleData.email"
-                          :prefix-icon="Message"
+            <el-form-item prop="roleDescription" required>
+                <el-input v-model="editRoleData.roleDescription"
+                          :prefix-icon="InfoFilled"
                           clearable
-                          placeholder="E-mail (Optional)"
+                          placeholder="Role description"
                           type="text"
                 />
             </el-form-item>
