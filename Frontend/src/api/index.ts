@@ -7,7 +7,10 @@ import type {
   UserManagementAddUserData,
   UserManagementEditUserData,
   UserQueryData,
-  RoleQueryData, PermissionManagementAddRoleData, PermissionManagementEditRoleData
+  RoleQueryData,
+  PermissionManagementAddRoleData,
+  PermissionManagementEditRoleData,
+  AssignRolesRequestData
 } from '../types'
 import type { AxiosResponse } from 'axios'
 
@@ -54,3 +57,11 @@ export const deleteRole = async (id: number): Promise<AxiosResponse> => Request.
 export const updateRole = async (id: number, data: PermissionManagementEditRoleData): Promise<AxiosResponse> => Request.put(`/api/v1/roles/${ id }`, data)
 
 export const updateRoleState = async (id: number, roleState: boolean): Promise<AxiosResponse> => Request.put(`/api/v1/roles/${ id }`, { roleState })
+
+
+/**
+ * UserRole - REST
+ */
+export const getAssignedRoles = async (id: number): Promise<AxiosResponse> => Request.get(`api/v1/user-role/${ id }`)
+
+export const assignRoles = async (data: AssignRolesRequestData): Promise<AxiosResponse> => Request.post('/api/v1/user-role', data)

@@ -128,6 +128,12 @@ export interface UserQueryData {
 
 export type ExcelUserData = number | string | null
 
+export interface AssignRolesData {
+  id: number
+  username: string
+  assignedRoles: number[]
+}
+
 
 /**
  * Roles
@@ -154,4 +160,18 @@ export interface PermissionManagementEditRoleData {
   id: number
   roleName: string
   roleDescription: string
+}
+
+
+/**
+ * UserRole
+ */
+export interface UserRole {
+  userId: number
+  roleId: number
+}
+
+export interface AssignRolesRequestData {
+  userId: number
+  roleIds: number[]
 }

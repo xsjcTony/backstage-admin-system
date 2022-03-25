@@ -337,7 +337,7 @@ const deleteRole = async (id: number): Promise<void> => {
 
         <el-table :data="tableData" border stripe>
             <el-table-column type="index"/>
-            <el-table-column label="Role" min-width="150" prop="roleName"/>
+            <el-table-column label="Role" min-width="200" prop="roleName"/>
             <el-table-column label="Description" min-width="250" prop="roleDescription"/>
             <el-table-column label="State" width="100">
                 <template #default="{ row }">
@@ -349,6 +349,13 @@ const deleteRole = async (id: number): Promise<void> => {
                 </template>
             </el-table-column>
             <el-table-column label="Actions" width="200">
+                <template #header>
+                    <span style="color: var(--el-color-primary)">Edit</span>
+                    |
+                    <span style="color: var(--el-color-warning)">PH</span>
+                    |
+                    <span style="color: var(--el-color-danger)">Delete</span>
+                </template>
                 <template #default="{ row }">
                     <el-button :icon="EditPen" type="primary" @click="showEditRoleDialog(row)"/>
                     <el-button :icon="Setting" type="warning"/>

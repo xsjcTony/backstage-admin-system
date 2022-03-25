@@ -6,16 +6,13 @@ import { QueryInterface, DataTypes } from 'sequelize'
 module.exports = {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const { INTEGER, DATE } = DataTypes
-    await queryInterface.createTable('user_role', {
-      id: {
-        type: INTEGER.UNSIGNED,
-        primaryKey: true,
-        autoIncrement: true
-      },
+
+    await queryInterface.createTable('user_roles', {
       user_id: {
         type: INTEGER.UNSIGNED,
+        primaryKey: true,
         allowNull: false,
-        unique: false,
+        unique: 'comb',
         references: {
           model: 'users',
           key: 'id'
@@ -23,8 +20,9 @@ module.exports = {
       },
       role_id: {
         type: INTEGER.UNSIGNED,
+        primaryKey: true,
         allowNull: false,
-        unique: false,
+        unique: 'comb',
         references: {
           model: 'roles',
           key: 'id'
@@ -37,9 +35,15 @@ module.exports = {
         type: DATE
       }
     })
+
+    await queryInterface.addIndex('user_roles', {
+      fields: ['user_id', 'role_id'],
+      type: 'UNIQUE',
+      name: 'comb'
+    }, 'user_roles')
   },
 
   down: async (queryInterface: QueryInterface): Promise<void> => {
-    await queryInterface.dropTable('user_role')
+    await queryInterface.dropTable('user_roles')
   }
 }

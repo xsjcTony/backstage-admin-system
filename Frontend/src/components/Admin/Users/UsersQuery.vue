@@ -1,9 +1,5 @@
 <script lang="ts" setup>
-import {
-  User,
-  Message,
-  Lock
-} from '@element-plus/icons-vue'
+import { User, Message, Lock } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { Awaitable } from 'element-plus/es/utils'
 import { storeToRefs } from 'pinia'

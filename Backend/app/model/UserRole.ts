@@ -4,7 +4,6 @@
 /* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
 
 import {
-  AutoIncrement,
   Column,
   DataType,
   Model,
@@ -28,19 +27,16 @@ const { INTEGER } = DataType
 export class UserRole extends Model<UserRole> {
 
   @PrimaryKey
-  @AutoIncrement
-  @Column(INTEGER.UNSIGNED)
-  public id!: number
-
   @ForeignKey(() => User)
   @AllowNull(false)
-  @Unique(false)
+  @Unique('comb')
   @Column(INTEGER.UNSIGNED)
   public userId!: number
 
+  @PrimaryKey
   @ForeignKey(() => Role)
   @AllowNull(false)
-  @Unique(false)
+  @Unique('comb')
   @Column(INTEGER.UNSIGNED)
   public roleId!: number
 

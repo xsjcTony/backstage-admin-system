@@ -114,3 +114,12 @@ export interface ModifyRoleData {
   roleDescription: string
   roleState?: boolean
 }
+
+
+/**
+ * UserRole
+ */
+export interface ModifyUserRoleData {
+  userId: number
+  roleId: number
+}
