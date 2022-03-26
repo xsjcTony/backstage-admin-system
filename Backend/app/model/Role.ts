@@ -14,68 +14,45 @@ import {
   Unique,
   CreatedAt,
   UpdatedAt,
-  Is,
-  IsEmail,
-  HasMany,
-  Default, BelongsToMany
+  Default,
+  BelongsToMany
 } from 'sequelize-typescript'
-import { Oauth } from './Oauth'
-import { Role } from './Role'
+import { User } from './User'
 import { UserRole } from './UserRole'
 
 
 const { INTEGER, STRING, BOOLEAN } = DataType
 
 @Table({
-  modelName: 'User'
+  modelName: 'Role'
 })
-export class User extends Model<User> {
+export class Role extends Model<Role> {
 
   @PrimaryKey
   @AutoIncrement
   @Column(INTEGER.UNSIGNED)
   public id!: number
 
-  @AllowNull(true)
+  @AllowNull(false)
   @Unique(true)
-  @Is(/^[A-Za-z0-9]{6,20}$/)
+  // @Is(/^(?!\s*$).+/)
   @Column(STRING)
-  public username!: string
-
-  @AllowNull(true)
-  @Unique(true)
-  @IsEmail
-  @Column(STRING)
-  public email!: string
+  public roleName!: string
 
   @AllowNull(false)
-  @Unique(false)
+  @Unique(true)
+  // @Is(/^(?!\s*$).+/)
   @Column(STRING)
-  public password?: string
-
-  @AllowNull(false)
-  @Unique(false)
-  @Default(false)
-  @Column(BOOLEAN)
-  public github!: boolean
+  public roleDescription!: string
 
   @AllowNull(false)
   @Unique(false)
   @Default(true)
   @Column(BOOLEAN)
-  public userState!: boolean
+  public roleState!: boolean
 
-  @AllowNull(true)
-  @Unique(false)
-  @Default('/public/assets/images/avatars/avatar.jpg')
-  @Column(STRING)
-  public avatarUrl!: string
-
-  @HasMany(() => Oauth)
-  public oauths!: Oauth[]
-
-  @BelongsToMany(() => Role, () => UserRole)
-  public roles!: (Role & { UserRole: UserRole })[]
+  @BelongsToMany(() => User, () => UserRole)
+  public users!: (User & { UserRole: UserRole })[]
 
   @CreatedAt
   public createdAt?: Date
@@ -84,4 +61,4 @@ export class User extends Model<User> {
   public updatedAt?: Date
 }
 
-export default () => User
+export default () => Role

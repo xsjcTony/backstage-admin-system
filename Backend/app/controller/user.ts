@@ -6,6 +6,7 @@
  */
 import { Controller } from 'egg'
 import * as jwt from 'jsonwebtoken'
+import { User } from '../model/User'
 import { RegisterType, RegisterData, LoginData } from '../types'
 import EmailUserRule from '../validator/emailUserRule'
 import NormalUserRule from '../validator/normalUserRule'
@@ -51,7 +52,7 @@ export default class UserController extends Controller {
 
     try {
       ctx.helper.verifyCaptcha(data.captcha)
-      const user = await ctx.service.user.loginUser(data)
+      const user = (await ctx.service.user.loginUser(data)).toJSON() as User
 
       // JWT
       const token = jwt.sign(user, this.config.keys, { expiresIn: '7d' })

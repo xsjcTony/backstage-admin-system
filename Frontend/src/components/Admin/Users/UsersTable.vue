@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-/* eslint 'vue/no-mutating-props': 'off' */
-
 import {
   EditPen,
   Delete,
@@ -17,18 +15,23 @@ import { watch } from 'vue'
 import { $, $ref } from 'vue/macros'
 import {
   deleteUser as destroyUser,
+  getAssignedRoles,
+  getRolesByQuery,
   getUsersByQuery,
   updateUser,
-  updateUserState
+  updateUserState,
+  assignRoles as assignRolesAPI, getUserById
 } from '../../../api'
 import { useStore } from '../../../stores'
 import { useUserStore } from '../../../stores/userStore'
 import type {
   FormInstance,
-  QueryData,
+  UserQueryData,
   StringResponseData,
   User as UserData,
-  UserManagementEditUserData
+  UserManagementEditUserData,
+  AssignRolesData,
+  Role, UserRole
 } from '../../../types'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { UploadFile, UploadRawFile } from 'element-plus'
@@ -53,7 +56,7 @@ const tableRowClassName = ({ row }: { row: UserData }): string => {
   return ''
 }
 
-const queryUsers = async (queryData: QueryData): Promise<void> => {
+const queryUsers = async (queryData: UserQueryData): Promise<void> => {
   try {
     const response = await getUsersByQuery(queryData)
 
@@ -91,6 +94,9 @@ const refreshUsers = async (): Promise<void> => {
     duration: 2000
   })
 }
+
+// format user's roles
+const formatRoles = (user: UserData): string => user.roles.map(role => role.roleName).join(' | ')
 
 
 /**
@@ -309,7 +315,7 @@ watch(() => queryData.currentPageNumber, async (newValue, oldValue) => {
   await queryUsers(queryData)
 })
 watch(() => queryData.pageSize, async (newValue, oldValue) => {
-  sessionStorage.setItem('userTablePageSize', newValue.toString())
+  sessionStorage.setItem('userTablePageSize', newValue?.toString() ?? '10')
 
   if (queryData.currentPageNumber !== 1) {
     queryData.currentPageNumber = 1
@@ -318,8 +324,71 @@ watch(() => queryData.pageSize, async (newValue, oldValue) => {
   }
 })
 
-// must be initialized after watch has been defined
-queryData.pageSize = parseInt(sessionStorage.getItem('userTablePageSize') ?? '10') || 10
+
+/**
+ * Assign Roles
+ */
+let assignRolesDialogVisible = $ref<boolean>(false)
+
+let availableRoles = $ref<Role[]>([])
+getRolesByQuery({ keyword: '' })
+  .then(res => void (availableRoles = res.data.data.rows))
+  .catch((err) => {
+    ElMessage.error({
+      message: 'Failed to fetch roles',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+
+    console.error('Failed to fetch roles: ', err)
+  })
+
+const assignRolesFormRef = $ref<FormInstance | null>(null)
+const assignRolesData = $ref<AssignRolesData>({
+  id: 0,
+  username: '',
+  assignedRoles: []
+})
+
+const showAssignRolesDialog = async (user: UserData): Promise<void> => {
+  assignRolesDialogVisible = true
+  assignRolesData.id = user.id
+  assignRolesData.username = user.username ?? user.email ?? `User ID: ${ user.id }`
+  assignRolesData.assignedRoles = (await getAssignedRoles(user.id)).data.data.map((userRole: UserRole) => userRole.roleId)
+}
+
+const assignRoles = async (): Promise<void> => {
+  try {
+    const response: AxiosResponse = await assignRolesAPI({
+      userId: assignRolesData.id,
+      roleIds: assignRolesData.assignedRoles
+    })
+
+    const newUser: UserData = (await getUserById(assignRolesData.id)).data.data
+
+    ElMessage.success({
+      message: response.data.msg || 'Success',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+
+    tableData[tableData.findIndex(user => user.id === assignRolesData.id)] = newUser
+    if (assignRolesData.id === currentUser?.id) {
+      currentUser = newUser
+    }
+
+    assignRolesDialogVisible = false
+  } catch (err) {
+    ElMessage.error({
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
+  }
+}
 </script>
 
 <template>
@@ -336,8 +405,12 @@ queryData.pageSize = parseInt(sessionStorage.getItem('userTablePageSize') ?? '10
     >
         <el-table-column type="index"/>
         <el-table-column label="Username" min-width="200" prop="username"/>
-        <el-table-column label="E-mail" min-width="250" prop="email"/>
-        <el-table-column label="Role" min-width="150" prop="role"/>
+        <el-table-column label="E-mail" min-width="200" prop="email"/>
+        <el-table-column :formatter="formatRoles"
+                         class-name="user-roles"
+                         label="Role"
+                         min-width="200"
+        />
         <el-table-column label="State" width="100">
             <template #default="{ row }">
                 <el-switch v-if="row.id !== currentUser.id"
@@ -349,9 +422,16 @@ queryData.pageSize = parseInt(sessionStorage.getItem('userTablePageSize') ?? '10
             </template>
         </el-table-column>
         <el-table-column label="Actions" width="200">
+            <template #header>
+                <span style="color: var(--el-color-primary)">Edit</span>
+                |
+                <span style="color: var(--el-color-warning)">Assign roles</span>
+                |
+                <span style="color: var(--el-color-danger)">Delete</span>
+            </template>
             <template #default="{ row }">
                 <el-button :icon="EditPen" type="primary" @click="showEditUserDialog(row)"/>
-                <el-button :icon="Setting" type="warning"/>
+                <el-button :icon="Setting" type="warning" @click="showAssignRolesDialog(row)"/>
                 <el-popconfirm v-if="row.id !== currentUser.id"
                                :icon="InfoFilled"
                                cancel-button-text="Cancel"
@@ -462,6 +542,40 @@ queryData.pageSize = parseInt(sessionStorage.getItem('userTablePageSize') ?? '10
         </template>
     </el-dialog>
     <!-- E Edit user dialog -->
+
+    <!-- S Assign roles dialog -->
+    <el-dialog v-model="assignRolesDialogVisible"
+               custom-class="user-management-assign-roles-dialog"
+               title="Assign Roles"
+    >
+        <el-form ref="assignRolesFormRef" :model="assignRolesData" label-width="auto">
+            <el-form-item label="Username" prop="username">
+                <el-input v-model="assignRolesData.username"
+                          disabled
+                          placeholder="Username"
+                          type="text"
+                />
+            </el-form-item>
+            <el-form-item label="Role" prop="role">
+                <el-select v-model="assignRolesData.assignedRoles" multiple placeholder="Roles">
+                    <el-option v-for="role in availableRoles"
+                               :key="role.id"
+                               :label="role.roleName"
+                               :value="role.id"
+                    />
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <!-- /Assign roles form -->
+
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="assignRolesDialogVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="assignRoles">Confirm</el-button>
+            </span>
+        </template>
+    </el-dialog>
+    <!-- E Assign roles dialog -->
 </template>
 
 <style lang="scss" scoped>
@@ -481,7 +595,15 @@ queryData.pageSize = parseInt(sessionStorage.getItem('userTablePageSize') ?? '10
     margin: 20px 0 30px;
 
     :deep(.current-user-row) {
-        background: #e1f3d8;
+        & > td {
+            background: #e1f3d8 !important;
+        }
+    }
+
+    :deep(.user-roles) {
+        & > .cell {
+            word-break: break-word;
+        }
     }
 }
 
@@ -518,5 +640,13 @@ queryData.pageSize = parseInt(sessionStorage.getItem('userTablePageSize') ?? '10
 <style lang="scss">
 .user-management-edit-user-dialog {
     min-width: 630px;
+}
+
+.user-management-assign-roles-dialog {
+    min-width: 500px;
+
+    .el-select {
+        width: 100%;
+    }
 }
 </style>

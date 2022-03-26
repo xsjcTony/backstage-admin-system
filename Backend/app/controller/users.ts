@@ -14,7 +14,7 @@ import xlsx from 'node-xlsx'
 import AddUserRule from '../validator/addUserRule'
 import EditUserRule from '../validator/editUserRule'
 import type { User } from '../model/User'
-import type { ExcelUserData, ImportUserData, QueryData } from '../types'
+import type { ExcelUserData, ImportUserData, UserQueryData } from '../types'
 import type { Sequelize } from 'sequelize'
 
 
@@ -51,7 +51,7 @@ export default class UsersController extends Controller {
     const { ctx } = this
 
     try {
-      const users = await ctx.service.users.getUsersByQuery(ctx.query as unknown as QueryData)
+      const users = await ctx.service.users.getUsersByQuery(ctx.query as unknown as UserQueryData)
       ctx.success(200, 'success', users)
     } catch (err) {
       if (err instanceof Error) {

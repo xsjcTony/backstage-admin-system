@@ -6,7 +6,11 @@ import type {
   JwtUserResponseData,
   UserManagementAddUserData,
   UserManagementEditUserData,
-  QueryData
+  UserQueryData,
+  RoleQueryData,
+  PermissionManagementAddRoleData,
+  PermissionManagementEditRoleData,
+  AssignRolesRequestData
 } from '../types'
 import type { AxiosResponse } from 'axios'
 
@@ -26,7 +30,7 @@ export const isLoggedIn = async (): Promise<ResponseData> => (await Request.get(
 /**
  * Users - REST
  */
-export const getUsersByQuery = async (data: QueryData): Promise<AxiosResponse> => Request.get('/api/v1/users', data)
+export const getUsersByQuery = async (data: UserQueryData): Promise<AxiosResponse> => Request.get('/api/v1/users', data)
 
 export const createUser = async (data: UserManagementAddUserData): Promise<AxiosResponse> => Request.post('/api/v1/users', data)
 
@@ -39,3 +43,25 @@ export const getUserById = async (id: number): Promise<AxiosResponse> => Request
 export const updateUserState = async (id: number, userState: boolean): Promise<AxiosResponse> => Request.put(`/api/v1/users/${ id }`, { userState })
 
 export const exportAllUsers = async (): Promise<AxiosResponse> => Request.getFile('/api/v1/export-all-users')
+
+
+/**
+ * Roles - REST
+ */
+export const getRolesByQuery = async (data: RoleQueryData): Promise<AxiosResponse> => Request.get('api/v1/roles', data)
+
+export const createRole = async (data: PermissionManagementAddRoleData): Promise<AxiosResponse> => Request.post('api/v1/roles', data)
+
+export const deleteRole = async (id: number): Promise<AxiosResponse> => Request.deleteRequest(`api/v1/roles/${ id }`)
+
+export const updateRole = async (id: number, data: PermissionManagementEditRoleData): Promise<AxiosResponse> => Request.put(`/api/v1/roles/${ id }`, data)
+
+export const updateRoleState = async (id: number, roleState: boolean): Promise<AxiosResponse> => Request.put(`/api/v1/roles/${ id }`, { roleState })
+
+
+/**
+ * UserRole - REST
+ */
+export const getAssignedRoles = async (id: number): Promise<AxiosResponse> => Request.get(`api/v1/user-role/${ id }`)
+
+export const assignRoles = async (data: AssignRolesRequestData): Promise<AxiosResponse> => Request.post('/api/v1/user-role', data)

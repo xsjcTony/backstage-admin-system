@@ -15,7 +15,7 @@ export interface MainStore {
 // UserStore
 export interface UserStore {
   tableData: User[]
-  queryData: QueryData
+  queryData: UserQueryData
   totalUserCounts: number
 }
 
@@ -23,7 +23,11 @@ export interface UserStore {
 /**
  * Vue
  */
-// RegisterData
+
+
+/**
+ * Registration
+ */
 export const enum RegisterType {
   Normal = 'normal',
   Email = 'email'
@@ -53,7 +57,6 @@ export type FormInstance = InstanceType<typeof ElForm>
 /**
  * Response Data
  */
-
 interface BaseResponseData {
   code: number
   msg: unknown
@@ -76,14 +79,19 @@ export interface ImportUsersResponseData extends BaseResponseData {
 }
 
 
-// loginData
+/**
+ * Login
+ */
 export interface LoginData {
   username: string
   password: string
   captcha: string
 }
 
-// UserManagementAddUserData
+
+/**
+ * Users
+ */
 export interface UserManagementAddUserData {
   username: string
   email: string | null
@@ -91,7 +99,6 @@ export interface UserManagementAddUserData {
   confirmPassword: string
 }
 
-// UserManagementEditUserData
 export interface UserManagementEditUserData {
   id?: number
   username: string
@@ -101,7 +108,6 @@ export interface UserManagementEditUserData {
   avatarUrl: string
 }
 
-// User
 export interface User {
   id: number
   username: string | null
@@ -109,11 +115,11 @@ export interface User {
   github: boolean
   userState: boolean
   avatarUrl: string
+  roles: Role[]
 }
 
-// QueryData
-export interface QueryData {
-  role: '' | 'administrator' | 'user'
+export interface UserQueryData {
+  role: string
   origin: '' | 'github' | 'local'
   type: '' | 'email' | 'username'
   keyword: string
@@ -121,5 +127,52 @@ export interface QueryData {
   pageSize?: number
 }
 
-// ExcelUserData
 export type ExcelUserData = number | string | null
+
+export interface AssignRolesData {
+  id: number
+  username: string
+  assignedRoles: number[]
+}
+
+
+/**
+ * Roles
+ */
+export interface Role {
+  id: number
+  roleName: string
+  roleDescription: string
+  roleState: boolean
+}
+
+export interface RoleQueryData {
+  keyword: string
+  currentPageNumber?: number
+  pageSize?: number
+}
+
+export interface PermissionManagementAddRoleData {
+  roleName: string
+  roleDescription: string
+}
+
+export interface PermissionManagementEditRoleData {
+  id: number
+  roleName: string
+  roleDescription: string
+}
+
+
+/**
+ * UserRole
+ */
+export interface UserRole {
+  userId: number
+  roleId: number
+}
+
+export interface AssignRolesRequestData {
+  userId: number
+  roleIds: number[]
+}

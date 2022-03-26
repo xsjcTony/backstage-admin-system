@@ -12,7 +12,7 @@ export const useUserStore = defineStore('user', {
         type: '',
         keyword: '',
         currentPageNumber: 1,
-        pageSize: 10
+        pageSize: parseInt(sessionStorage.getItem('userTablePageSize') ?? '10') || 10
       },
       totalUserCounts: 0
     }

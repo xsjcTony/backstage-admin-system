@@ -1,9 +1,5 @@
 <script lang="ts" setup>
-import {
-  User,
-  Message,
-  Lock
-} from '@element-plus/icons-vue'
+import { User, Message, Lock } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { Awaitable } from 'element-plus/es/utils'
 import { storeToRefs } from 'pinia'
@@ -17,7 +13,7 @@ import type {
   FormInstance,
   UserManagementAddUserData,
   ImportUsersResponseData,
-  QueryData,
+  UserQueryData,
   User as UserData,
   ExcelUserData
 } from '../../../types'
@@ -38,7 +34,7 @@ const jwt = localStorage.getItem('token') ?? ''
 /**
  * Query
  */
-const queryUsers = async (queryData: QueryData): Promise<void> => {
+const queryUsers = async (queryData: UserQueryData): Promise<void> => {
   try {
     const response = await getUsersByQuery(queryData)
 

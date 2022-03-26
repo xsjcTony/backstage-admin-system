@@ -2,12 +2,13 @@
 
 import { Service } from 'egg'
 import { Op } from 'sequelize'
+import { Role } from '../model/Role'
 import type { User } from '../model/User'
 import type {
   AddUserData,
   EditUserData,
   ImportUserData,
-  QueryData
+  UserQueryData
 } from '../types'
 import type { WhereOptions } from 'sequelize'
 import type { ICreateOptions, IFindOptions } from 'sequelize-typescript'
@@ -24,24 +25,42 @@ export default class UsersService extends Service {
     return this.ctx.model.User.findAll({
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
-      }
+      },
+      include: [{
+        model: Role,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
     })
   }
 
 
   /**
    * Get users by query info (REST API - GET)
-   * @param {QueryData} query
-   * @return {Promise<User[]>}
+   * @param {UserQueryData} query
+   * @return {Promise<{rows: User[], count: number}>}
    */
-  public async getUsersByQuery(query: QueryData): Promise<{
+  public async getUsersByQuery(query: UserQueryData): Promise<{
     rows: User[]
     count: number
   }> {
     let baseOptions: IFindOptions<User> = {
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
-      }
+      },
+      include: [{
+        model: Role,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
     }
 
     if (query.currentPageNumber && query.pageSize) {
@@ -143,7 +162,16 @@ export default class UsersService extends Service {
     const user = await this.ctx.model.User.findByPk(id, {
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
-      }
+      },
+      include: [{
+        model: Role,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
     })
 
     if (user) {
@@ -185,7 +213,16 @@ export default class UsersService extends Service {
     const user = await this.ctx.model.User.findByPk(id, {
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
-      }
+      },
+      include: [{
+        model: Role,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
     })
 
     if (user) {

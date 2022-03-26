@@ -1,6 +1,6 @@
 import { Service } from 'egg'
-import { Oauth } from '../model/Oauth'
 import { User } from '../model/User'
+import type { Oauth } from '../model/Oauth'
 import type { OAuthUserData } from '../types'
 
 
@@ -38,6 +38,6 @@ export default class OauthService extends Service {
   }
 
   public async deleteOAuth(id: number): Promise<void> {
-    await Oauth.destroy({ where: { id } })
+    await this.ctx.model.Oauth.destroy({ where: { id } })
   }
 }

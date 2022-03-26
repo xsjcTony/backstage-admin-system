@@ -7,14 +7,14 @@ import UsersTable from './Users/UsersTable.vue'
 /**
  * Header (Breadcrumb)
  */
-const resetDefaultActiveMenuItem = () => void sessionStorage.removeItem('defaultActiveMenuItem')
+const emit = defineEmits<(e: 'resetDefaultActiveMenuItem') => void>()
 </script>
 
 <template>
     <!-- S Breadcrumb -->
     <el-breadcrumb :separator-icon="ArrowRight">
         <el-breadcrumb-item>
-            <a href="/admin" @click="resetDefaultActiveMenuItem">Home Page</a>
+            <a href="/admin" @click="emit('resetDefaultActiveMenuItem')">Home Page</a>
         </el-breadcrumb-item>
         <el-breadcrumb-item>User Management</el-breadcrumb-item>
         <el-breadcrumb-item>User List</el-breadcrumb-item>

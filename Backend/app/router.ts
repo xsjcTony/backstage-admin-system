@@ -6,11 +6,8 @@ import { Application } from 'egg'
 
 
 export default async (app: Application): Promise<void> => {
-  const { controller, router } = app
-  const authenticator = app.middleware.authenticator(null, app)
 
-
-  router.get('/', controller.home.index);
+  const authenticator = app.middleware.authenticator(null, app);
 
 
   /**
@@ -28,5 +25,17 @@ export default async (app: Application): Promise<void> => {
   /**
    * Users - REST API
    */
-  (await import('./router/users')).default(app, authenticator)
+  (await import('./router/users')).default(app, authenticator);
+
+
+  /**
+   * Roles - REST API
+   */
+  (await import('./router/roles')).default(app, authenticator);
+
+
+  /**
+   * User_Role - REST API
+   */
+  (await import('./router/userRole')).default(app, authenticator)
 }
