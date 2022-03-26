@@ -11,8 +11,6 @@ module.exports = {
       user_id: {
         type: INTEGER.UNSIGNED,
         primaryKey: true,
-        allowNull: false,
-        unique: 'comb',
         references: {
           model: 'users',
           key: 'id'
@@ -21,8 +19,6 @@ module.exports = {
       role_id: {
         type: INTEGER.UNSIGNED,
         primaryKey: true,
-        allowNull: false,
-        unique: 'comb',
         references: {
           model: 'roles',
           key: 'id'
@@ -35,12 +31,6 @@ module.exports = {
         type: DATE
       }
     })
-
-    await queryInterface.addIndex('user_roles', {
-      fields: ['user_id', 'role_id'],
-      type: 'UNIQUE',
-      name: 'comb'
-    }, 'user_roles')
   },
 
   down: async (queryInterface: QueryInterface): Promise<void> => {

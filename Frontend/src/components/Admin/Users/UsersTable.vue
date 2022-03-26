@@ -20,7 +20,7 @@ import {
   getUsersByQuery,
   updateUser,
   updateUserState,
-  assignRoles as assignRolesAPI
+  assignRoles as assignRolesAPI, getUserById
 } from '../../../api'
 import { useStore } from '../../../stores'
 import { useUserStore } from '../../../stores/userStore'
@@ -94,6 +94,9 @@ const refreshUsers = async (): Promise<void> => {
     duration: 2000
   })
 }
+
+// format user's roles
+const formatRoles = (user: UserData): string => user.roles.map(role => role.roleName).join(' | ')
 
 
 /**
@@ -362,6 +365,8 @@ const assignRoles = async (): Promise<void> => {
       roleIds: assignRolesData.assignedRoles
     })
 
+    const newUser: UserData = (await getUserById(assignRolesData.id)).data.data
+
     ElMessage.success({
       message: response.data.msg || 'Success',
       center: true,
@@ -369,7 +374,11 @@ const assignRoles = async (): Promise<void> => {
       duration: 3000
     })
 
-    // TODO: update table
+    tableData[tableData.findIndex(user => user.id === assignRolesData.id)] = newUser
+    if (assignRolesData.id === currentUser?.id) {
+      currentUser = newUser
+    }
+
     assignRolesDialogVisible = false
   } catch (err) {
     ElMessage.error({
@@ -396,8 +405,12 @@ const assignRoles = async (): Promise<void> => {
     >
         <el-table-column type="index"/>
         <el-table-column label="Username" min-width="200" prop="username"/>
-        <el-table-column label="E-mail" min-width="250" prop="email"/>
-        <el-table-column label="Role" min-width="150" prop="role"/>
+        <el-table-column label="E-mail" min-width="200" prop="email"/>
+        <el-table-column :formatter="formatRoles"
+                         class-name="user-roles"
+                         label="Role"
+                         min-width="200"
+        />
         <el-table-column label="State" width="100">
             <template #default="{ row }">
                 <el-switch v-if="row.id !== currentUser.id"
@@ -582,7 +595,15 @@ const assignRoles = async (): Promise<void> => {
     margin: 20px 0 30px;
 
     :deep(.current-user-row) {
-        background: #e1f3d8;
+        & > td {
+            background: #e1f3d8 !important;
+        }
+    }
+
+    :deep(.user-roles) {
+        & > .cell {
+            word-break: break-word;
+        }
     }
 }
 
@@ -619,5 +640,13 @@ const assignRoles = async (): Promise<void> => {
 <style lang="scss">
 .user-management-edit-user-dialog {
     min-width: 630px;
+}
+
+.user-management-assign-roles-dialog {
+    min-width: 500px;
+
+    .el-select {
+        width: 100%;
+    }
 }
 </style>

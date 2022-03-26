@@ -1,4 +1,5 @@
 import { Service } from 'egg'
+import { Role } from '../model/Role'
 import type { User } from '../model/User'
 import type { LoginData, RegisterData } from '../types'
 import type { WhereOptions } from 'sequelize'
@@ -64,7 +65,13 @@ export default class UserService extends Service {
       where: options,
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
-      }
+      },
+      include: [{
+        model: Role,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        }
+      }]
     })
   }
 
@@ -92,7 +99,16 @@ export default class UserService extends Service {
     const res = await this.ctx.model.User.findByPk(data.id, {
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
-      }
+      },
+      include: [{
+        model: Role,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
     })
 
     if (res) {
@@ -124,7 +140,16 @@ export default class UserService extends Service {
     const res = await this.ctx.model.User.findByPk(data.id, {
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
-      }
+      },
+      include: [{
+        model: Role,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
     })
 
     if (res) {

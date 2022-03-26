@@ -115,6 +115,7 @@ export interface User {
   github: boolean
   userState: boolean
   avatarUrl: string
+  roles: Role[]
 }
 
 export interface UserQueryData {

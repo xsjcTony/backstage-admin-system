@@ -28,15 +28,11 @@ export class UserRole extends Model<UserRole> {
 
   @PrimaryKey
   @ForeignKey(() => User)
-  @AllowNull(false)
-  @Unique('comb')
   @Column(INTEGER.UNSIGNED)
   public userId!: number
 
   @PrimaryKey
   @ForeignKey(() => Role)
-  @AllowNull(false)
-  @Unique('comb')
   @Column(INTEGER.UNSIGNED)
   public roleId!: number
 
