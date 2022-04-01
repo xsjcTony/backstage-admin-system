@@ -13,6 +13,7 @@ import type {
 import type { WhereOptions } from 'sequelize'
 import type { ICreateOptions, IFindOptions } from 'sequelize-typescript'
 import type { IWhereOptions } from 'sequelize-typescript/lib/interfaces/IWhereOptions'
+import { Privilege } from '../model/Privilege'
 
 
 export default class UsersService extends Service {
@@ -221,7 +222,16 @@ export default class UsersService extends Service {
         },
         through: {
           attributes: []
-        }
+        },
+        include: [{
+          model: Privilege,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt']
+          },
+          through: {
+            attributes: []
+          }
+        }]
       }]
     })
 

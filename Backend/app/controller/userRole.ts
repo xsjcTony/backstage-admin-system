@@ -18,26 +18,6 @@ import { UserRole } from '../model/UserRole'
 export default class UserRoleController extends Controller {
 
   /**
-   * Get roles assigned to the given user
-   * @return {Promise<void>}
-   */
-  public async getUserRolesByUserId(): Promise<void> {
-    const { ctx } = this
-
-    try {
-      const userRoles = await this.ctx.service.userRole.findUserRoles({ userId: ctx.params.id })
-      ctx.success(200, 'Success', userRoles)
-    } catch (err) {
-      if (err instanceof Error) {
-        ctx.error(400, err.message, err)
-      } else {
-        ctx.error(400, 'Failed to assign roles', err)
-      }
-    }
-  }
-
-
-  /**
    * Assign role to a user (REST API - POST)
    * @return {Promise<void>}
    */

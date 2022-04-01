@@ -20,7 +20,7 @@ module.exports = {
       role_description: {
         type: STRING,
         allowNull: false,
-        unique: false
+        unique: true
       },
       role_state: {
         type: BOOLEAN,

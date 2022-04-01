@@ -2,6 +2,7 @@
 
 import { Service } from 'egg'
 import { Op } from 'sequelize'
+import { Privilege } from '../model/Privilege'
 import type { Role } from '../model/Role'
 import type {
   RoleQueryData,
@@ -24,7 +25,16 @@ export default class RolesService extends Service {
     let options: IFindOptions<Role> = {
       attributes: {
         exclude: ['createdAt', 'updatedAt']
-      }
+      },
+      include: [{
+        model: Privilege,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
     }
 
     if (query.currentPageNumber && query.pageSize) {
@@ -49,7 +59,7 @@ export default class RolesService extends Service {
 
   /**
    * Add role to database (REST API - POST)
-   * @param {AddRoleData} data
+   * @param {ModifyRoleData} data
    * @return {Promise<Role>}
    */
   public async createRole(data: ModifyRoleData): Promise<Role> {
@@ -75,7 +85,7 @@ export default class RolesService extends Service {
    * @return {Promise<Role>}
    */
   public async deleteRole(id: string): Promise<Role> {
-    const role = await this._getRoleById(id)
+    const role = await this.getRoleById(id)
 
     await role.destroy()
     return role
@@ -83,16 +93,49 @@ export default class RolesService extends Service {
 
 
   /**
-   * Update user in database (REST API - PUT)
+   * Update role in database (REST API - PUT)
+   * @param {string} id
+   * @param {ModifyRoleData} data
+   * @return {Promise<Role>}
    */
   public async updateRole(id: string, data: ModifyRoleData): Promise<Role> {
-    const role = await this._getRoleById(id)
+    const role = await this.getRoleById(id)
 
     await role.update(data)
 
     const res = role.toJSON() as Role
     delete res.updatedAt
     return res
+  }
+
+
+  /**
+   * Look for role based on given `PRIMARY KEY`
+   * @param {string} id
+   * @return {Promise<Role>}
+   * @private
+   */
+  public async getRoleById(id: string): Promise<Role> {
+    const role = await this.ctx.model.Role.findByPk(id, {
+      attributes: {
+        exclude: ['createdAt', 'updatedAt']
+      },
+      include: [{
+        model: Privilege,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
+    })
+
+    if (role) {
+      return role
+    } else {
+      throw new Error('Role doesn\'t exist.')
+    }
   }
 
 
@@ -108,26 +151,5 @@ export default class RolesService extends Service {
    */
   private async _findRole(options: IFindOptions<Role>['where']): Promise<Role | null> {
     return this.ctx.model.Role.findOne({ where: options })
-  }
-
-
-  /**
-   * Look for role based on given `PRIMARY KEY`
-   * @param {string} id
-   * @return {Promise<Role>}
-   * @private
-   */
-  private async _getRoleById(id: string): Promise<Role> {
-    const role = await this.ctx.model.Role.findByPk(id, {
-      attributes: {
-        exclude: ['createdAt', 'updatedAt']
-      }
-    })
-
-    if (role) {
-      return role
-    } else {
-      throw new Error('Role doesn\'t exist.')
-    }
   }
 }

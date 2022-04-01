@@ -11,7 +11,7 @@ export default class UserRoleService extends Service {
 
   /**
    * Add userRole to database (REST API - POST)
-   * @param {AddUserRoleData} data
+   * @param {ModifyUserRoleData} data
    * @param {ICreateOptions} options
    * @return {Promise<UserRole>}
    */
@@ -38,37 +38,6 @@ export default class UserRoleService extends Service {
     await userRole.destroy(options)
     return userRole
   }
-
-
-  /**
-   * Delete role in database (REST API - DELETE)
-   * @param {string} id
-   * @return {Promise<Role>}
-   */
-  /*
-  public async deleteRole(id: string): Promise<Role> {
-    const role = await this._getRoleById(id)
-
-    await role.destroy()
-    return role
-  }
-  */
-
-
-  /**
-   * Update user in database (REST API - PUT)
-   */
-  /*
-  public async updateRole(id: string, data: ModifyRoleData): Promise<Role> {
-    const role = await this._getRoleById(id)
-
-    await role.update(data)
-
-    const res = role.toJSON() as Role
-    delete res.updatedAt
-    return res
-  }
-  */
 
 
   /**

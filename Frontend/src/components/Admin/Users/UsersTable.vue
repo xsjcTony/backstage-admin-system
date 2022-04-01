@@ -15,12 +15,12 @@ import { watch } from 'vue'
 import { $, $ref } from 'vue/macros'
 import {
   deleteUser as destroyUser,
-  getAssignedRoles,
   getRolesByQuery,
   getUsersByQuery,
   updateUser,
   updateUserState,
-  assignRoles as assignRolesAPI, getUserById
+  assignRoles as assignRolesAPI,
+  getUserById
 } from '../../../api'
 import { useStore } from '../../../stores'
 import { useUserStore } from '../../../stores/userStore'
@@ -31,7 +31,7 @@ import type {
   User as UserData,
   UserManagementEditUserData,
   AssignRolesData,
-  Role, UserRole
+  Role
 } from '../../../types'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { UploadFile, UploadRawFile } from 'element-plus'
@@ -65,7 +65,7 @@ const queryUsers = async (queryData: UserQueryData): Promise<void> => {
     tableData = users
   } catch (err) {
     ElMessage.error({
-      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
       center: true,
       showClose: true,
       duration: 2000
@@ -94,9 +94,6 @@ const refreshUsers = async (): Promise<void> => {
     duration: 2000
   })
 }
-
-// format user's roles
-const formatRoles = (user: UserData): string => user.roles.map(role => role.roleName).join(' | ')
 
 
 /**
@@ -150,7 +147,7 @@ const editUser = async (formEl: FormInstance | undefined): Promise<void> => {
         editUserDialogVisible = false
       } catch (err) {
         ElMessage.error({
-          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
           center: true,
           showClose: true,
           duration: 3000
@@ -271,7 +268,7 @@ const changeUserState = async (user: UserData): Promise<void> => {
     })
   } catch (err) {
     ElMessage.error({
-      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
       center: true,
       showClose: true,
       duration: 3000
@@ -299,7 +296,7 @@ const deleteUser = async (id: number): Promise<void> => {
     tableData.splice(tableData.findIndex(user => user.id === id), 1)
   } catch (err) {
     ElMessage.error({
-      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
       center: true,
       showClose: true,
       duration: 3000
@@ -355,7 +352,7 @@ const showAssignRolesDialog = async (user: UserData): Promise<void> => {
   assignRolesDialogVisible = true
   assignRolesData.id = user.id
   assignRolesData.username = user.username ?? user.email ?? `User ID: ${ user.id }`
-  assignRolesData.assignedRoles = (await getAssignedRoles(user.id)).data.data.map((userRole: UserRole) => userRole.roleId)
+  assignRolesData.assignedRoles = user.roles.map((role: Role) => role.id)
 }
 
 const assignRoles = async (): Promise<void> => {
@@ -382,7 +379,7 @@ const assignRoles = async (): Promise<void> => {
     assignRolesDialogVisible = false
   } catch (err) {
     ElMessage.error({
-      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
       center: true,
       showClose: true,
       duration: 3000
@@ -406,12 +403,14 @@ const assignRoles = async (): Promise<void> => {
         <el-table-column type="index"/>
         <el-table-column label="Username" min-width="200" prop="username"/>
         <el-table-column label="E-mail" min-width="200" prop="email"/>
-        <el-table-column :formatter="formatRoles"
-                         class-name="user-roles"
-                         label="Role"
-                         min-width="200"
-        />
-        <el-table-column label="State" width="100">
+        <el-table-column class-name="user-roles" label="Role" min-width="200">
+            <template #default="{ row }">
+                <el-tag v-for="role in row.roles" :key="role.id" effect="plain">
+                    {{ role.roleName }}
+                </el-tag>
+            </template>
+        </el-table-column>
+        <el-table-column label="State" width="70">
             <template #default="{ row }">
                 <el-switch v-if="row.id !== currentUser.id"
                            v-model="row.userState"
@@ -421,13 +420,11 @@ const assignRoles = async (): Promise<void> => {
                 />
             </template>
         </el-table-column>
-        <el-table-column label="Actions" width="200">
+        <el-table-column label="Actions" width="220">
             <template #header>
-                <span style="color: var(--el-color-primary)">Edit</span>
-                |
-                <span style="color: var(--el-color-warning)">Assign roles</span>
-                |
-                <span style="color: var(--el-color-danger)">Delete</span>
+                <el-tag>Edit</el-tag>
+                <el-tag type="warning">Assign roles</el-tag>
+                <el-tag type="danger">Delete</el-tag>
             </template>
             <template #default="{ row }">
                 <el-button :icon="EditPen" type="primary" @click="showEditUserDialog(row)"/>
@@ -586,6 +583,10 @@ const assignRoles = async (): Promise<void> => {
     padding-top: 20px;
     border-top: 1px solid #cccccc80;
 
+    .el-tag {
+        user-select: none;
+    }
+
     .el-button {
         color: #fff;
     }
@@ -593,6 +594,12 @@ const assignRoles = async (): Promise<void> => {
 
 .el-table {
     margin: 20px 0 30px;
+
+    th {
+        .el-tag + .el-tag {
+            margin-left: 5px;
+        }
+    }
 
     :deep(.current-user-row) {
         & > td {
@@ -602,7 +609,9 @@ const assignRoles = async (): Promise<void> => {
 
     :deep(.user-roles) {
         & > .cell {
-            word-break: break-word;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px
         }
     }
 }

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { Message, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import 'element-plus/es/components/message/style/css'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { registerUser, sendVerificationEmail } from '../../api'
@@ -97,7 +96,7 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
       } catch (err) {
         // Error
         ElMessage.error({
-          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
           center: true,
           showClose: true,
           duration: 3000
@@ -177,7 +176,7 @@ const sendVerificationCode = async (): Promise<void> => {
   } catch (err) {
     // Error
     ElMessage.error({
-      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
       center: true,
       showClose: true,
       duration: 3000

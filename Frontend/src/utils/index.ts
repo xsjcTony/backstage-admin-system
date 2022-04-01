@@ -1,4 +1,7 @@
-import type { User, ExcelUserData } from '../types'
+/* eslint '@typescript-eslint/prefer-reduce-type-parameter': 'off' */
+/* eslint '@typescript-eslint/no-unnecessary-condition': 'off' */
+
+import type { User, ExcelUserData, Privilege, GroupedPrivilegeSet, GroupedPrivilege, PrivilegeNode } from '../types'
 import type { RouteRecordRaw } from 'vue-router'
 
 
@@ -73,3 +76,44 @@ export const userToExcel = (user: User): ExcelUserData[] => {
 
   return res
 }
+
+
+/**
+ * Group privileges by `type -> level -> privileges` data structure
+ * @param {Privilege[]} privileges
+ * @return {GroupedPrivilegeSet}
+ */
+export const groupPrivilegesByTypeAndLevel = (privileges: Privilege[]): GroupedPrivilegeSet => privileges.reduce<GroupedPrivilegeSet>((prev, curr) => {
+  prev[curr.type] = prev[curr.type] ?? {}
+  prev[curr.type][curr.level] = prev[curr.type][curr.level] ?? []
+
+  const t = { ...curr } as unknown as GroupedPrivilege
+  delete t.type
+  delete t.level
+
+  prev[curr.type][curr.level].push(t)
+  return prev
+}, {} as GroupedPrivilegeSet)
+
+
+/**
+ * Convert privileges into `el-tree` data structure
+ * @param {Privilege[]} privileges
+ * @return {PrivilegeNode[]}
+ */
+export const buildPrivilegeTree = (privileges: Privilege[]): PrivilegeNode[] => privileges.reduce<PrivilegeNode[]>((prev, curr: PrivilegeNode) => {
+  if (curr.level === 1) {
+    prev.push(curr)
+    return prev
+  }
+
+  privileges.some((privilege: PrivilegeNode) => {
+    if (curr.parentId === privilege.id) {
+      privilege.children = privilege.children ?? []
+      privilege.children.push(curr)
+      return true
+    }
+  })
+
+  return prev
+}, [])

@@ -4,9 +4,10 @@ import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
-import { loginUser } from '../api'
+import { getUserById, loginUser } from '../api'
 import { useStore } from '../stores'
-import type { FormInstance, LoginData, JwtUserResponseData } from '../types'
+import { buildPrivilegeTree } from '../utils'
+import type { FormInstance, LoginData, JwtUserResponseData, Privilege, User as UserData } from '../types'
 import type { AxiosError } from 'axios'
 
 
@@ -68,13 +69,30 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
         // Succeed
         const data: JwtUserResponseData = await loginUser(loginData)
         localStorage.setItem('token', data.data.token) // JWT Token
+
+        // Create privilege tree
+        const id = data.data.id
+        const user: UserData = (await getUserById(id)).data.data
+
+        const privileges: Privilege[] = []
+        const addedPrivilegeIds: number[] = []
+        for (const role of user.roles) {
+          for (const privilege of role.privileges) {
+            if (!addedPrivilegeIds.includes(privilege.id)) {
+              addedPrivilegeIds.push(privilege.id)
+              privileges.push(privilege)
+            }
+          }
+        }
+        user.privilegeTree = buildPrivilegeTree(privileges)
+
         mainStore.loggedIn = true // Pinia
-        mainStore.currentUser = data.data
+        mainStore.currentUser = user
         await router.push('/admin')
       } catch (err) {
         // Error
         ElMessage.error({
-          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
           center: true,
           showClose: true,
           duration: 3000
@@ -154,7 +172,7 @@ const refreshCaptcha = (): void => {
                     <img ref="captcha"
                          alt
                          class="captcha-image"
-                         src="http://127.0.0.1:7001/captcha"
+                         :src="`http://127.0.0.1:7001/captcha?t=${ new Date().getTime() }`"
                          @click="refreshCaptcha"
                     >
                 </div>

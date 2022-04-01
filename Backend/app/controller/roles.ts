@@ -37,6 +37,26 @@ export default class RolesController extends Controller {
 
 
   /**
+   * Get role by ID (Primary key) (REST API - GET)
+   * @return {Promise<void>}
+   */
+  public async getRoleById(): Promise<void> {
+    const { ctx } = this
+
+    try {
+      const role = await ctx.service.roles.getRoleById(ctx.params.id)
+      ctx.success(200, 'success', role)
+    } catch (err) {
+      if (err instanceof Error) {
+        ctx.error(500, err.message, err)
+      } else {
+        ctx.error(500, 'Error', err)
+      }
+    }
+  }
+
+
+  /**
    * Add role to database (REST API - POST)
    * @return {Promise<void>}
    */
@@ -49,9 +69,9 @@ export default class RolesController extends Controller {
       ctx.validate(RoleRule, data)
 
       // save into database
-      const user = await ctx.service.roles.createRole(data)
+      const role = await ctx.service.roles.createRole(data)
 
-      ctx.success(200, 'Role has been added', user)
+      ctx.success(200, 'Role has been added', role)
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)
@@ -97,9 +117,9 @@ export default class RolesController extends Controller {
       }
 
       // save into database
-      const user = await ctx.service.roles.updateRole(ctx.params.id, data)
+      const role = await ctx.service.roles.updateRole(ctx.params.id, data)
 
-      ctx.success(200, 'Role has been updated', user)
+      ctx.success(200, 'Role has been updated', role)
     } catch (err) {
       if (err instanceof Error) {
         ctx.error(400, err.message, err)

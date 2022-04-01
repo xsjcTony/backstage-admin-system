@@ -44,7 +44,7 @@ const queryUsers = async (queryData: UserQueryData): Promise<void> => {
     tableData = users
   } catch (err) {
     ElMessage.error({
-      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
       center: true,
       showClose: true,
       duration: 2000
@@ -115,7 +115,7 @@ const exportQueryResult = async (): Promise<void> => {
     xlsx.writeFileXLSX(workbook, 'users.xlsx')
   } catch (err) {
     ElMessage.error({
-      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
       center: true,
       showClose: true,
       duration: 2000
@@ -155,7 +155,7 @@ const addUser = async (formEl: FormInstance | undefined): Promise<void> => {
         tableData.push(response.data.data)
       } catch (err) {
         ElMessage.error({
-          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : 'Error'),
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
           center: true,
           showClose: true,
           duration: 3000
@@ -285,7 +285,7 @@ const exportAllUsers = async (): Promise<void> => {
     downloadFile(res.data, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'users.xlsx')
   } catch (err) {
     ElMessage.error({
-      message: (err as AxiosError).message || (err instanceof Error ? err.message : 'Error'),
+      message: (err as AxiosError).message || (err instanceof Error ? err.message : (err as any).message || 'Error'),
       center: true,
       showClose: true,
       duration: 3000

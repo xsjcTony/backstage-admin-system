@@ -3,6 +3,7 @@ import { Role } from '../model/Role'
 import type { User } from '../model/User'
 import type { LoginData, RegisterData } from '../types'
 import type { WhereOptions } from 'sequelize'
+import { Privilege } from '../model/Privilege'
 
 
 export default class UserService extends Service {
@@ -65,13 +66,7 @@ export default class UserService extends Service {
       where: options,
       attributes: {
         exclude: ['password', 'createdAt', 'updatedAt']
-      },
-      include: [{
-        model: Role,
-        attributes: {
-          exclude: ['createdAt', 'updatedAt']
-        }
-      }]
+      }
     })
   }
 

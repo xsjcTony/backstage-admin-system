@@ -11,5 +11,5 @@ export default (app: Application, authenticator: any): void => {
   /**
    * User_Role - REST API
    */
-  router.post('/api/v1/user-role', authenticator, controller.userRole.assignUserRoles)
+  router.post('/api/v1/role-privilege', authenticator, controller.rolePrivilege.assignRolePrivileges)
 }

@@ -15,8 +15,11 @@ import {
   CreatedAt,
   UpdatedAt,
   Default,
-  BelongsToMany
+  BelongsToMany,
+  Is
 } from 'sequelize-typescript'
+import { Privilege } from './Privilege'
+import { RolePrivilege } from './RolePrivilege'
 import { User } from './User'
 import { UserRole } from './UserRole'
 
@@ -35,13 +38,13 @@ export class Role extends Model<Role> {
 
   @AllowNull(false)
   @Unique(true)
-  // @Is(/^(?!\s*$).+/)
+  @Is(/^(?!\s*$).+/)
   @Column(STRING)
   public roleName!: string
 
   @AllowNull(false)
   @Unique(true)
-  // @Is(/^(?!\s*$).+/)
+  @Is(/^(?!\s*$).+/)
   @Column(STRING)
   public roleDescription!: string
 
@@ -53,6 +56,9 @@ export class Role extends Model<Role> {
 
   @BelongsToMany(() => User, () => UserRole)
   public users!: (User & { UserRole: UserRole })[]
+
+  @BelongsToMany(() => Privilege, () => RolePrivilege)
+  public privileges!: (Privilege & { RolePrivilege: RolePrivilege })[]
 
   @CreatedAt
   public createdAt?: Date

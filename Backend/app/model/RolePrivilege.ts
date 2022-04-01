@@ -13,26 +13,26 @@ import {
   UpdatedAt,
   ForeignKey
 } from 'sequelize-typescript'
+import { Privilege } from './Privilege'
 import { Role } from './Role'
-import { User } from './User'
 
 
 const { INTEGER } = DataType
 
 @Table({
-  modelName: 'UserRole'
+  modelName: 'RolePrivilege'
 })
-export class UserRole extends Model<UserRole> {
-
-  @PrimaryKey
-  @ForeignKey(() => User)
-  @Column(INTEGER.UNSIGNED)
-  public userId!: number
+export class RolePrivilege extends Model<RolePrivilege> {
 
   @PrimaryKey
   @ForeignKey(() => Role)
   @Column(INTEGER.UNSIGNED)
   public roleId!: number
+
+  @PrimaryKey
+  @ForeignKey(() => Privilege)
+  @Column(INTEGER.UNSIGNED)
+  public privilegeId!: number
 
   @CreatedAt
   public createdAt?: Date
@@ -41,4 +41,4 @@ export class UserRole extends Model<UserRole> {
   public updatedAt?: Date
 }
 
-export default () => UserRole
+export default () => RolePrivilege

@@ -123,3 +123,34 @@ export interface ModifyUserRoleData {
   userId: number
   roleId: number
 }
+
+
+/**
+ * Privilege
+ */
+export interface PrivilegeQueryData {
+  type: '' | 'menu' | 'request' | 'route'
+  keyword: string
+  currentPageNumber?: string
+  pageSize?: string
+}
+
+export interface ModifyPrivilegeData {
+  privilegeName: string
+  privilegeDescription: string
+  type: 'menu' | 'request' | 'route'
+  requestMethod: 'all' | 'delete' | 'get' | 'post' | 'put' | null
+  privilegeUrl: string | null
+  parentId: number | null
+  level: 1 | 2 | 3
+  privilegeState?: boolean
+}
+
+
+/**
+ * RolePrivilege
+ */
+export interface ModifyRolePrivilegeData {
+  roleId: number
+  privilegeId: number
+}

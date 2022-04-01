@@ -12,6 +12,7 @@ export default (app: Application, authenticator: any): void => {
    * Roles - REST API
    */
   router.get('/api/v1/roles', authenticator, controller.roles.getRolesByQuery)
+  router.get('/api/v1/roles/:id', authenticator, controller.roles.getRoleById)
   router.post('/api/v1/roles', authenticator, controller.roles.createRole)
   router.delete('/api/v1/roles/:id', authenticator, controller.roles.deleteRole)
   router.put('/api/v1/roles/:id', authenticator, controller.roles.updateRole)

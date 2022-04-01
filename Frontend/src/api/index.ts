@@ -10,7 +10,11 @@ import type {
   RoleQueryData,
   PermissionManagementAddRoleData,
   PermissionManagementEditRoleData,
-  AssignRolesRequestData
+  AssignRolesRequestData,
+  PrivilegeQueryData,
+  PermissionManagementAddPrivilegeData,
+  PermissionManagementEditPrivilegeData,
+  AssignPrivilegesRequestData
 } from '../types'
 import type { AxiosResponse } from 'axios'
 
@@ -48,13 +52,15 @@ export const exportAllUsers = async (): Promise<AxiosResponse> => Request.getFil
 /**
  * Roles - REST
  */
-export const getRolesByQuery = async (data: RoleQueryData): Promise<AxiosResponse> => Request.get('api/v1/roles', data)
+export const getRolesByQuery = async (data: RoleQueryData): Promise<AxiosResponse> => Request.get('/api/v1/roles', data)
 
-export const createRole = async (data: PermissionManagementAddRoleData): Promise<AxiosResponse> => Request.post('api/v1/roles', data)
+export const createRole = async (data: PermissionManagementAddRoleData): Promise<AxiosResponse> => Request.post('/api/v1/roles', data)
 
-export const deleteRole = async (id: number): Promise<AxiosResponse> => Request.deleteRequest(`api/v1/roles/${ id }`)
+export const deleteRole = async (id: number): Promise<AxiosResponse> => Request.deleteRequest(`/api/v1/roles/${ id }`)
 
 export const updateRole = async (id: number, data: PermissionManagementEditRoleData): Promise<AxiosResponse> => Request.put(`/api/v1/roles/${ id }`, data)
+
+export const getRoleById = async (id: number): Promise<AxiosResponse> => Request.get(`/api/v1/roles/${ id }`)
 
 export const updateRoleState = async (id: number, roleState: boolean): Promise<AxiosResponse> => Request.put(`/api/v1/roles/${ id }`, { roleState })
 
@@ -62,6 +68,24 @@ export const updateRoleState = async (id: number, roleState: boolean): Promise<A
 /**
  * UserRole - REST
  */
-export const getAssignedRoles = async (id: number): Promise<AxiosResponse> => Request.get(`api/v1/user-role/${ id }`)
-
 export const assignRoles = async (data: AssignRolesRequestData): Promise<AxiosResponse> => Request.post('/api/v1/user-role', data)
+
+
+/**
+ * Privileges - REST
+ */
+export const getPrivilegesByQuery = async (data: PrivilegeQueryData): Promise<AxiosResponse> => Request.get('/api/v1/privileges', data)
+
+export const createPrivilege = async (data: PermissionManagementAddPrivilegeData): Promise<AxiosResponse> => Request.post('/api/v1/privileges', data)
+
+export const updatePrivilege = async (id: number, data: PermissionManagementEditPrivilegeData): Promise<AxiosResponse> => Request.put(`/api/v1/privileges/${ id }`, data)
+
+export const updatePrivilegeState = async (id: number, privilegeState: boolean): Promise<AxiosResponse> => Request.put(`/api/v1/privileges/${ id }`, { privilegeState })
+
+export const deletePrivilege = async (id: number): Promise<AxiosResponse> => Request.deleteRequest(`/api/v1/privileges/${ id }`)
+
+
+/**
+ * RolePrivilege - REST
+ */
+export const assignPrivileges = async (data: AssignPrivilegesRequestData): Promise<AxiosResponse> => Request.post('/api/v1/role-privilege', data)

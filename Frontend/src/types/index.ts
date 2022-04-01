@@ -1,4 +1,4 @@
-import type { ElForm } from 'element-plus'
+import type { ElForm, ElTree } from 'element-plus'
 
 
 /**
@@ -21,8 +21,12 @@ export interface UserStore {
 
 
 /**
- * Vue
+ * Element-Plus
  */
+// ElForm
+export type FormInstance = InstanceType<typeof ElForm>
+// ElTree
+export type TreeInstance = InstanceType<typeof ElTree>
 
 
 /**
@@ -48,10 +52,6 @@ interface EmailRegisterData extends BaseRegisterData {
 }
 
 export type RegisterData = EmailRegisterData | NormalRegisterData
-
-
-// ElForm
-export type FormInstance = InstanceType<typeof ElForm>
 
 
 /**
@@ -116,6 +116,7 @@ export interface User {
   userState: boolean
   avatarUrl: string
   roles: Role[]
+  privilegeTree?: PrivilegeNode[]
 }
 
 export interface UserQueryData {
@@ -144,6 +145,8 @@ export interface Role {
   roleName: string
   roleDescription: string
   roleState: boolean
+  privileges: Privilege[]
+  privilegeTree?: PrivilegeNode[]
 }
 
 export interface RoleQueryData {
@@ -163,16 +166,82 @@ export interface PermissionManagementEditRoleData {
   roleDescription: string
 }
 
+export interface AssignPrivilegesData {
+  id: number
+  roleName: string
+  assignedPrivileges: number[]
+}
+
 
 /**
  * UserRole
  */
-export interface UserRole {
-  userId: number
-  roleId: number
-}
-
 export interface AssignRolesRequestData {
   userId: number
   roleIds: number[]
 }
+
+
+/**
+ * Privileges
+ */
+export interface Privilege {
+  id: number
+  privilegeName: string
+  privilegeDescription: string
+  privilegeState: boolean
+  type: 'menu' | 'request' | 'route'
+  requestMethod: 'all' | 'delete' | 'get' | 'post' | 'put' | null
+  privilegeUrl: string | null
+  parentId: number | null
+  level: 1 | 2 | 3
+}
+
+export type GroupedPrivilege = PartialBy<Privilege, 'level' | 'type'>
+
+export type GroupedPrivilegeSet = {
+  [P in Privilege['type']]: {
+    [U in Privilege['level']]: GroupedPrivilege[]
+  }
+}
+
+export interface PrivilegeNode extends Privilege {
+  children?: PrivilegeNode[]
+}
+
+export interface PrivilegeQueryData {
+  type: '' | 'menu' | 'request' | 'route'
+  keyword: string
+  currentPageNumber?: number
+  pageSize?: number
+}
+
+export interface PermissionManagementAddPrivilegeData {
+  privilegeName: string
+  privilegeDescription: string
+  type: 'menu' | 'request' | 'route'
+  requestMethod: 'all' | 'delete' | 'get' | 'post' | 'put' | null
+  privilegeUrl: string | null
+  parentId: number | null
+  level: 1 | 2 | 3
+}
+
+export interface PermissionManagementEditPrivilegeData extends PermissionManagementAddPrivilegeData {
+  id: number
+}
+
+
+/**
+ * RolePrivilege
+ */
+export interface AssignPrivilegesRequestData {
+  roleId: number
+  privilegeIds: number[]
+}
+
+
+/**
+ * Utilities
+ */
+// Make specified keys in
+type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

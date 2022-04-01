@@ -24,6 +24,7 @@ const logout = async (): Promise<void> => {
   localStorage.removeItem('token')
   mainStore.loggedIn = false
   mainStore.currentUser = null
+  resetDefaultActiveMenuItem()
   await router.push('/login')
 }
 
@@ -54,6 +55,21 @@ const currentPath = route.name as string
 if (['users', 'roles', 'permissions'].includes(currentPath)) {
   changeDefaultActiveMenuItem(currentPath)
 }
+
+
+/**
+ * Privilege - Menu
+ */
+const availableMenus = currentUser.privilegeTree?.find(privilege => privilege.type === 'menu')
+const defaultOpenedMenus: string[] = []
+availableMenus?.children?.forEach((p) => {
+  if (p.privilegeName === 'User management menu') {
+    defaultOpenedMenus.push('user-management')
+  }
+  if (p.privilegeName === 'Permission management menu') {
+    defaultOpenedMenus.push('permission-management')
+  }
+})
 </script>
 
 <template>
@@ -73,32 +89,47 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                          class="el-menu-vertical-demo"
                          :default-active="defaultActiveMenuItem"
                          router
-                         :default-openeds="['user-management', 'permission-management']"
+                         :default-openeds="defaultOpenedMenus"
                 >
-                    <el-sub-menu index="user-management">
+
+                    <el-sub-menu v-if="availableMenus?.children?.some(p => p.privilegeName === 'User management menu')"
+                                 index="user-management"
+                    >
                         <template #title>
                             <el-icon>
                                 <Setting/>
                             </el-icon>
                             <span>User Management</span>
                         </template>
-                        <el-menu-item index="users" @click="changeDefaultActiveMenuItem('users')">
+
+                        <el-menu-item v-if="availableMenus?.children?.find(p => p.privilegeName === 'User management menu')?.children?.some(p => p.privilegeName === 'User list menu')"
+                                      index="users"
+                                      @click="changeDefaultActiveMenuItem('users')"
+                        >
                             <template #default>
                                 <el-icon>
                                     <User/>
                                 </el-icon>
-                                <span>User Management</span>
+                                <span>User List</span>
                             </template>
                         </el-menu-item>
+
                     </el-sub-menu>
-                    <el-sub-menu index="permission-management">
+
+                    <el-sub-menu v-if="availableMenus?.children?.some(p => p.privilegeName === 'Permission management menu')"
+                                 index="permission-management"
+                    >
                         <template #title>
                             <el-icon>
                                 <Collection/>
                             </el-icon>
                             <span>Permission Management</span>
                         </template>
-                        <el-menu-item index="roles" @click="changeDefaultActiveMenuItem('roles')">
+
+                        <el-menu-item v-if="availableMenus?.children?.find(p => p.privilegeName === 'Permission management menu')?.children?.some(p => p.privilegeName === 'Role list menu')"
+                                      index="roles"
+                                      @click="changeDefaultActiveMenuItem('roles')"
+                        >
                             <template #default>
                                 <el-icon>
                                     <View/>
@@ -106,14 +137,19 @@ if (['users', 'roles', 'permissions'].includes(currentPath)) {
                                 <span>Role List</span>
                             </template>
                         </el-menu-item>
-                        <el-menu-item index="permissions" @click="changeDefaultActiveMenuItem('permissions')">
+
+                        <el-menu-item v-if="availableMenus?.children?.find(p => p.privilegeName === 'Permission management menu')?.children?.some(p => p.privilegeName === 'Privilege list menu')"
+                                      index="privileges"
+                                      @click="changeDefaultActiveMenuItem('privileges')"
+                        >
                             <template #default>
                                 <el-icon>
                                     <Unlock/>
                                 </el-icon>
-                                <span>Permission List</span>
+                                <span>Privilege List</span>
                             </template>
                         </el-menu-item>
+
                     </el-sub-menu>
                 </el-menu>
             </el-aside>
