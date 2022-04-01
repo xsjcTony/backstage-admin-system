@@ -1,4 +1,7 @@
 /* eslint '@typescript-eslint/explicit-function-return-type': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-member-access': 'off' */
 
 import {
   AutoIncrement,
@@ -9,15 +12,22 @@ import {
   Table,
   AllowNull,
   Unique,
-  CreatedAt, UpdatedAt, Is, IsEmail
+  CreatedAt,
+  UpdatedAt,
+  Is,
+  IsEmail,
+  HasMany,
+  Default, BelongsToMany
 } from 'sequelize-typescript'
+import { Oauth } from './Oauth'
+import { Role } from './Role'
+import { UserRole } from './UserRole'
 
 
-const { INTEGER, STRING } = DataType
+const { INTEGER, STRING, BOOLEAN } = DataType
 
 @Table({
-  modelName: 'User',
-  tableName: 'users'
+  modelName: 'User'
 })
 export class User extends Model<User> {
 
@@ -41,13 +51,37 @@ export class User extends Model<User> {
   @AllowNull(false)
   @Unique(false)
   @Column(STRING)
-  public password!: string
+  public password?: string
+
+  @AllowNull(false)
+  @Unique(false)
+  @Default(false)
+  @Column(BOOLEAN)
+  public github!: boolean
+
+  @AllowNull(false)
+  @Unique(false)
+  @Default(true)
+  @Column(BOOLEAN)
+  public userState!: boolean
+
+  @AllowNull(true)
+  @Unique(false)
+  @Default('/public/assets/images/avatars/avatar.jpg')
+  @Column(STRING)
+  public avatarUrl!: string
+
+  @HasMany(() => Oauth)
+  public oauths!: Oauth[]
+
+  @BelongsToMany(() => Role, () => UserRole)
+  public roles!: (Role & { UserRole: UserRole })[]
 
   @CreatedAt
-  public createdAt!: Date
+  public createdAt?: Date
 
   @UpdatedAt
-  public updatedAt!: Date
+  public updatedAt?: Date
 }
 
 export default () => User

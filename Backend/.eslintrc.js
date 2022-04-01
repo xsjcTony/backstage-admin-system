@@ -88,7 +88,6 @@ module.exports = {
     'no-useless-escape': 'error',
     'no-new-func': 'error',
     'wrap-iife': ['error', 'outside'],
-    'no-loop-func': 'error',
     'prefer-spread': 'error',
     'prefer-arrow-callback': [
       'error',
@@ -115,13 +114,25 @@ module.exports = {
     // eslint-plugin-import
     'import/first': 'error',
     'import/no-webpack-loader-syntax': 'error',
-    'import/newline-after-import': ['error', { count: 1 }],
+    'import/newline-after-import': ['error', { count: 2 }],
     'import/extensions': [
       'error',
       'ignorePackages',
       {
         ts: 'never',
         tsx: 'never'
+      }
+    ],
+    'import/order': [
+      'error',
+      {
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+        'newlines-between': 'ignore',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true
+        },
+        warnOnUnassignedImports: false
       }
     ],
 
@@ -166,7 +177,7 @@ module.exports = {
       'error',
       {
         assertionStyle: 'as',
-        objectLiteralTypeAssertions: 'allow-as-parameter'
+        objectLiteralTypeAssertions: 'allow'
       }
     ],
     '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
@@ -206,7 +217,7 @@ module.exports = {
           requireLast: true
         },
         singleline: {
-          delimiter: 'semi',
+          delimiter: 'comma',
           requireLast: false
         },
         multilineDetection: 'brackets'
@@ -219,7 +230,7 @@ module.exports = {
       'error',
       {
         ignoreArrowShorthand: false,
-        ignoreVoidOperator: false
+        ignoreVoidOperator: true
       }
     ],
     '@typescript-eslint/no-dupe-class-members': 'error',
@@ -235,7 +246,6 @@ module.exports = {
     ],
     '@typescript-eslint/no-extra-non-null-assertion': 'error',
     '@typescript-eslint/no-extra-parens': 'error',
-    // '@typescript-eslint/no-extra-semi': 'error'
     '@typescript-eslint/no-extraneous-class': 'error',
     '@typescript-eslint/no-floating-promises': [
       'error',
@@ -261,8 +271,8 @@ module.exports = {
         allowAsThisParameter: false
       }
     ],
+    '@typescript-eslint/no-loop-func': 'error',
     '@typescript-eslint/no-loss-of-precision': 'error',
-    '@typescript-eslint/no-meaningless-void-operator': ['error', { checkNever: false }],
     '@typescript-eslint/no-misused-new': 'error',
     '@typescript-eslint/no-misused-promises': [
       'error',
@@ -337,7 +347,10 @@ module.exports = {
       {
         functions: true,
         classes: true,
-        variables: true
+        variables: true,
+        enums: true,
+        typedefs: true,
+        ignoreTypeReferences: true
       }
     ],
     '@typescript-eslint/no-useless-constructor': 'error',

@@ -2,6 +2,7 @@
 
 import { QueryInterface, DataTypes } from 'sequelize'
 
+
 module.exports = {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const { INTEGER, STRING, DATE } = DataTypes
