@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { Message, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import 'element-plus/es/components/message/style/css'
-import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { registerUser, sendVerificationEmail } from '../../api'
-import { RegisterType, FormInstance, ResponseData } from '../../types'
+import { RegisterType } from '../../types'
+import type { FormInstance } from '../../types'
+import type { AxiosError } from 'axios'
 
 
 const router = useRouter()
@@ -16,7 +16,7 @@ const router = useRouter()
  */
 const emailRegisterRef = $ref<FormInstance | null>(null)
 
-const emailRegisterData = reactive({
+const emailRegisterData = $ref({
   email: '',
   password: '',
   confirmPassword: '',
@@ -44,7 +44,7 @@ const validatePassword = (rule: any, value: string, callback: any): void => {
   } else {
     if (emailRegisterData.confirmPassword !== '') {
       if (!emailRegisterRef) return
-      emailRegisterRef.validateField('confirmPassword', () => null)
+      void emailRegisterRef.validateField('confirmPassword', () => null)
     }
     callback()
   }
@@ -76,12 +76,12 @@ const validateAgreement = (rule: any, value: boolean, callback: any): void => {
   }
 }
 
-const emailRegisterRules = reactive({
+const emailRegisterRules = $ref({
   email: { validator: validateEmail },
   password: { validator: validatePassword },
   confirmPassword: { validator: validateConfirmPassword },
   captcha: { validator: validateCaptcha },
-  agreement: { validator: validateAgreement, trigger: 'blur' }
+  agreement: { validator: validateAgreement }
 })
 
 const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
@@ -90,23 +90,13 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const data: ResponseData = await registerUser(emailRegisterData) as ResponseData
-
-        if (data.code === 200) {
-          // Succeed
-          await router.push('/login')
-        } else {
-          // Fail
-          ElMessage.error({
-            message: typeof data.msg === 'string' ? data.msg : 'Error',
-            center: true,
-            showClose: true,
-            duration: 3000
-          })
-        }
+        // Succeed
+        await registerUser(emailRegisterData)
+        await router.push('/login')
       } catch (err) {
+        // Error
         ElMessage.error({
-          message: err instanceof Error ? err.message : 'Error',
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
           center: true,
           showClose: true,
           duration: 3000
@@ -156,48 +146,37 @@ const sendVerificationCode = async (): Promise<void> => {
   }
 
   try {
-    const data: ResponseData = await sendVerificationEmail({ email }) as ResponseData
+    await sendVerificationEmail({ email })
 
-    if (data.code === 200) {
-      ElMessage.success({
-        message: 'Verification email has been sent',
-        center: true,
-        showClose: true,
-        duration: 3000
-      })
+    ElMessage.success({
+      message: 'Verification email has been sent',
+      center: true,
+      showClose: true,
+      duration: 3000
+    })
 
-      // disable send button for 60 seconds
-      loading = false
-      disableSendButton = true
-      let count = 60
+    // disable send button for 60 seconds
+    loading = false
+    disableSendButton = true
+    let count = 60
+    sendButtonText = `Resend in ${ count }s`
+    const disableTimer = setInterval(() => {
+      count--
+
+      if (count === 0) {
+        disableSendButton = false
+        sendButtonText = 'Resend Verification Code'
+        clearInterval(disableTimer)
+        return
+      }
+
       sendButtonText = `Resend in ${ count }s`
-      const disableTimer = setInterval(() => {
-        count--
+    }, 1000)
 
-        if (count === 0) {
-          disableSendButton = false
-          sendButtonText = 'Resend Verification Code'
-          clearInterval(disableTimer)
-          return
-        }
-
-        sendButtonText = `Resend in ${ count }s`
-      }, 1000)
-
-    } else {
-      ElMessage.error({
-        message: 'Failed to sent verification email',
-        center: true,
-        showClose: true,
-        duration: 3000
-      })
-
-      disableSendButton = false
-      sendButtonText = 'Resend Verification Code'
-    }
   } catch (err) {
+    // Error
     ElMessage.error({
-      message: err instanceof Error ? err.message : 'Error',
+      message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
       center: true,
       showClose: true,
       duration: 3000
@@ -217,7 +196,7 @@ const sendVerificationCode = async (): Promise<void> => {
              @submit.prevent
     >
         <el-form-item class="email" prop="email" required>
-            <el-input v-model.number="emailRegisterData.email"
+            <el-input v-model="emailRegisterData.email"
                       :prefix-icon="Message"
                       clearable
                       placeholder="E-mail"

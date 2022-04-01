@@ -20,10 +20,14 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
     credentials: true
   }
 
-  // add your special config in here
-  const bizConfig = {
-    sourceUrl: `https://github.com/eggjs/examples/tree/master/${ appInfo.name }`
+  // file
+  config.multipart = {
+    mode: 'file',
+    fileExtensions: ['.xlsx']
   }
+
+  // add your special config in here
+  const bizConfig = {}
 
   // the return config will combines to EggAppConfig
   return {

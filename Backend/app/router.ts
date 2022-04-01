@@ -1,32 +1,53 @@
 /* eslint '@typescript-eslint/unbound-method': 'off' */
 /* eslint '@typescript-eslint/no-unsafe-assignment': 'off' */
+/* eslint '@typescript-eslint/no-unsafe-argument': 'off' */
 
 import { Application } from 'egg'
 
 
-export default (app: Application): void => {
-  const { controller, router } = app
-  const authenticator = app.middleware.authenticator(null, app)
+export default async (app: Application): Promise<void> => {
 
-  /**
-   * Utils
-   */
-  router.get('/', controller.home.index)
-  router.get('/captcha', controller.util.generateCaptcha)
-  router.get('/verify_email', controller.util.sendVerificationEmail)
+  const authenticator = app.middleware.authenticator(null, app);
 
 
   /**
-   * User
+   * Captcha
    */
-  router.post('/register', controller.user.create)
-  router.post('/login', controller.user.login)
-  router.get('/is_logged_in', controller.user.isLoggedIn)
+  (await import('./router/captcha')).default(app);
 
 
   /**
-   * Oauth - GitHub
+   * Account
    */
-  router.get('/github', controller.github.getLoginView)
-  router.get('/github/callback', controller.github.getAccessToken)
+  (await import('./router/account')).default(app);
+
+
+  /**
+   * Users - REST API
+   */
+  (await import('./router/users')).default(app, authenticator);
+
+
+  /**
+   * Roles - REST API
+   */
+  (await import('./router/roles')).default(app, authenticator);
+
+
+  /**
+   * User_Role - REST API
+   */
+  (await import('./router/userRole')).default(app, authenticator);
+
+
+  /**
+   * Privileges - REST API
+   */
+  (await import('./router/privileges')).default(app, authenticator);
+
+
+  /**
+   * Role_Privilege - REST API
+   */
+  (await import('./router/rolePrivilege')).default(app, authenticator)
 }

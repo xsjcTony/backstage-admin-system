@@ -1,7 +1,9 @@
 import { Service } from 'egg'
-import { WhereOptions } from 'sequelize'
-import { User } from '../model/User'
+import { Role } from '../model/Role'
+import type { User } from '../model/User'
 import type { LoginData, RegisterData } from '../types'
+import type { WhereOptions } from 'sequelize'
+import { Privilege } from '../model/Privilege'
 
 
 export default class UserService extends Service {
@@ -60,7 +62,12 @@ export default class UserService extends Service {
    * @private
    */
   private async _findUser(options: WhereOptions): Promise<User | null> {
-    return this.ctx.model.User.findOne({ where: options })
+    return this.ctx.model.User.findOne({
+      where: options,
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
+      }
+    })
   }
 
 
@@ -68,11 +75,11 @@ export default class UserService extends Service {
    * Create user in database by USERNAME.
    * @param {string} username
    * @param {string} password
-   * @param {number} [github = 0]
+   * @param {boolean} [github = false]
    * @return {Promise<User>}
    * @private
    */
-  private async _createUserByUsername(username: string, password: string, github = 0): Promise<User> {
+  private async _createUserByUsername(username: string, password: string, github = false): Promise<User> {
     const user = await this._findUser({ username })
     if (user) {
       throw new Error('Username already exists.')
@@ -84,11 +91,26 @@ export default class UserService extends Service {
       github
     })
 
-    const res = data.toJSON() as User
-    delete res.password
-    delete res.email
+    const res = await this.ctx.model.User.findByPk(data.id, {
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
+      },
+      include: [{
+        model: Role,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
+    })
 
-    return res
+    if (res) {
+      return res
+    } else {
+      throw new Error()
+    }
   }
 
 
@@ -110,11 +132,26 @@ export default class UserService extends Service {
       password
     })
 
-    const res = data.toJSON() as User
-    delete res.password
-    delete res.username
+    const res = await this.ctx.model.User.findByPk(data.id, {
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
+      },
+      include: [{
+        model: Role,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        through: {
+          attributes: []
+        }
+      }]
+    })
 
-    return res
+    if (res) {
+      return res
+    } else {
+      throw new Error()
+    }
   }
 
 
@@ -128,15 +165,11 @@ export default class UserService extends Service {
   private async _loginUserByUsername(username: string, password: string): Promise<User> {
     const user = await this._findUser({ username, password })
 
-    if (!user) {
+    if (!user || !user.userState) {
       throw new Error('Incorrect login credential')
     }
 
-    const res = user.toJSON() as User
-    delete res.password
-    delete res.email
-
-    return res
+    return user
   }
 
 
@@ -150,14 +183,10 @@ export default class UserService extends Service {
   private async _loginUserByEmail(email: string, password: string): Promise<User> {
     const user = await this._findUser({ email, password })
 
-    if (!user) {
+    if (!user || !user.userState) {
       throw new Error('Incorrect login credential')
     }
 
-    const res = user.toJSON() as User
-    delete res.password
-    delete res.username
-
-    return res
+    return user
   }
 }

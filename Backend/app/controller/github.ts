@@ -73,12 +73,19 @@ export default class GithubController extends Controller {
     const { ctx } = this
 
     try {
-      const user = await ctx.service.oauth.getOAuth(data)
+      const oauth = await ctx.service.oauth.getOAuth(data)
+
+      const user = oauth.user
+
+      if (!user.userState) {
+        await ctx.service.oauth.deleteOAuth(oauth.id)
+        throw new Error('Account is closed, create a new account')
+      }
 
       /**
        * User already exists -> login straight away
        */
-      const token = jwt.sign(user.user, this.config.keys, { expiresIn: '7d' })
+      const token = jwt.sign(user.toJSON(), this.config.keys, { expiresIn: '7d' })
 
       ctx.cookies.set('token', token, {
         path: '/',
@@ -94,11 +101,13 @@ export default class GithubController extends Controller {
        * 1. Create a user
        */
       const userInfo = {
-        username: uuidV4().replace(/-/g, '').substring(0, 20),
+        username: uuidV4()
+          .replace(/-/g, '')
+          .substring(0, 20),
         password: 'com.123456',
         captcha: '',
         registerType: RegisterType.Normal,
-        github: 1
+        github: true
       }
 
       const user = await ctx.service.user.createUser(userInfo)
@@ -108,11 +117,10 @@ export default class GithubController extends Controller {
        */
       await ctx.service.oauth.createOAuth(accessToken, data.provider, data.id, user.id)
 
-
       /**
        * 3. Login (redirect to '/admin')
        */
-      const token = jwt.sign(user, this.config.keys, { expiresIn: '7d' })
+      const token = jwt.sign(user.toJSON(), this.config.keys, { expiresIn: '7d' })
 
       ctx.cookies.set('token', token, {
         path: '/',

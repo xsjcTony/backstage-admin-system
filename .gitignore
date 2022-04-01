@@ -14,6 +14,8 @@ Backend/app/**/*.map
 Backend/test/**/*.map
 Backend/config/**/*.map
 
+Backend/app/public/assets/**/*
+
 KOA2-TS/node_modules/
 KOA2-TS/.idea/
 

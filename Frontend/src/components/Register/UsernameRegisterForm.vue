@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { User, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import 'element-plus/es/components/message/style/css'
-import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
 import { registerUser } from '../../api'
-import { RegisterType, FormInstance, ResponseData } from '../../types'
+import { RegisterType } from '../../types'
+import type { FormInstance } from '../../types'
+import type { AxiosError } from 'axios'
 
 
 const router = useRouter()
@@ -16,7 +16,7 @@ const router = useRouter()
  */
 const usernameRegisterRef = $ref<FormInstance | null>(null)
 
-const usernameRegisterData = reactive({
+const usernameRegisterData = $ref({
   username: '',
   password: '',
   confirmPassword: '',
@@ -44,7 +44,7 @@ const validatePassword = (rule: any, value: string, callback: any): void => {
   } else {
     if (usernameRegisterData.confirmPassword !== '') {
       if (!usernameRegisterRef) return
-      usernameRegisterRef.validateField('confirmPassword', () => null)
+      void usernameRegisterRef.validateField('confirmPassword', () => null)
     }
     callback()
   }
@@ -76,12 +76,12 @@ const validateAgreement = (rule: any, value: boolean, callback: any): void => {
   }
 }
 
-const usernameRegisterRules = reactive({
+const usernameRegisterRules = $ref({
   username: { validator: validateUsername },
   password: { validator: validatePassword },
   confirmPassword: { validator: validateConfirmPassword },
   captcha: { validator: validateCaptcha },
-  agreement: { validator: validateAgreement, trigger: 'blur' }
+  agreement: { validator: validateAgreement }
 })
 
 const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
@@ -90,24 +90,13 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const data: ResponseData = await registerUser(usernameRegisterData) as ResponseData
-
-        if (data.code === 200) {
-          // Succeed
-          await router.push('/login')
-        } else {
-          // Fail
-          ElMessage.error({
-            message: typeof data.msg === 'string' ? data.msg : 'Error',
-            center: true,
-            showClose: true,
-            duration: 3000
-          })
-          refreshCaptcha()
-        }
+        // Succeed
+        await registerUser(usernameRegisterData)
+        await router.push('/login')
       } catch (err) {
+        // Error
         ElMessage.error({
-          message: err instanceof Error ? err.message : 'Error',
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
           center: true,
           showClose: true,
           duration: 3000
@@ -152,7 +141,7 @@ const refreshCaptcha = (): void => {
              @submit.prevent
     >
         <el-form-item class="username" prop="username" required>
-            <el-input v-model.number="usernameRegisterData.username"
+            <el-input v-model="usernameRegisterData.username"
                       :prefix-icon="User"
                       autofocus
                       clearable

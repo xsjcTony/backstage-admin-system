@@ -177,7 +177,7 @@ module.exports = {
       'error',
       {
         assertionStyle: 'as',
-        objectLiteralTypeAssertions: 'allow-as-parameter'
+        objectLiteralTypeAssertions: 'allow'
       }
     ],
     '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
@@ -217,7 +217,7 @@ module.exports = {
           requireLast: true
         },
         singleline: {
-          delimiter: 'semi',
+          delimiter: 'comma',
           requireLast: false
         },
         multilineDetection: 'brackets'

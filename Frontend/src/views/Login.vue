@@ -2,18 +2,20 @@
 import { User, Lock, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
-import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { $ref } from 'vue/macros'
-import { loginUser } from '../api'
+import { getUserById, loginUser } from '../api'
 import { useStore } from '../stores'
-import { FormInstance, LoginData, JWTResponseData } from '../types'
+import { buildPrivilegeTree } from '../utils'
+import type { FormInstance, LoginData, JwtUserResponseData, Privilege, User as UserData } from '../types'
+import type { AxiosError } from 'axios'
 
 
 /**
  * Global Constants
  */
 const router = useRouter()
+const mainStore = useStore()
 
 
 /**
@@ -21,7 +23,7 @@ const router = useRouter()
  */
 const loginRef = $ref<FormInstance | null>(null)
 
-const loginData: LoginData = reactive({
+const loginData: LoginData = $ref({
   username: '',
   password: '',
   captcha: ''
@@ -52,7 +54,7 @@ const validateCaptcha = (rule: any, value: string, callback: any): void => {
   }
 }
 
-const usernameRegisterRules = reactive({
+const usernameRegisterRules = $ref({
   username: { validator: validateUsername },
   password: { validator: validatePassword },
   captcha: { validator: validateCaptcha }
@@ -64,27 +66,33 @@ const submitForm = async (formEl: FormInstance | undefined): Promise<void> => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        // login
-        const data: JWTResponseData = await loginUser(loginData) as JWTResponseData
+        // Succeed
+        const data: JwtUserResponseData = await loginUser(loginData)
+        localStorage.setItem('token', data.data.token) // JWT Token
 
-        if (data.code === 200) {
-          // Succeed
-          sessionStorage.setItem('token', data.data.token) // JWT Token
-          useStore().loggedIn = true // Pinia
-          await router.push('/admin')
-        } else {
-          // Fail
-          ElMessage.error({
-            message: typeof data.msg === 'string' ? data.msg : 'Error',
-            center: true,
-            showClose: true,
-            duration: 3000
-          })
-          refreshCaptcha()
+        // Create privilege tree
+        const id = data.data.id
+        const user: UserData = (await getUserById(id)).data.data
+
+        const privileges: Privilege[] = []
+        const addedPrivilegeIds: number[] = []
+        for (const role of user.roles) {
+          for (const privilege of role.privileges) {
+            if (!addedPrivilegeIds.includes(privilege.id)) {
+              addedPrivilegeIds.push(privilege.id)
+              privileges.push(privilege)
+            }
+          }
         }
+        user.privilegeTree = buildPrivilegeTree(privileges)
+
+        mainStore.loggedIn = true // Pinia
+        mainStore.currentUser = user
+        await router.push('/admin')
       } catch (err) {
+        // Error
         ElMessage.error({
-          message: err instanceof Error ? err.message : 'Error',
+          message: (err as AxiosError).response?.data.msg || (err instanceof Error ? err.message : (err as any).message || 'Error'),
           center: true,
           showClose: true,
           duration: 3000
@@ -164,7 +172,7 @@ const refreshCaptcha = (): void => {
                     <img ref="captcha"
                          alt
                          class="captcha-image"
-                         src="http://127.0.0.1:7001/captcha"
+                         :src="`http://127.0.0.1:7001/captcha?t=${ new Date().getTime() }`"
                          @click="refreshCaptcha"
                     >
                 </div>
