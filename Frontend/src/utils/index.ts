@@ -1,7 +1,14 @@
 /* eslint '@typescript-eslint/prefer-reduce-type-parameter': 'off' */
 /* eslint '@typescript-eslint/no-unnecessary-condition': 'off' */
 
-import type { User, ExcelUserData, Privilege, GroupedPrivilegeSet, GroupedPrivilege, PrivilegeNode } from '../types'
+import type {
+  ExcelUserData,
+  Privilege,
+  GroupedPrivilegeSet,
+  GroupedPrivilege,
+  PrivilegeNode,
+  ExportUser
+} from '../types'
 import type { RouteRecordRaw } from 'vue-router'
 
 
@@ -61,16 +68,16 @@ export const downloadFile = (blob: BlobPart, mime = '', filename = ''): void => 
  * @param {User} user
  * @return {ExcelUserData[]}
  */
-export const userToExcel = (user: User): ExcelUserData[] => {
+export const userToExcel = (user: ExportUser): ExcelUserData[] => {
   const res: ExcelUserData[] = []
 
   for (const key in user) {
-    const data = user[key as keyof User]
+    const data = user[key as keyof ExportUser]
 
     if (typeof data === 'boolean') {
       res.push(data ? 1 : 0)
     } else {
-      res.push(data)
+      res.push(data as ExcelUserData)
     }
   }
 

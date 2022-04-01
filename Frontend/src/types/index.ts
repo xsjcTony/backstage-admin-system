@@ -128,6 +128,16 @@ export interface UserQueryData {
   pageSize?: number
 }
 
+export interface ExportUser {
+  id: number
+  username: string | null
+  email: string | null
+  github: boolean
+  userState: boolean
+  avatarUrl: string
+  roles?: Role[]
+}
+
 export type ExcelUserData = number | string | null
 
 export interface AssignRolesData {

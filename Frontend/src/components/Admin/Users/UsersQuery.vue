@@ -15,7 +15,8 @@ import type {
   ImportUsersResponseData,
   UserQueryData,
   User as UserData,
-  ExcelUserData
+  ExcelUserData,
+  ExportUser
 } from '../../../types'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { UploadFile, UploadRawFile } from 'element-plus'
@@ -90,7 +91,7 @@ const exportQueryResult = async (): Promise<void> => {
       type: queryData.type,
       keyword: queryData.keyword
     })
-    const users: UserData[] = response.data.data.rows
+    const users: ExportUser[] = response.data.data.rows
 
     if (users.length === 0) {
       ElMessage.error({
@@ -102,6 +103,8 @@ const exportQueryResult = async (): Promise<void> => {
 
       return
     }
+
+    users.forEach(user => void delete user.roles)
 
     const keys = Object.keys(users[0])
     const data: (ExcelUserData[] | string[])[] = [keys]
